@@ -5,41 +5,147 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Royal Birmingham Conservatoire — Multi-Venue Quote Calculator</title>
   <style>
-    :root{
-      --brand:#002e5b;
-      --muted:#6b6b6b;
-      --bg:#fafafa;
-      --card:#ffffff;
+    :root {
+      --brand: #002e5b;
+      --accent: #004b8d;
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --muted: #6b6b6b;
     }
-    body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#222;margin:0;padding:20px;display:flex;justify-content:center;}
-    .wrapper{max-width:1000px;width:100%;}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
-    h1{font-size:20px;margin:0;color:var(--brand);}
-    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(8,24,40,0.06);margin-bottom:14px;}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    label{display:block;font-size:13px;margin-bottom:6px;}
-    select,input[type=number],input[type=text]{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;}
-    .full{grid-column:1/-1;}
-    fieldset{border:1px solid #eee;padding:10px;border-radius:8px;margin:0;}
-    .row{display:flex;gap:8px;align-items:center;}
-    .qty{width:86px;}
-    .checkbox-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #fafafa;}
-    table{width:100%;border-collapse:collapse;margin-top:10px;}
-    th, td{border:1px solid #ddd;padding:8px;text-align:center;}
-    th{background:var(--brand);color:white;}
-    #grandTotal{font-weight:700;font-size:18px;color:var(--brand);text-align:right;margin-top:10px;}
-    button{background:var(--brand);color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;}
-    .muted{color:var(--muted);font-size:13px;}
-    @media (max-width:700px){.grid{grid-template-columns:1fr;}header{flex-direction:column;align-items:flex-start;}}
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: #222;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .wrapper {
+      max-width: 1000px;
+      width: 100%;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 22px;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 46, 91, 0.1);
+      margin-bottom: 16px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--brand);
+    }
+    select, input[type=number], input[type=time], input[type=text] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 0;
+    }
+    legend {
+      font-weight: 600;
+      color: var(--brand);
+      padding: 0 8px;
+    }
+    .checkbox-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .qty {
+      width: 80px;
+    }
+    button {
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s ease-in-out;
+    }
+    button:hover {
+      background: var(--accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: var(--brand);
+      color: white;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f3f7fb;
+    }
+    #afterHoursRow {
+      margin-top: 10px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    #grandTotal {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--brand);
+      text-align: right;
+      margin-top: 10px;
+    }
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: 1fr; }
+      header { text-align: center; }
+    }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <header>
-      <div>
-        <h1>Royal Birmingham Conservatoire — Multi-Venue Quote</h1>
-        <div class="muted">Add multiple venues to generate a combined quote. All prices + VAT.</div>
-      </div>
+      <h1>Royal Birmingham Conservatoire — Multi-Venue Quote</h1>
+      <div class="muted">Add multiple venues to generate a combined quote. All prices + VAT.</div>
     </header>
 
     <div class="card">
@@ -53,8 +159,8 @@
             <option value="Lab">The Lab</option>
             <option value="Jazz">Eastside Jazz Club</option>
             <option value="Organ">Organ Studio</option>
-            <option value="WorkshopLarge">Workshop Space Large (Workshop 1 - capacity 60 / Workshop 2 - capacity 60 / Workshop 3 - capacity 50)</option>
-            <option value="WorkshopSmall">Workshop Space Small (Workshop 4 - capacity 40 / Workshop 5 - capacity 30 / Workshop 6 - capacity 20)</option>
+            <option value="WorkshopLarge">Workshop Space Large (workshop 1 - capacity 60/workshop 2 - capacity 60/workshop 3 - capacity 50)</option>
+            <option value="WorkshopSmall">Workshop Space Small (workshop 4 - capacity 40/workshop 5 - capacity 30/workshop 6 - capacity 20)</option>
             <option value="DLHub">Distance Learning Hub</option>
             <option value="PracticeGrand2">Practice Room (2 grands)</option>
             <option value="PracticeGrand">Practice Room (grand)</option>
@@ -70,15 +176,14 @@
           </select>
         </div>
         <div>
-          <label for="hours">Number of hours (min 4 for main venues)</label>
+          <label for="hours">Number of hours</label>
           <input id="hours" type="number" min="0" step="0.5" value="4" />
-          <div class="muted">Main performance venues require a minimum of 4 hours hire.</div>
+          <div class="muted">Minimum 4 hours for main venues (Bradshaw, Recital, Jazz, Organ, Lab).</div>
         </div>
 
         <div class="full">
           <fieldset>
             <legend><strong>Technical / Equipment</strong></legend>
-            <div class="muted" style="margin-bottom:6px;">Quantity</div>
             <div class="checkbox-row"><div>PA (per day)</div><div><input id="pa_qty" class="qty" type="number" min="0" value="0" /></div></div>
             <div class="checkbox-row"><div>Projector (per day)</div><div><input id="projector_qty" class="qty" type="number" min="0" value="0" /></div></div>
             <div class="checkbox-row"><div>Microphone (wired)</div><div><input id="mic_wired_qty" class="qty" type="number" min="0" value="0" /></div></div>
@@ -87,18 +192,41 @@
             <div class="checkbox-row"><div>Overhead audio recording</div><div><input id="overhead_qty" class="qty" type="number" min="0" value="0" /></div></div>
             <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
             <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
+            <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          </fieldset>
+          <div class="muted" style="margin-top:6px;">Other instrument hire is available upon request, subject to availability.</div>
+        </div>
+
+        <div class="full">
+          <fieldset>
+            <legend><strong>After-hours Surcharge</strong></legend>
+            <div class="muted">Select days and end time to calculate after-hours surcharge (£20/hr + VAT).</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
+              <label><input type="checkbox" class="day" value="Mon"> Mon</label>
+              <label><input type="checkbox" class="day" value="Tue"> Tue</label>
+              <label><input type="checkbox" class="day" value="Wed"> Wed</label>
+              <label><input type="checkbox" class="day" value="Thu"> Thu</label>
+              <label><input type="checkbox" class="day" value="Fri"> Fri</label>
+              <label><input type="checkbox" class="day" value="Sat"> Sat</label>
+              <label><input type="checkbox" class="day" value="Sun"> Sun</label>
+            </div>
+            <div style="margin-top:8px;">
+              <label for="endTime">Event end time</label>
+              <input id="endTime" type="time" value="23:00" />
+            </div>
           </fieldset>
         </div>
 
         <div class="full" style="margin-top:10px;">
-          <button id="addBtn">Add to Quote</button>
+          <button id="addBtn">Add to Order</button>
           <button id="emailBtn">Email Quote</button>
+          <button id="downloadBtn">Download HTML</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h3 style="margin-top:0">Quote Summary</h3>
+      <h3 style="margin-top:0;color:var(--brand);">Order Summary</h3>
       <table id="orderTable">
         <thead>
           <tr>
@@ -107,115 +235,14 @@
         </thead>
         <tbody></tbody>
       </table>
+      <div id="afterHoursRow" style="display:none;">After-hours surcharge: £0.00</div>
       <div id="grandTotal">Grand Total: £0.00</div>
       <div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
+      <div class="muted">For bookings that run past our regular opening hours, a surcharge of £20 per-hour +VAT applies. Please see our Technical Specification and Hire Charges document for more information.</div>
       <div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
     </div>
 
+    <footer>© Royal Birmingham Conservatoire — Venue Hire Quote Calculator</footer>
   </div>
-
-  <script>
-    const rates = {
-      Bradshaw: { standard: 250, premium: 125 },
-      Recital: { standard: 200, premium: 100 },
-      Lab: { standard: 175, premium: 87.5 },
-      Jazz: { standard: 175, premium: 87.5 },
-      Organ: { standard: 150, premium: 75 },
-      WorkshopLarge: { standard: 60, premium: 60 },
-      WorkshopSmall: { standard: 50, premium: 50 },
-      DLHub: { standard: 35, premium: 35 },
-      PracticeGrand2: { standard: 40, premium: 40 },
-      PracticeGrand: { standard: 30, premium: 30 },
-      PracticeUpright: { standard: 25, premium: 25 },
-      Dressing: { standard: 25, premium: 25 }
-    };
-
-    const mainVenues = ['Bradshaw','Recital','Jazz','Organ','Lab'];
-    let order = [];
-
-    function formatGBP(n){return '£' + n.toFixed(2);}
-
-    function calculateCosts(baseRate, hours, equip={}){
-      const base = baseRate * hours;
-      const addons = (equip.pa||0)*100 + (equip.projector||0)*250 + (equip.micWired||0)*20 +
-                     (equip.micWireless||0)*40 + (equip.monitor||0)*15 + (equip.overhead||0)*100 +
-                     (equip.video||0)*250 + (equip.laptop||0)*50;
-      const subtotal = base + addons;
-      const vat = subtotal*0.2;
-      const total = subtotal + vat;
-      return {base, addons, subtotal, vat, total};
-    }
-
-    function updateTable(){
-      const tbody = document.querySelector('#orderTable tbody');
-      tbody.innerHTML = '';
-      let grand = 0;
-      order.forEach((item,index)=>{
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${item.venue}</td><td>${item.hireType}</td><td>${item.hours}</td>
-        <td>${formatGBP(item.costs.base)}</td><td>${formatGBP(item.costs.addons)}</td>
-        <td>${formatGBP(item.costs.subtotal)}</td><td>${formatGBP(item.costs.vat)}</td>
-        <td>${formatGBP(item.costs.total)}</td>
-        <td><button onclick="removeItem(${index})">Remove</button></td>`;
-        tbody.appendChild(row);
-        grand += item.costs.total;
-      });
-      document.getElementById('grandTotal').textContent = 'Grand Total: ' + formatGBP(grand);
-    }
-
-    function removeItem(i){
-      order.splice(i,1);
-      updateTable();
-    }
-
-    document.getElementById('addBtn').addEventListener('click',()=>{
-      const venue = document.getElementById('venue').value;
-      if(!venue){alert('Please select a venue'); return;}
-      const hireType = document.getElementById('hireType').value;
-      let hours = parseFloat(document.getElementById('hours').value) || 0;
-
-      if(mainVenues.includes(venue) && hours < 4) {
-        alert('Main performance venues require a minimum of 4 hours.');
-        hours = 4;
-        document.getElementById('hours').value = 4;
-      }
-
-      const equip = {
-        pa: parseInt(document.getElementById('pa_qty').value)||0,
-        projector: parseInt(document.getElementById('projector_qty').value)||0,
-        micWired: parseInt(document.getElementById('mic_wired_qty').value)||0,
-        micWireless: parseInt(document.getElementById('mic_wireless_qty').value)||0,
-        monitor: parseInt(document.getElementById('monitor_qty').value)||0,
-        overhead: parseInt(document.getElementById('overhead_qty').value)||0,
-        video: parseInt(document.getElementById('video_qty').value)||0,
-        laptop: parseInt(document.getElementById('laptop_qty').value)||0
-      };
-
-      const costs = calculateCosts(rates[venue][hireType], hours, equip);
-      order.push({venue, hireType, hours, equip, costs});
-      updateTable();
-    });
-
-    document.getElementById('emailBtn').addEventListener('click',()=>{
-      if(order.length===0){alert('Please add at least one venue to the quote'); return;}
-      let bodyText = order.map((item,i)=>{
-        return `Quote Item ${i+1}:
-Venue: ${item.venue}
-Hire Type: ${item.hireType}
-Hours: ${item.hours}
-Base: ${formatGBP(item.costs.base)}
-Equipment: ${formatGBP(item.costs.addons)}
-Subtotal: ${formatGBP(item.costs.subtotal)}
-VAT: ${formatGBP(item.costs.vat)}
-Total: ${formatGBP(item.costs.total)}`;
-      }).join('\n\n');
-      const grand = order.reduce((a,b)=>a+b.costs.total,0);
-      bodyText += `\n\nGrand Total: ${formatGBP(grand)}\n\nTechnician hours will be quoted separately based on the technical requirements of the event.`;
-      
-      const subject = 'Royal Birmingham Conservatoire - Event Quote';
-      const mailto = `mailto:conservatoireevents@bcu.ac.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
-      window.location.href = mailto;
-    });
-  </script>
 </body>
 </html>
