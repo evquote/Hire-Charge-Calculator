@@ -145,6 +145,7 @@ button{background:var(--brand);color:white;border:none;padding:10px 14px;border-
     </thead>
     <tbody></tbody>
   </table>
+  <div id="afterHoursRow" style="font-weight:600;color:var(--brand);margin-top:8px;"></div>
   <div id="grandTotal">Grand Total: £0.00</div>
   <div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
   <div class="muted" style="margin-top:6px;">
@@ -156,150 +157,154 @@ button{background:var(--brand);color:white;border:none;padding:10px 14px;border-
 </div>
 
 <script>
-const rates = {
-  Bradshaw:{standard:250,premium:125}, Recital:{standard:200,premium:100},
-  Lab:{standard:175,premium:87.5}, Jazz:{standard:175,premium:87.5}, Organ:{standard:150,premium:75},
-  WorkshopLarge:{standard:60,premium:60}, WorkshopSmall:{standard:50,premium:50}, DLHub:{standard:35,premium:35},
-  PracticeGrand2:{standard:40,premium:40}, PracticeGrand:{standard:30,premium:30}, PracticeUpright:{standard:25,premium:25},
-  Dressing:{standard:25,premium:25}
-};
-const mainVenues=['Bradshaw','Recital','Jazz','Organ','Lab'];
-let order=[];
-const PIANO_RATE=100;
-
-function formatGBP(n){return '£'+n.toFixed(2);}
-
-function populateTimeDropdowns(){
-  const startSelect=document.getElementById('startTime');
-  const endSelect=document.getElementById('endTime');
-  for(let h=0;h<24;h++){
-    for(let m=0;m<60;m+=30){
-      const val=('0'+h).slice(-2)+':'+('0'+m).slice(-2);
-      [startSelect,endSelect].forEach(select=>{
-        const opt=document.createElement('option'); opt.value=val; opt.textContent=val;
-        select.appendChild(opt);
-      });
-    }
-  }
-  startSelect.value='09:00';
-  endSelect.value='23:00';
-}
-populateTimeDropdowns();
-
-function calculateCosts(baseRate,hours,equip={}){
-  const base=baseRate*hours;
-  const addons=(equip.pa||0)*100+(equip.projector||0)*250+(equip.micWired||0)*20+
-               (equip.micWireless||0)*40+(equip.monitor||0)*15+(equip.overhead||0)*100+
-               (equip.video||0)*250+(equip.laptop||0)*50+(equip.piano||0)*PIANO_RATE;
-  const subtotal=base+addons;
-  const vat=subtotal*0.2;
-  const total=subtotal+vat;
-  return {base,addons,subtotal,vat,total};
-}
-
-function calculateAfterHours(){
-  const selectedDays=Array.from(document.querySelectorAll(".day:checked")).map(d=>d.value);
-  if(!selectedDays.length) return {surcharge:0,vat:0,total:0};
-  const startTime=document.getElementById('startTime').value;
-  const endTime=document.getElementById('endTime').value;
-  const [startH,startM]=startTime.split(':').map(Number);
-  const [endH,endM]=endTime.split(':').map(Number);
-  let surcharge=0;
-  selectedDays.forEach(day=>{
-    const opening=8;
-    const closing=(day==='Sat'||day==='Sun')?19:23;
-    const bookingStart=startH+(startM>0?0.5:0);
-    const bookingEnd=endH+(endM>0?0.5:0);
-    if(bookingStart<opening) surcharge+=Math.floor(opening-bookingStart)*20;
-    if(bookingEnd>closing) surcharge+=Math.floor(bookingEnd-closing)*20;
-  });
-  const vat=surcharge*0.2;
-  return {surcharge,vat,total:surcharge+vat};
-}
-
-function updateTable(){
-  const tbody=document.querySelector('#orderTable tbody');
-  tbody.innerHTML='';
-  let grand=0;
-  order.forEach((item,index)=>{
-    const row=document.createElement('tr');
-    row.innerHTML=`<td>${item.venue}</td><td>${item.hireType}</td><td>${item.hours}</td>
-    <td>${formatGBP(item.costs.base)}</td><td>${formatGBP(item.costs.addons)}</td>
-    <td>${formatGBP(item.costs.subtotal)}</td><td>${formatGBP(item.costs.vat)}</td>
-    <td>${formatGBP(item.costs.total)}</td>
-    <td><button onclick="removeItem(${index})">Remove</button></td>`;
-    tbody.appendChild(row);
-    grand+=item.costs.total;
-  });
-  const after=calculateAfterHours();
-  const afterRow=document.getElementById('afterHoursRow');
-  if(!afterRow){
-    const div=document.createElement('div');
-    div.id='afterHoursRow';
-    div.style.fontWeight='600';
-    div.style.color='var(--brand)';
-    div.style.marginTop='8px';
-    div.textContent=`After-hours surcharge: ${formatGBP(after.surcharge)} + VAT = ${formatGBP(after.total)}`;
-    tbody.parentNode.appendChild(div);
-  }else{
-    afterRow.textContent=`After-hours surcharge: ${formatGBP(after.surcharge)} + VAT = ${formatGBP(after.total)}`;
-  }
-  document.getElementById('grandTotal').textContent='Grand Total: '+formatGBP(grand+after.total);
-}
-
-function removeItem(i){order.splice(i,1);updateTable();}
-
-document.getElementById('addBtn').addEventListener('click',()=>{
-  const venue=document.getElementById('venue').value;
-  if(!venue){alert('Please select a venue');return;}
-  const hireType=document.getElementById('hireType').value;
-  let hours=parseFloat(document.getElementById('hours').value)||0;
-  if(mainVenues.includes(venue) && hours<4){alert('Main performance venues require a minimum of 4 hours.');hours=4;document.getElementById('hours').value=4;}
-  const equip={
-    pa:parseInt(document.getElementById('pa_qty').value)||0,
-    projector:parseInt(document.getElementById('projector_qty').value)||0,
-    micWired:parseInt(document.getElementById('mic_wired_qty').value)||0,
-    micWireless:parseInt(document.getElementById('mic_wireless_qty').value)||0,
-    monitor:parseInt(document.getElementById('monitor_qty').value)||0,
-    overhead:parseInt(document.getElementById('overhead_qty').value)||0,
-    video:parseInt(document.getElementById('video_qty').value)||0,
-    laptop:parseInt(document.getElementById('laptop_qty').value)||0,
-    piano:parseInt(document.getElementById('piano_qty').value)||0
+document.addEventListener('DOMContentLoaded', () => {
+  const rates = {
+    Bradshaw:{standard:250,premium:125}, Recital:{standard:200,premium:100},
+    Lab:{standard:175,premium:87.5}, Jazz:{standard:175,premium:87.5}, Organ:{standard:150,premium:75},
+    WorkshopLarge:{standard:60,premium:60}, WorkshopSmall:{standard:50,premium:50}, DLHub:{standard:35,premium:35},
+    PracticeGrand2:{standard:40,premium:40}, PracticeGrand:{standard:30,premium:30}, PracticeUpright:{standard:25,premium:25},
+    Dressing:{standard:25,premium:25}
   };
-  const costs=calculateCosts(rates[venue][hireType],hours,equip);
-  order.push({venue,hireType,hours,equip,costs});
-  updateTable();
-});
+  const mainVenues=['Bradshaw','Recital','Jazz','Organ','Lab'];
+  const PIANO_RATE=100;
+  let order=[];
 
-document.getElementById('emailBtn').addEventListener('click',()=>{
-  if(order.length===0){alert('Please add at least one venue to the quote');return;}
-  let bodyText=order.map((item,i)=>{
-    return `Quote Item ${i+1}: Venue: ${item.venue} Hire Type: ${item.hireType} Hours: ${item.hours} Base: ${formatGBP(item.costs.base)} Equipment: ${formatGBP(item.costs.addons)} Subtotal: ${formatGBP(item.costs.subtotal)} VAT: ${formatGBP(item.costs.vat)} Total: ${formatGBP(item.costs.total)}`;
-  }).join('\n\n');
-  const after=calculateAfterHours();
-  const grand=order.reduce((a,b)=>a+b.costs.total,0)+after.total;
-  bodyText+=`\n\nAfter-hours surcharge: ${formatGBP(after.surcharge)} + VAT = ${formatGBP(after.total)}`;
-  bodyText+=`\n\nGrand Total: ${formatGBP(grand)}\n\nTechnician hours will be quoted separately based on the technical requirements of the event.`;
+  // Populate start and end time dropdowns
+  function populateTimeDropdowns(){
+    const startSelect=document.getElementById('startTime');
+    const endSelect=document.getElementById('endTime');
+    for(let h=0;h<24;h++){
+      for(let m=0;m<60;m+=30){
+        const val=('0'+h).slice(-2)+':'+('0'+m).slice(-2);
+        [startSelect,endSelect].forEach(select=>{
+          const opt=document.createElement('option'); opt.value=val; opt.textContent=val;
+          select.appendChild(opt);
+        });
+      }
+    }
+    startSelect.value='09:00';
+    endSelect.value='23:00';
+  }
+  populateTimeDropdowns();
 
-  const subject='Royal Birmingham Conservatoire - Event Quote';
-  const mailto=`mailto:conservatoireevents@bcu.ac.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
-  window.location.href=mailto;
-});
+  // Format GBP
+  function formatGBP(n){return '£'+n.toFixed(2);}
 
-document.getElementById('downloadBtn').addEventListener('click',()=>{
-  let html=`<html><head><title>Quote</title></head><body><h1>Quote Summary</h1><table border="1" cellspacing="0" cellpadding="5"><tr><th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th></tr>`;
-  order.forEach(item=>{
-    html+=`<tr><td>${item.venue}</td><td>${item.hireType}</td><td>${item.hours}</td><td>${formatGBP(item.costs.base)}</td><td>${formatGBP(item.costs.addons)}</td><td>${formatGBP(item.costs.subtotal)}</td><td>${formatGBP(item.costs.vat}</td><td>${formatGBP(item.costs.total)}</td></tr>`;
+  // Calculate costs
+  function calculateCosts(baseRate,hours,equip){
+    const base=baseRate*hours;
+    const addons=(equip.pa||0)*100+(equip.projector||0)*250+(equip.micWired||0)*20+
+                 (equip.micWireless||0)*40+(equip.monitor||0)*15+(equip.overhead||0)*100+
+                 (equip.video||0)*250+(equip.laptop||0)*50+(equip.piano||0)*PIANO_RATE;
+    const subtotal=base+addons;
+    const vat=subtotal*0.2;
+    const total=subtotal+vat;
+    return {base,addons,subtotal,vat,total};
+  }
+
+  // Calculate after-hours surcharge
+  function calculateAfterHours(){
+    const selectedDays=Array.from(document.querySelectorAll(".day:checked")).map(d=>d.value);
+    if(!selectedDays.length) return {surcharge:0,vat:0,total:0};
+    const startTime=document.getElementById('startTime').value;
+    const endTime=document.getElementById('endTime').value;
+    const [startH,startM]=startTime.split(':').map(Number);
+    const [endH,endM]=endTime.split(':').map(Number);
+    let surcharge=0;
+    selectedDays.forEach(day=>{
+      const opening=8;
+      const closing=(day==='Sat'||day==='Sun')?19:23;
+      const bookingStart=startH+(startM>0?0.5:0);
+      const bookingEnd=endH+(endM>0?0.5:0);
+      if(bookingStart<opening) surcharge+=Math.ceil(opening-bookingStart)*20;
+      if(bookingEnd>closing) surcharge+=Math.ceil(bookingEnd-closing)*20;
+    });
+    const vat=surcharge*0.2;
+    return {surcharge,vat,total:surcharge+vat};
+  }
+
+  // Update table
+  function updateTable(){
+    const tbody=document.querySelector('#orderTable tbody');
+    tbody.innerHTML='';
+    let grand=0;
+    order.forEach((item,index)=>{
+      const row=document.createElement('tr');
+      row.innerHTML=`<td>${item.venue}</td><td>${item.hireType}</td><td>${item.hours}</td>
+      <td>${formatGBP(item.costs.base)}</td><td>${formatGBP(item.costs.addons)}</td>
+      <td>${formatGBP(item.costs.subtotal)}</td><td>${formatGBP(item.costs.vat)}</td>
+      <td>${formatGBP(item.costs.total)}</td>
+      <td><button onclick="removeItem(${index})">Remove</button></td>`;
+      tbody.appendChild(row);
+      grand+=item.costs.total;
+    });
+    const after=calculateAfterHours();
+    document.getElementById('afterHoursRow').textContent=`After-hours surcharge: ${formatGBP(after.surcharge)} + VAT = ${formatGBP(after.total)}`;
+    document.getElementById('grandTotal').textContent='Grand Total: '+formatGBP(grand+after.total);
+  }
+
+  // Remove item (make global for button)
+  window.removeItem=(i)=>{order.splice(i,1);updateTable();};
+
+  // Add to quote
+  document.getElementById('addBtn').addEventListener('click',()=>{
+    const venue=document.getElementById('venue').value;
+    if(!venue){alert('Please select a venue');return;}
+    const hireType=document.getElementById('hireType').value;
+    let hours=parseFloat(document.getElementById('hours').value)||0;
+    if(mainVenues.includes(venue) && hours<4){
+      alert('Main performance venues require a minimum of 4 hours.');
+      hours=4;
+      document.getElementById('hours').value=4;
+    }
+    const equip={
+      pa:parseInt(document.getElementById('pa_qty').value)||0,
+      projector:parseInt(document.getElementById('projector_qty').value)||0,
+      micWired:parseInt(document.getElementById('mic_wired_qty').value)||0,
+      micWireless:parseInt(document.getElementById('mic_wireless_qty').value)||0,
+      monitor:parseInt(document.getElementById('monitor_qty').value)||0,
+      overhead:parseInt(document.getElementById('overhead_qty').value)||0,
+      video:parseInt(document.getElementById('video_qty').value)||0,
+      laptop:parseInt(document.getElementById('laptop_qty').value)||0,
+      piano:parseInt(document.getElementById('piano_qty').value)||0
+    };
+    const costs=calculateCosts(rates[venue][hireType],hours,equip);
+    order.push({venue,hireType,hours,equip,costs});
+    updateTable();
   });
-  const after=calculateAfterHours();
-  html+=`<tr><td colspan="7" style="text-align:right">After-hours surcharge</td><td>${formatGBP(after.total)}</td></tr>`;
-  const grandTotal=order.reduce((a,b)=>a+b.costs.total,0)+after.total;
-  html+=`<tr><td colspan="7" style="text-align:right"><strong>Grand Total</strong></td><td><strong>${formatGBP(grandTotal)}</strong></td></tr>`;
-  html+='</table></body></html>';
-  const blob=new Blob([html],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='quote.html'; a.click();
-  URL.revokeObjectURL(url);
+
+  // Email quote
+  document.getElementById('emailBtn').addEventListener('click',()=>{
+    if(order.length===0){alert('Please add at least one venue to the quote');return;}
+    let bodyText=order.map((item,i)=>{
+      return `Quote Item ${i+1}: Venue: ${item.venue} Hire Type: ${item.hireType} Hours: ${item.hours} Base: ${formatGBP(item.costs.base)} Equipment: ${formatGBP(item.costs.addons)} Subtotal: ${formatGBP(item.costs.subtotal)} VAT: ${formatGBP(item.costs.vat)} Total: ${formatGBP(item.costs.total)}`;
+    }).join('\n\n');
+    const after=calculateAfterHours();
+    const grand=order.reduce((a,b)=>a+b.costs.total,0)+after.total;
+    bodyText+=`\n\nAfter-hours surcharge: ${formatGBP(after.surcharge)} + VAT = ${formatGBP(after.total)}`;
+    bodyText+=`\n\nGrand Total: ${formatGBP(grand)}\n\nTechnician hours will be quoted separately based on the technical requirements of the event.`;
+
+    const subject='Royal Birmingham Conservatoire - Event Quote';
+    const mailto=`mailto:conservatoireevents@bcu.ac.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    window.location.href=mailto;
+  });
+
+  // Download quote
+  document.getElementById('downloadBtn').addEventListener('click',()=>{
+    let html=`<html><head><title>Quote</title></head><body><h1>Quote Summary</h1><table border="1" cellspacing="0" cellpadding="5"><tr><th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th></tr>`;
+    order.forEach(item=>{
+      html+=`<tr><td>${item.venue}</td><td>${item.hireType}</td><td>${item.hours}</td><td>${formatGBP(item.costs.base)}</td><td>${formatGBP(item.costs.addons)}</td><td>${formatGBP(item.costs.subtotal)}</td><td>${formatGBP(item.costs.vat)}</td><td>${formatGBP(item.costs.total)}</td></tr>`;
+    });
+    const after=calculateAfterHours();
+    html+=`<tr><td colspan="7" style="text-align:right">After-hours surcharge</td><td>${formatGBP(after.total)}</td></tr>`;
+    const grandTotal=order.reduce((a,b)=>a+b.costs.total,0)+after.total;
+    html+=`<tr><td colspan="7" style="text-align:right"><strong>Grand Total</strong></td><td><strong>${formatGBP(grandTotal)}</strong></td></tr>`;
+    html+='</table></body></html>';
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='quote.html'; a.click();
+    URL.revokeObjectURL(url);
+  });
 });
 </script>
 </body>
