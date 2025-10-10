@@ -245,5 +245,140 @@
 
     <footer>© Royal Birmingham Conservatoire — Venue Hire Quote Calculator</footer>
   </div>
+  <script>
+const venueRates = {
+  "Bradshaw": 100,    // per hour, example rate
+  "Recital": 90,
+  "Lab": 70,
+  "Jazz": 95,
+  "Organ": 80,
+  "WorkshopLarge": 60,
+  "WorkshopSmall": 50,
+  "DLHub": 55,
+  "PracticeGrand2": 40,
+  "PracticeGrand": 30,
+  "PracticeUpright": 20,
+  "Dressing": 25
+};
+
+const hireMultipliers = {
+  "standard": 1,
+  "premium": 1.2
+};
+
+const equipmentRates = {
+  "pa_qty": 50,
+  "projector_qty": 30,
+  "mic_wired_qty": 10,
+  "mic_wireless_qty": 20,
+  "monitor_qty": 15,
+  "overhead_qty": 25,
+  "video_qty": 30,
+  "laptop_qty": 40,
+  "piano_qty": 100
+};
+
+const vatRate = 0.2;
+const afterHoursRate = 20;
+
+const addBtn = document.getElementById("addBtn");
+const orderTableBody = document.querySelector("#orderTable tbody");
+const grandTotalEl = document.getElementById("grandTotal");
+const afterHoursRowEl = document.getElementById("afterHoursRow");
+
+let orderRows = [];
+
+function calculateAfterHours(hours, endTime, selectedDays) {
+  if (!selectedDays.length) return 0;
+  const endHour = parseInt(endTime.split(":")[0]);
+  const afterHours = Math.max(0, endHour - 20); // after 8pm
+  return afterHours * selectedDays.length * afterHoursRate;
+}
+
+function addToOrder() {
+  const venue = document.getElementById("venue").value;
+  const hireType = document.getElementById("hireType").value;
+  const hours = parseFloat(document.getElementById("hours").value);
+
+  if (!venue || !hours) {
+    alert("Please select a venue and number of hours.");
+    return;
+  }
+
+  // Base rate
+  const baseRate = venueRates[venue] || 0;
+  const baseCost = baseRate * hours * (hireMultipliers[hireType] || 1);
+
+  // Equipment cost
+  let equipmentCost = 0;
+  Object.keys(equipmentRates).forEach(key => {
+    const qty = parseInt(document.getElementById(key).value) || 0;
+    equipmentCost += qty * equipmentRates[key];
+  });
+
+  const subtotal = baseCost + equipmentCost;
+  const vat = subtotal * vatRate;
+  const total = subtotal + vat;
+
+  // After-hours
+  const selectedDays = Array.from(document.querySelectorAll(".day:checked")).map(d => d.value);
+  const endTime = document.getElementById("endTime").value;
+  const afterHours = calculateAfterHours(hours, endTime, selectedDays);
+  const afterHoursVAT = afterHours * vatRate;
+  const afterHoursTotal = afterHours + afterHoursVAT;
+
+  // Add row
+  const row = {
+    venue, hireType, hours, baseCost, equipmentCost, subtotal, vat, total
+  };
+  orderRows.push(row);
+  renderTable();
+
+  // Show after-hours surcharge if any
+  if (afterHoursTotal > 0) {
+    afterHoursRowEl.style.display = "block";
+    afterHoursRowEl.textContent = `After-hours surcharge: £${afterHoursTotal.toFixed(2)}`;
+  } else {
+    afterHoursRowEl.style.display = "none";
+  }
+}
+
+function renderTable() {
+  orderTableBody.innerHTML = "";
+  let grandTotal = 0;
+
+  orderRows.forEach((row, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.venue}</td>
+      <td>${row.hireType}</td>
+      <td>${row.hours}</td>
+      <td>£${row.baseCost.toFixed(2)}</td>
+      <td>£${row.equipmentCost.toFixed(2)}</td>
+      <td>£${row.subtotal.toFixed(2)}</td>
+      <td>£${row.vat.toFixed(2)}</td>
+      <td>£${row.total.toFixed(2)}</td>
+      <td><button onclick="removeRow(${index})">Remove</button></td>
+    `;
+    orderTableBody.appendChild(tr);
+    grandTotal += row.total;
+  });
+
+  // Add after-hours if displayed
+  if (afterHoursRowEl.style.display === "block") {
+    const afterHoursText = afterHoursRowEl.textContent.match(/£([\d.]+)/);
+    if (afterHoursText) grandTotal += parseFloat(afterHoursText[1]);
+  }
+
+  grandTotalEl.textContent = `Grand Total: £${grandTotal.toFixed(2)}`;
+}
+
+function removeRow(index) {
+  orderRows.splice(index, 1);
+  renderTable();
+}
+
+addBtn.addEventListener("click", addToOrder);
+</script>
 </body>
 </html>
