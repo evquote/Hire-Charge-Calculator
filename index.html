@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Royal Birmingham Conservatoire — Quote & Staffing Calculators</title>
+<title>Royal Birmingham Conservatoire — Multi-Venue Quote Calculator</title>
 <style>
 :root{
   --brand:#002e5b;
@@ -13,10 +13,10 @@
 }
 body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#222;margin:0;padding:20px;display:flex;justify-content:center;}
 .wrapper{max-width:1000px;width:100%;}
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+header{display:flex;align-items:center;gap:16px;margin-bottom:18px;justify-content:space-between;flex-wrap:wrap;}
 h1{font-size:20px;margin:0;color:var(--brand);}
-nav{display:flex;gap:10px;flex-wrap:wrap;}
-nav button{background:var(--brand);color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;}
+nav{display:flex;gap:10px;align-items:center;}
+nav button, nav a.button{background:var(--brand);color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;text-decoration:none;}
 .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(8,24,40,0.06);margin-bottom:14px;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 label{display:block;font-size:13px;margin-bottom:6px;}
@@ -40,14 +40,18 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 <div class="wrapper">
 
 <header>
-  <h1>Royal Birmingham Conservatoire — Calculators</h1>
+  <div>
+    <h1>Royal Birmingham Conservatoire — Multi-Venue Quote</h1>
+    <div class="muted">Add multiple venues to generate a combined quote. All prices + VAT.</div>
+  </div>
   <nav>
     <button id="venueTab">Venue Quote</button>
     <button id="staffTab">Staffing Costs</button>
+    <a href="#" class="button" id="clearSession" style="display:none;">Logout Staffing</a>
   </nav>
 </header>
 
-<!-- ===== VENUE QUOTE SECTION ===== -->
+<!-- ===== VENUE QUOTE SECTION (original content preserved) ===== -->
 <div id="venuePage">
   <div class="card">
     <div class="grid">
@@ -126,12 +130,14 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
           <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
           <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
           <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
-          <div class="muted" style="margin-top:6px;">Other instrument hire available upon request, subject to availability.</div>
+          <div class="muted" style="margin-top:6px;">Other instrument hire is available upon request, subject to availability.</div>
         </fieldset>
       </div>
 
       <div class="full" style="margin-top:10px;">
-        <button class="mainBtn" id="addBtn">Add to Quote</button>
+        <button id="addBtn">Add to Quote</button>
+        <button id="emailBtn">Email Quote</button>
+        <button id="downloadBtn">Download HTML</button>
       </div>
     </div>
   </div>
@@ -147,44 +153,96 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
       <tbody></tbody>
     </table>
     <div id="grandTotal">Grand Total: £0.00</div>
+    <div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
+    <div class="muted" style="margin-top:6px;">After-hours surcharge: £20/hour + VAT applies outside regular opening hours.</div>
+    <div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
   </div>
 </div>
 
-<!-- ===== STAFF COSTS SECTION ===== -->
+<!-- ===== STAFF COSTS SECTION (new tab, same layout) ===== -->
 <div id="staffPage" class="hidden">
   <div class="card">
-    <table id="staffTable">
-      <thead>
-        <tr>
-          <th>Role</th><th>Rate (£/hr)</th><th>Quantity</th><th>Hours</th><th>Total (£)</th><th>Remove</th>
-        </tr>
-      </thead>
-      <tbody id="staffBody"></tbody>
-    </table>
-    <button id="addOtherBtn">Add "Other" Role</button>
+    <h3 style="margin-top:0">Staffing Costs</h3>
+    <div class="muted" style="margin-bottom:10px;">
+      Password protected. Enter password when switching to this tab. VAT (20%) is added to the grand total.
+    </div>
+
+    <div class="grid" style="margin-bottom:10px;">
+      <div class="full">
+        <table id="staffTable">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Rate (£/hr)</th>
+              <th>Quantity</th>
+              <th>Hours</th>
+              <th>Total (£)</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody id="staffBody"></tbody>
+        </table>
+      </div>
+      <div class="full" style="text-align:left;">
+        <button id="addOtherBtn">Add "Other" Role</button>
+      </div>
+    </div>
+
     <div id="staffGrandTotal">Grand Total (incl. VAT): £0.00</div>
+    <div class="muted" style="margin-top:6px;">Tip: set quantity and hours for each role to calculate total staffing cost (VAT included).</div>
   </div>
 </div>
 
 </div>
 
 <script>
-// ===== NAVIGATION =====
+/* =========================
+   Navigation & Password
+   ========================= */
 const venuePage = document.getElementById('venuePage');
 const staffPage = document.getElementById('staffPage');
-document.getElementById('venueTab').onclick = () => {
-  venuePage.classList.remove('hidden'); staffPage.classList.add('hidden');
+const venueTab = document.getElementById('venueTab');
+const staffTab = document.getElementById('staffTab');
+const clearSession = document.getElementById('clearSession');
+const STAFF_PASSWORD = 'rbcstaffcosts';
+
+venueTab.onclick = () => {
+  venuePage.classList.remove('hidden');
+  staffPage.classList.add('hidden');
 };
-document.getElementById('staffTab').onclick = () => {
-  if (!sessionStorage.getItem('staffAccess')) {
-    const pass = prompt('Enter password to access staffing calculator:');
-    if (pass !== 'rbcstaffcosts') return alert('Incorrect password.');
-    sessionStorage.setItem('staffAccess','rbcstaffcosts');
+staffTab.onclick = () => {
+  // If already authorized in sessionStorage, show staff tab
+  if (sessionStorage.getItem('staffAccess') === STAFF_PASSWORD) {
+    venuePage.classList.add('hidden');
+    staffPage.classList.remove('hidden');
+    clearSession.style.display = 'inline-block';
+    return;
   }
-  venuePage.classList.add('hidden'); staffPage.classList.remove('hidden');
+  // prompt for password
+  const pass = prompt('Enter password to access staffing calculator:');
+  if (pass === STAFF_PASSWORD) {
+    sessionStorage.setItem('staffAccess', STAFF_PASSWORD);
+    venuePage.classList.add('hidden');
+    staffPage.classList.remove('hidden');
+    clearSession.style.display = 'inline-block';
+  } else {
+    alert('Incorrect password.');
+  }
+};
+clearSession.onclick = (e) => {
+  e.preventDefault();
+  sessionStorage.removeItem('staffAccess');
+  clearSession.style.display = 'none';
+  venuePage.classList.remove('hidden');
+  staffPage.classList.add('hidden');
+  alert('Staffing access cleared.');
 };
 
-// ===== VENUE QUOTE CALCULATOR =====
+
+/* =========================
+   VENUE QUOTE CALCULATOR
+   (keeps your original logic, cleaned and intact)
+   ========================= */
 document.addEventListener("DOMContentLoaded", () => {
   const rates = {
     Bradshaw:{standard:250,premium:125},Recital:{standard:200,premium:100},Lab:{standard:175,premium:87.5},
@@ -192,74 +250,249 @@ document.addEventListener("DOMContentLoaded", () => {
     WorkshopSmall:{standard:50,premium:50},DLHub:{standard:35,premium:35},PracticeGrand2:{standard:40,premium:40},
     PracticeGrand:{standard:30,premium:30},PracticeUpright:{standard:25,premium:25},Dressing:{standard:25,premium:25}
   };
-  const EQUIPMENT_RATES = {pa:100, projector:250, micWired:20, micWireless:40, monitor:15, overhead:100, video:250, laptop:50, piano:100};
+
+  const PIANO_RATE = 100;
+  const EQUIPMENT_RATES = {
+    pa:100, projector:250, micWired:20, micWireless:40, monitor:15,
+    overhead:100, video:250, laptop:50, piano:PIANO_RATE
+  };
+
   const order = [];
+
   const formatGBP = n => '£' + n.toFixed(2);
-  const startTime=document.getElementById('startTime'), endTime=document.getElementById('endTime');
-  for(let h=0;h<24;h++){for(let m=0;m<60;m+=30){const v=('0'+h).slice(-2)+':'+('0'+m).slice(-2);
-    [startTime,endTime].forEach(sel=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}}
-  startTime.value='09:00'; endTime.value='13:00';
-  const timeToHours=t=>{const [h,m]=t.split(':').map(Number);return h+m/60;};
-  const getBookingHours=()=>Math.max(timeToHours(endTime.value)-timeToHours(startTime.value),4);
-  const calcCosts=(rate,h,e)=>{const base=rate*h;const addons=Object.keys(e).reduce((s,k)=>s+(e[k]||0)*EQUIPMENT_RATES[k],0);const sub=base+addons;const vat=sub*0.2;const total=sub+vat;return {base,addons,subtotal:sub,vat,total};};
-  const calcAfterHours=(hours,days)=>{const s=timeToHours(startTime.value);const e=timeToHours(endTime.value);let surcharge=0;
-    days.forEach(d=>{const open=8;const close=(d==='Sat'||d==='Sun')?19:23;if(s<open)surcharge+=(open-s)*20;if(e>close)surcharge+=(e-close)*20;});
-    return surcharge*1.2;};
-  const updateTable=()=>{const tb=document.querySelector('#orderTable tbody');tb.innerHTML='';let grand=0;
-    order.forEach((it,i)=>{const r=document.createElement('tr');r.innerHTML=`
-      <td>${it.venue}</td><td>${it.hireType}</td><td>${it.hours}</td>
-      <td>${formatGBP(it.costs.base)}</td><td>${formatGBP(it.costs.addons)}</td><td>${formatGBP(it.costs.subtotal)}</td>
-      <td>${formatGBP(it.costs.vat)}</td><td>${formatGBP(it.costs.total)}</td><td>${formatGBP(it.afterHours)}</td>
-      <td><button onclick="removeItem(${i})">Remove</button></td>`;tb.appendChild(r);grand+=it.costs.total+it.afterHours;});
-    document.getElementById('grandTotal').textContent='Grand Total: '+formatGBP(grand);};
-  window.removeItem=i=>{order.splice(i,1);updateTable();};
-  document.getElementById('addBtn').onclick=()=>{
-    const v=document.getElementById('venue').value;if(!v)return alert('Select a venue.');
-    const hType=document.getElementById('hireType').value;
-    const hours=getBookingHours();const days=[...document.querySelectorAll('.day:checked')].map(d=>d.value);
-    if(!days.length)return alert('Select at least one day.');
-    const eq={pa:+pa_qty.value,projector:+projector_qty.value,micWired:+mic_wired_qty.value,micWireless:+mic_wireless_qty.value,monitor:+monitor_qty.value,overhead:+overhead_qty.value,video:+video_qty.value,laptop:+laptop_qty.value,piano:+piano_qty.value};
-    const rate=rates[v][hType];const costs=calcCosts(rate,hours,eq);const afterHours=calcAfterHours(hours,days);
-    order.push({venue:v,hireType:hType,hours,costs,afterHours});updateTable();
+
+  const startTime = document.getElementById('startTime');
+  const endTime = document.getElementById('endTime');
+  const venue = document.getElementById('venue');
+  const hireType = document.getElementById('hireType');
+  const addBtn = document.getElementById('addBtn');
+  const emailBtn = document.getElementById('emailBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  const pa_qty = document.getElementById('pa_qty');
+  const projector_qty = document.getElementById('projector_qty');
+  const mic_wired_qty = document.getElementById('mic_wired_qty');
+  const mic_wireless_qty = document.getElementById('mic_wireless_qty');
+  const monitor_qty = document.getElementById('monitor_qty');
+  const overhead_qty = document.getElementById('overhead_qty');
+  const video_qty = document.getElementById('video_qty');
+  const laptop_qty = document.getElementById('laptop_qty');
+  const piano_qty = document.getElementById('piano_qty');
+
+  function populateTimes() {
+    for(let h=0; h<24; h++){
+      for(let m=0; m<60; m+=30){
+        const v=('0'+h).slice(-2)+':'+('0'+m).slice(-2);
+        [startTime,endTime].forEach(sel=>{
+          const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
+        });
+      }
+    }
+    startTime.value='09:00'; endTime.value='13:00';
+  }
+  populateTimes();
+
+  function timeToHours(t){ const [h,m]=t.split(':').map(Number); return h+m/60; }
+
+  function getBookingHours(){ 
+    let diff=timeToHours(endTime.value)-timeToHours(startTime.value);
+    if(diff<0) diff+=24;
+    return Math.max(diff,4);
+  }
+
+  function calcCosts(rate,h,e){
+    const base = rate * h;
+    const addons = Object.keys(e).reduce((sum,key)=>sum + (e[key]||0)*EQUIPMENT_RATES[key],0);
+    const sub = base + addons;
+    const vat = sub * 0.2;
+    const total = sub + vat;
+    return {base,addons,subtotal:sub,vat,total};
+  }
+
+  function calcAfterHoursPerBooking(hours, days){
+    const s = timeToHours(startTime.value);
+    const e = timeToHours(endTime.value);
+    let surcharge = 0;
+    days.forEach(d=>{
+      const open = 8;
+      const close = (d==='Sat'||d==='Sun')?19:23;
+      if(s<open) surcharge += Math.max(0, open-s)*20;
+      if(e>close) surcharge += Math.max(0, e-close)*20;
+    });
+    return surcharge*1.2;
+  }
+
+  function updateTable(){
+    const tb = document.querySelector('#orderTable tbody'); 
+    tb.innerHTML = '';
+    let grand = 0;
+    order.forEach((it,i)=>{
+      const r = document.createElement('tr');
+      r.innerHTML = `
+        <td>${it.venue}</td>
+        <td>${it.hireType}</td>
+        <td>${it.hours}</td>
+        <td>${formatGBP(it.costs.base)}</td>
+        <td>${formatGBP(it.costs.addons)}</td>
+        <td>${formatGBP(it.costs.subtotal)}</td>
+        <td>${formatGBP(it.costs.vat)}</td>
+        <td>${formatGBP(it.costs.total)}</td>
+        <td>${formatGBP(it.afterHours)}</td>
+        <td><button onclick="removeItem(${i})">Remove</button></td>
+      `;
+      tb.appendChild(r);
+      grand += it.costs.total + it.afterHours;
+    });
+    document.getElementById('grandTotal').textContent = 'Grand Total: ' + formatGBP(grand);
+  }
+
+  window.removeItem = i => { order.splice(i,1); updateTable(); };
+
+  addBtn.onclick = () => {
+    const v = venue.value; if(!v){alert('Please select a venue'); return;}
+    const hType = hireType.value;
+    const hours = getBookingHours();
+    const days = [...document.querySelectorAll('.day:checked')].map(d=>d.value);
+    if(!days.length){alert('Please select at least one day'); return;}
+
+    const eq = {
+      pa:+pa_qty.value, projector:+projector_qty.value, micWired:+mic_wired_qty.value,
+      micWireless:+mic_wireless_qty.value, monitor:+monitor_qty.value, overhead:+overhead_qty.value,
+      video:+video_qty.value, laptop:+laptop_qty.value, piano:+piano_qty.value
+    };
+
+    const rate = rates[v][hType];
+    const costs = calcCosts(rate,hours,eq);
+    const afterHours = calcAfterHoursPerBooking(hours,days);
+
+    order.push({venue:v, hireType:hType, hours, costs, afterHours});
+    updateTable();
+  };
+
+  emailBtn.onclick = () => {
+    if(!order.length) return alert('Add at least one venue first.');
+    let body = order.map((it,i)=>
+      `Item ${i+1}: ${it.venue} (${it.hireType}) ${it.hours}h | Base ${formatGBP(it.costs.base)} | Equip ${formatGBP(it.costs.addons)} | Total ${formatGBP(it.costs.total)} | After-Hours ${formatGBP(it.afterHours)}`
+    ).join('\n');
+    const grand = order.reduce((a,b)=>a+b.costs.total+b.afterHours,0);
+    body += `\n\nGrand Total: ${formatGBP(grand)}\n\nTechnician hours quoted separately.`;
+    location.href = `mailto:conservatoireevents@bcu.ac.uk?subject=${encodeURIComponent('RBC Event Quote')}&body=${encodeURIComponent(body)}`;
+  };
+
+  downloadBtn.onclick = () => {
+    if(!order.length) return alert('Add at least one venue first.');
+    let html = `<html><head><title>Quote</title></head><body>
+    <h1>Quote Summary</h1>
+    <table border="1" cellpadding="5">
+      <tr>
+        <th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th>
+        <th>VAT (£)</th><th>Total (£)</th><th>After-Hours (£)</th>
+      </tr>`;
+    let grand = 0;
+    order.forEach(it=>{
+      html += `<tr>
+        <td>${it.venue}</td>
+        <td>${it.hireType}</td>
+        <td>${it.hours}</td>
+        <td>${formatGBP(it.costs.base)}</td>
+        <td>${formatGBP(it.costs.addons)}</td>
+        <td>${formatGBP(it.costs.subtotal)}</td>
+        <td>${formatGBP(it.costs.vat)}</td>
+        <td>${formatGBP(it.costs.total)}</td>
+        <td>${formatGBP(it.afterHours)}</td>
+      </tr>`;
+      grand += it.costs.total+it.afterHours;
+    });
+    html += `<tr>
+      <td colspan="8" style="text-align:right"><strong>Grand Total</strong></td>
+      <td><strong>${formatGBP(grand)}</strong></td>
+    </tr></table></body></html>`;
+    const blob = new Blob([html],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='quote.html'; a.click();
+    URL.revokeObjectURL(url);
   };
 });
 
-// ===== STAFFING COSTS CALCULATOR =====
-document.addEventListener("DOMContentLoaded",()=>{
-  const staffRates=[{name:"Duty Manager",rate:32},{name:"Steward",rate:22},{name:"Porter",rate:20},{name:"Additional Security",rate:20},{name:"Technician",rate:35}];
-  const staffBody=document.getElementById("staffBody");
-  const staffGrand=document.getElementById("staffGrandTotal");
-  const formatGBP=n=>"£"+n.toFixed(2);
-  function renderRow(role,rate,qty=0,hours=0,editable=false){
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${editable?`<input type="text" class="roleName" value="${role}" />`:role}</td>
-      <td><input type="number" class="rate" value="${rate}" ${editable?"":"readonly"} /></td>
+/* =========================
+   STAFFING COSTS CALCULATOR
+   (same look & feel)
+   ========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const staffRates = [
+    { name: "Duty Manager", rate: 32 },
+    { name: "Steward", rate: 22 },
+    { name: "Porter", rate: 20 },
+    { name: "Security", rate: 20 },
+    { name: "Technician", rate: 35 }
+  ];
+
+  const staffBody = document.getElementById("staffBody");
+  const staffGrand = document.getElementById("staffGrandTotal");
+
+  const formatGBP = n => "£" + n.toFixed(2);
+
+  function renderRow(role, rate, qty = 0, hours = 0, editable = false) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${editable ? `<input type="text" class="roleName" value="${role}" />` : escapeHtml(role)}</td>
+      <td><input type="number" class="rate" value="${rate!==null && rate!==undefined ? rate : ''}" ${editable ? "" : "readonly"} min="0" step="0.01" /></td>
       <td><input type="number" class="qty" min="0" value="${qty}" /></td>
       <td><input type="number" class="hours" min="0" value="${hours}" /></td>
       <td class="total">£0.00</td>
-      <td><button class="removeBtn">X</button></td>`;
+      <td><button class="removeBtn">X</button></td>
+    `;
     staffBody.appendChild(tr);
   }
-  function calcTotals(){
-    let grand=0;
-    [...staffBody.querySelectorAll("tr")].forEach(tr=>{
-      const rate=parseFloat(tr.querySelector(".rate").value)||0;
-      const qty=parseFloat(tr.querySelector(".qty").value)||0;
-      const hrs=parseFloat(tr.querySelector(".hours").value)||0;
-      const total=rate*qty*hrs;
-      tr.querySelector(".total").textContent=formatGBP(total);
-      grand+=total;
-    });
-    const vat=grand*0.2;const totalIncl=grand+vat;
-    staffGrand.textContent=`Grand Total (incl. VAT): ${formatGBP(totalIncl)} — (VAT £${vat.toFixed(2)})`;
+
+  // simple escape to prevent accidental HTML injection when role strings include special chars
+  function escapeHtml(s){
+    if(!s && s !== 0) return '';
+    return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]; });
   }
-  staffBody.addEventListener("input",calcTotals);
-  staffBody.addEventListener("click",e=>{
-    if(e.target.classList.contains("removeBtn")){e.target.closest("tr").remove();calcTotals();}
+
+  function calculateTotals() {
+    let grand = 0;
+    const rows = [...staffBody.querySelectorAll("tr")];
+    rows.forEach(tr => {
+      const rate = parseFloat(tr.querySelector(".rate").value) || 0;
+      const qty = parseFloat(tr.querySelector(".qty").value) || 0;
+      const hrs = parseFloat(tr.querySelector(".hours").value) || 0;
+      const total = rate * qty * hrs;
+      tr.querySelector(".total").textContent = formatGBP(total);
+      grand += total;
+    });
+    const vat = grand * 0.2;
+    const grandWithVat = grand + vat;
+    staffGrand.textContent = `Grand Total (incl. VAT): ${formatGBP(grandWithVat)}  —  (VAT ${formatGBP(vat)})`;
+  }
+
+  // attach event delegation
+  staffBody.addEventListener("input", calculateTotals);
+  staffBody.addEventListener("click", (e) => {
+    if (e.target.classList.contains("removeBtn")) {
+      e.target.closest("tr").remove();
+      calculateTotals();
+    }
   });
-  document.getElementById("addOtherBtn").onclick=()=>{renderRow("Other","",0,0,true);};
-  staffRates.forEach(r=>renderRow(r.name,r.rate));
+
+  document.getElementById("addOtherBtn").addEventListener("click", () => {
+    renderRow("Other", "", 0, 0, true);
+    calculateTotals();
+  });
+
+  // Initialize with preset roles
+  staffRates.forEach(r => renderRow(r.name, r.rate));
+
+  // Add an editable "Other" row by default (optional - not added automatically here)
+  // Render initial totals
+  calculateTotals();
 });
+
+/* =========================
+   End
+   ========================= */
 </script>
 </body>
 </html>
+
