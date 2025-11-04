@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Royal Birmingham Conservatoire — Multi-Venue Quote Calculator</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="wrapper">
+
+<header>
+  <div>
+    <h1>Royal Birmingham Conservatoire — Multi-Venue Quote</h1>
+    <div class="muted">Add multiple venues to generate a combined quote. All prices + VAT.</div>
+  </div>
+  <nav>
+        <button id="venueTab" class="active">Venue Quote</button>
+    <button id="staffTab">Staffing Costs</button>
+    <a href="#" class="button" id="clearSession" style="display:none;">Logout Staffing</a>
+  </nav>
+</header>
+
+<div id="galleryContainer">
+    <div class="gallery" id="venueGallery">
+      <div class="panel" data-venue="Bradshaw">
+        <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-24-131600593110714462.jpg" alt="Bradshaw Hall" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Bradshaw+Hall'">
+        <div class="title">Bradshaw Hall</div>
+      </div>
+      <div class="panel" data-venue="Recital">
+        <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-27-131600597991399988.jpg" alt="Recital Hall" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Recital+Hall'">
+        <div class="title">Recital Hall</div>
+      </div>
+      <div class="panel" data-venue="Jazz">
+        <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg" alt="Eastside Jazz Club" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Jazz+Club'">
+        <div class="title">Eastside Jazz Club</div>
+      </div>
+      <div class="panel" data-venue="Organ">
+        <img src="https.img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg" alt="Organ Studio" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Organ+Studio'">
+        <div class="title">Organ Studio</div>
+      </div>
+      <div class="panel" data-venue="Lab">
+        <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg" alt="The Lab" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=The+Lab'">
+        <div class="title">The Lab</div>
+      </div>
+      <div class="panel" data-venue="Workshop">
+        <img src="httpsimg.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg" alt="Workshops / Performance Studios" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Workshops'">
+        <div class="title">Workshops / Performance Studios</div>
+      </div>
+    </div>
+</div>
+
+<div id="venuePage">
+<div class="card">
+  <div class="grid">
+    <div class="full">
+      <fieldset>
+        <legend><strong>Booking Times & Event Day(s)</strong></legend>
+        <div class="muted" style="margin-bottom:12px;">
+          Please include your full booking time (get-in and get-out). Minimum 4-hour booking applies.<br>
+          Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.<br>
+          After-hours surcharge: £20/hour + VAT applies outside these hours.
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width: 200px;">
+            <label for="startTime">Booking Start Time</label>
+            <select id="startTime"></select>
+          </div>
+          <div style="flex:1; min-width: 200px;">
+            <label for="endTime">Booking End Time</label>
+            <select id="endTime"></select>
+          </div>
+        </div>
+        <div style="margin-bottom:6px;">
+          <label style="margin-bottom: 10px;"><strong>Event Day(s)</strong></label>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;">
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Mon"> Mon</label>
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Tue"> Tue</label>
+    _       <label style="font-weight:400;"><input type="checkbox" class="day" value="Wed"> Wed</label>
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Thu"> Thu</label>
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Fri"> Fri</label>
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Sat"> Sat</label>
+            <label style="font-weight:400;"><input type="checkbox" class="day" value="Sun"> Sun</label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div>
+      <label for="venue">Venue / Space</label>
+D     <select id="venue">
+        <option value="">— select venue —</option>
+        <option value="Bradshaw">Bradshaw Hall</option>
+        <option value="Recital">Recital Hall</option>
+        <option value="Lab">The Lab</option>
+        <option value="Jazz">Eastside Jazz Club</option>
+        <option value="Organ">Organ Studio</option>
+        <option value="Workshop">Workshop Space</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="hireType">Hire Type</label>
+      <select id="hireType">
+        <option value="standard">Standard Rate (includes FOH staff)</option>
+        <option value="premium">Recording / Premium Workshop (dry hire)</option>
+      </select>
+    </div>
+
+    <div class="full">
+      <fieldset>
+        <legend><strong>Technical / Equipment</strong></legend>
+        <div class="muted" style="margin-bottom:6px;">Quantity</div>
+        <div class="checkbox-row"><div>PA (per day)</div><div><input id="pa_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Projector (per day)</div><div><input id="projector_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Microphone (wired)</div><div><input id="mic_wired_qty" class="qty"type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Microphone (wireless)</div><div><input id="mic_wireless_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Monitor</div><div><input id="monitor_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Overhead audio recording</div><div><input id="overhead_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
+        <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
+      </fieldset>
+    </div>
+
+    <div id="form-error" class="form-error"></div>
+
+    <div class="full" style="margin-top:10px;">
+      <button id="addBtn" class="mainBtn">Add to Quote</button>
+      <button id="emailBtn" class="mainBtn">Email Quote</button>
+      <button id="downloadBtn" class="mainBtn">Download HTML</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+<h3 style="margin-top:0">Quote Summary</h3>
+<div style="overflow-x: auto;"> <table id="orderTable">
+<thead>
+<tr>
+<th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th><th>After-Hours (£)</th><th>Remove</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+<div id="grandTotal">Grand Total: £0.00</div>
+<div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
+<div class="muted" style="margin-top:6px;">After-hours surcharge: £20/hour + VAT applies outside regular opening hours.</div>
+<div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
+<div class="muted" style="margin-top:8px;"><strong>Disclaimer:</strong> Quote is for reference purposes only. All costs are subject to review.</div>
+</div>
+</div> <div id="staffPage" class="card" style="display: none;">
+    <h3>Staffing Costs</h3>
+    <p>This feature is not yet built. You can add your staffing calculator form here.</p>
+</div>
+
+<div id="venueModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close">×</button>
+    <button class="modal-arrow modal-prev">❮</button>
+    <button class="modal-arrow modal-next">❯</button>
+    <div id="modalImageContainer"></div>
+    <div class="desc" id="modalDesc"></div>
+  </div>
+</div>
+
+</div> <script src="app.js" defer></script>
+
+</body>
+</html>

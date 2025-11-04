@@ -1,0 +1,78 @@
+{
+  "vatRate": 0.20,
+  "afterHoursRate": 20,
+  "minBookingHours": 4,
+  "venueRates": {
+    "Bradshaw": { "standard": 220, "premium": 160 },
+    "Recital": { "standard": 150, "premium": 110 },
+    "Lab": { "standard": 100, "premium": 80 },
+    "Jazz": { "standard": 120, "premium": 90 },
+    "Organ": { "standard": 80, "premium": 60 },
+    "Workshop": { "standard": 70, "premium": 50 }
+  },
+  "equipmentRates": {
+    "pa": { "rate": 100, "perDay": true },
+    "projector": { "rate": 50, "perDay": true },
+    "mic_wired": { "rate": 10, "perDay": false },
+    "mic_wireless": { "rate": 25, "perDay": false },
+    "monitor": { "rate": 15, "perDay": false },
+    "overhead": { "rate": 75, "perDay": false },
+    "video": { "rate": 75, "perDay": false },
+    "laptop": { "rate": 30, "perDay": false },
+    "piano": { "rate": 50, "perDay": false }
+  },
+  "venueDetails": {
+    "Bradshaw": {
+      "alt": "Bradshaw Hall",
+      "desc": "The Bradshaw Hall has been acoustically modelled...",
+      "images": [
+        "https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg",
+        "https://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg?quality=90",
+        "https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg",
+        "https://cphfcrflaa.cloudimg.io/_bcuimages/04-07-2024-folk-ensemble-web-133765767100637752.jpg"
+      ]
+    },
+    "Recital": {
+      "alt": "Recital Hall",
+      "desc": "The intimate Recital Hall has a variable acoustic...",
+      "images": [
+        "https://azure.wgp-cdn.co.uk/app-pianist/posts/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?&width=1200&height=630&mode=crop",
+        "https://www.association-of-noise-consultants.co.uk/wp-content/uploads/2018/08/RBC-Recital-Hall-Steinway-Piano-min.jpg",
+        "https://www.bof.co.uk/assets/images/projects/royal-birmingham-conservatoire/small-4.png"
+      ]
+    },
+    "Jazz": {
+      "alt": "Eastside Jazz Club",
+      "desc": "Birmingham’s only dedicated Jazz venue...",
+      "images": [
+        "https.img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg",
+        "https://www.bcu.ac.uk/conservatoire/media/conservatoire/images/facilities/eastside-jazz-club-800x400.jpg",
+        "https://www.bcu.ac.uk/mediaitem/eastside-jazz-club-131601337050516886.jpg?quality=90"
+      ]
+    },
+    "Organ": {
+      "alt": "Organ Studio",
+      "desc": "A light and airy venue that is equally suited...",
+      "images": [
+        "https.img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg",
+        "https.www.bcu.ac.uk/mediaitem/organ-studio-131601339846011388.jpg?quality=90"
+      ]
+    },
+    "Lab": {
+      "alt": "The Lab",
+      "desc": "The Lab is a cutting edge, completely flexible black-box studio...",
+      "images": [
+        "https.img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg",
+        "https.www.bcu.ac.uk/mediaitem/the-lab-131601340791483389.jpg?quality=90"
+      ]
+    },
+    "Workshop": {
+      "alt": "Workshops / Performance Studios",
+      "desc": "Eight 30-60 capacity performance studios sit at the heart...",
+      "images": [
+        "https.img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg",
+        "https.img.bcu.ac.uk/_bcuimages/natalie-haas-cello-workshop-133970508075817499.jpg"
+      ]
+    }
+  }
+}
