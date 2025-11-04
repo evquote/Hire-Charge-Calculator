@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function init() {
         try {
             // Fetch data from our new JSON file
-            const response = await fetch('data.json');
+            const response = await fetch('./data.json');
             if (!response.ok) throw new Error('Failed to load pricing data.');
             appData = await response.json();
 
@@ -501,3 +501,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 10. RUN THE APP ---
     init();
 });
+
