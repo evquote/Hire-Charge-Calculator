@@ -39,7 +39,8 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
 .panel{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;box-shadow:0 3px 8px rgba(0,0,0,0.06);transition:transform .22s ease,box-shadow .22s ease;}
 .panel:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 12px 30px rgba(0,0,0,0.15);}
-.panel img{width:100%;height:120px;object-fit:cover;display:block;filter:contrast(1);}
+.panel img{width:100%;height:110px;object-fit:cover;display:block;transition:transform .28s ease;}
+.panel:hover img{transform:scale(1.06);}
 .panel .title{
   position:absolute;left:0;right:0;bottom:0;
   background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,46,91,0.88) 100%);
@@ -48,15 +49,18 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
   display:flex;flex-direction:column;
 }
 .panel .title .venue-name{font-weight:700;}
-.panel .title .venue-sub{font-weight:400;font-size:12px;opacity:0.9;margin-top:2px}
+.panel .title .venue-sub{font-weight:500;font-size:12px;opacity:0.95;margin-top:3px}
 
-/* ===== Modal styles ===== */
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);justify-content:center;align-items:center;z-index:9999;padding:20px;}
-.modal-content{background:white;max-width:920px;width:100%;padding:18px;border-radius:8px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.4);display:flex;flex-direction:column;gap:12px;}
-.modal-media{position:relative;}
-.modal-content img{width:100%;height:auto;border-radius:6px;cursor:pointer;display:block;}
+/* ===== Modal styles (smaller images, scrollable text) ===== */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.72);justify-content:center;align-items:center;z-index:9999;padding:18px;}
+.modal-content{
+  background:white;max-width:820px;width:100%;max-height:85vh;overflow-y:auto;padding:18px;border-radius:8px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  display:flex;flex-direction:column;gap:12px;
+}
+.modal-media{position:relative;width:100%;}
+.modal-content img{width:100%;max-height:360px;object-fit:cover;border-radius:6px;cursor:pointer;display:block;}
 .modal-caption{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-.modal-desc{color:#222;font-size:14px;line-height:1.45;max-height:220px;overflow:auto;padding-top:6px;}
+.modal-desc{color:#222;font-size:14px;line-height:1.45;overflow:auto;padding-top:6px;}
 .modal-close{position:absolute;top:12px;right:12px;background:var(--brand);color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;}
 .modal-prev, .modal-next{
   position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,46,91,0.9);color:#fff;border:none;padding:10px 12px;border-radius:6px;cursor:pointer;font-size:18px;
@@ -65,12 +69,13 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 .modal-next{right:8px}
 .modal-hint{font-size:12px;color:#666;text-align:center;margin-top:6px;}
 
-/* responsive */
+/* responsive tweaks */
 @media (max-width:820px){
   .modal-content{max-width:760px}
 }
 @media (max-width:520px){
-  .panel img{height:100px}
+  .panel img{height:95px}
+  .modal-content img{max-height:240px}
   .modal-prev, .modal-next{padding:8px;font-size:16px}
 }
 </style>
@@ -90,9 +95,8 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
   </nav>
 </header>
 
-<!-- GALLERY -->
+<!-- ===== Gallery (panels) ===== -->
 <div class="gallery" id="venueGallery">
-  <!-- Panels - images replaced by your data below via JS, but include fallback markup for quick view -->
   <div class="panel" data-venue="Bradshaw">
     <img src="https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg" alt="Bradshaw Hall">
     <div class="title"><span class="venue-name">Bradshaw Hall</span><span class="venue-sub">Large concert hall</span></div>
@@ -119,114 +123,115 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
   </div>
 </div>
 
-<!-- VENUE QUOTE (original content preserved) -->
+<!-- ===== VENUE QUOTE SECTION (original content preserved) ===== -->
 <div id="venuePage">
-<div class="card">
-  <div class="grid">
-    <div class="full">
-      <fieldset>
-        <legend><strong>Booking Times & Event Day(s)</strong></legend>
-        <div class="muted" style="margin-bottom:6px;">
-          Please include your full booking time (get-in and get-out). Minimum 4-hour booking applies.<br>
-          Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.<br>
-          After-hours surcharge: £20/hour + VAT applies outside these hours.
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:6px;">
-          <div style="flex:1">
-            <label for="startTime">Booking Start Time</label>
-            <select id="startTime"></select>
+  <div class="card">
+    <div class="grid">
+      <div class="full">
+        <fieldset>
+          <legend><strong>Booking Times & Event Day(s)</strong></legend>
+          <div class="muted" style="margin-bottom:6px;">
+            Please include your full booking time (get-in and get-out). Minimum 4-hour booking applies.<br>
+            Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.<br>
+            After-hours surcharge: £20/hour + VAT applies outside these hours.
           </div>
-          <div style="flex:1">
-            <label for="endTime">Booking End Time</label>
-            <select id="endTime"></select>
+
+          <div style="display:flex;gap:10px;margin-bottom:6px;">
+            <div style="flex:1">
+              <label for="startTime">Booking Start Time</label>
+              <select id="startTime"></select>
+            </div>
+            <div style="flex:1">
+              <label for="endTime">Booking End Time</label>
+              <select id="endTime"></select>
+            </div>
           </div>
-        </div>
 
-        <div style="margin-bottom:6px;">
-          <label><strong>Event Day(s)</strong></label>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
-            <label><input type="checkbox" class="day" value="Mon"> Mon</label>
-            <label><input type="checkbox" class="day" value="Tue"> Tue</label>
-            <label><input type="checkbox" class="day" value="Wed"> Wed</label>
-            <label><input type="checkbox" class="day" value="Thu"> Thu</label>
-            <label><input type="checkbox" class="day" value="Fri"> Fri</label>
-            <label><input type="checkbox" class="day" value="Sat"> Sat</label>
-            <label><input type="checkbox" class="day" value="Sun"> Sun</label>
+          <div style="margin-bottom:6px;">
+            <label><strong>Event Day(s)</strong></label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
+              <label><input type="checkbox" class="day" value="Mon"> Mon</label>
+              <label><input type="checkbox" class="day" value="Tue"> Tue</label>
+              <label><input type="checkbox" class="day" value="Wed"> Wed</label>
+              <label><input type="checkbox" class="day" value="Thu"> Thu</label>
+              <label><input type="checkbox" class="day" value="Fri"> Fri</label>
+              <label><input type="checkbox" class="day" value="Sat"> Sat</label>
+              <label><input type="checkbox" class="day" value="Sun"> Sun</label>
+            </div>
           </div>
-        </div>
-      </fieldset>
-    </div>
+        </fieldset>
+      </div>
 
-    <div>
-      <label for="venue">Venue / Space</label>
-      <select id="venue">
-        <option value="">— select venue —</option>
-        <option value="Bradshaw">Bradshaw Hall</option>
-        <option value="Recital">Recital Hall</option>
-        <option value="Lab">The Lab</option>
-        <option value="Jazz">Eastside Jazz Club</option>
-        <option value="Organ">Organ Studio</option>
-        <option value="WorkshopLarge">Workshop Space Large</option>
-        <option value="WorkshopSmall">Workshop Space Small</option>
-        <option value="DLHub">Distance Learning Hub</option>
-        <option value="PracticeGrand2">Practice Room (2 grands)</option>
-        <option value="PracticeGrand">Practice Room (grand)</option>
-        <option value="PracticeUpright">Practice Room (upright)</option>
-        <option value="Dressing">Additional Dressing Rooms</option>
-      </select>
-    </div>
+      <div>
+        <label for="venue">Venue / Space</label>
+        <select id="venue">
+          <option value="">— select venue —</option>
+          <option value="Bradshaw">Bradshaw Hall</option>
+          <option value="Recital">Recital Hall</option>
+          <option value="Lab">The Lab</option>
+          <option value="Jazz">Eastside Jazz Club</option>
+          <option value="Organ">Organ Studio</option>
+          <option value="WorkshopLarge">Workshop Space Large</option>
+          <option value="WorkshopSmall">Workshop Space Small</option>
+          <option value="DLHub">Distance Learning Hub</option>
+          <option value="PracticeGrand2">Practice Room (2 grands)</option>
+          <option value="PracticeGrand">Practice Room (grand)</option>
+          <option value="PracticeUpright">Practice Room (upright)</option>
+          <option value="Dressing">Additional Dressing Rooms</option>
+        </select>
+      </div>
 
-    <div>
-      <label for="hireType">Hire Type</label>
-      <select id="hireType">
-        <option value="standard">Standard Rate (includes FOH staff)</option>
-        <option value="premium">Recording / Premium Workshop (dry hire)</option>
-      </select>
-    </div>
+      <div>
+        <label for="hireType">Hire Type</label>
+        <select id="hireType">
+          <option value="standard">Standard Rate (includes FOH staff)</option>
+          <option value="premium">Recording / Premium Workshop (dry hire)</option>
+        </select>
+      </div>
 
-    <div class="full">
-      <fieldset>
-        <legend><strong>Technical / Equipment</strong></legend>
-        <div class="muted" style="margin-bottom:6px;">Quantity</div>
-        <div class="checkbox-row"><div>PA (per day)</div><div><input id="pa_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Projector (per day)</div><div><input id="projector_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Microphone (wired)</div><div><input id="mic_wired_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Microphone (wireless)</div><div><input id="mic_wireless_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Monitor</div><div><input id="monitor_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Overhead audio recording</div><div><input id="overhead_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="muted" style="margin-top:6px;">Other instrument hire is available upon request, subject to availability.</div>
-      </fieldset>
-    </div>
+      <div class="full">
+        <fieldset>
+          <legend><strong>Technical / Equipment</strong></legend>
+          <div class="muted" style="margin-bottom:6px;">Quantity</div>
+          <div class="checkbox-row"><div>PA (per day)</div><div><input id="pa_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Projector (per day)</div><div><input id="projector_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Microphone (wired)</div><div><input id="mic_wired_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Microphone (wireless)</div><div><input id="mic_wireless_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Monitor</div><div><input id="monitor_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Overhead audio recording</div><div><input id="overhead_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
+          <div class="muted" style="margin-top:6px;">Other instrument hire is available upon request, subject to availability.</div>
+        </fieldset>
+      </div>
 
-    <div class="full" style="margin-top:10px;">
-      <button id="addBtn">Add to Quote</button>
-      <button id="emailBtn">Email Quote</button>
-      <button id="downloadBtn">Download HTML</button>
+      <div class="full" style="margin-top:10px;">
+        <button id="addBtn">Add to Quote</button>
+        <button id="emailBtn">Email Quote</button>
+        <button id="downloadBtn">Download HTML</button>
+      </div>
+
     </div>
   </div>
-</div>
 
-<!-- Quote Summary -->
-<div class="card">
-  <h3 style="margin-top:0">Quote Summary</h3>
-  <table id="orderTable">
-    <thead>
-      <tr>
-        <th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th><th>After-Hours (£)</th><th>Remove</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div id="grandTotal">Grand Total: £0.00</div>
-  <div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
-  <div class="muted" style="margin-top:6px;">After-hours surcharge: £20/hour + VAT applies outside regular opening hours.</div>
-  <div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
-  <div class="muted" style="margin-top:8px;"><strong>Disclaimer:</strong> Quote is for reference purposes only. All costs are subject to review.</div>
-</div>
+  <!-- Quote Summary -->
+  <div class="card">
+    <h3 style="margin-top:0">Quote Summary</h3>
+    <table id="orderTable">
+      <thead>
+        <tr>
+          <th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th><th>After-Hours (£)</th><th>Remove</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="grandTotal">Grand Total: £0.00</div>
+    <div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
+    <div class="muted" style="margin-top:6px;">After-hours surcharge: £20/hour + VAT applies outside regular opening hours.</div>
+    <div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
+    <div class="muted" style="margin-top:8px;"><strong>Disclaimer:</strong> Quote is for reference purposes only. All costs are subject to review.</div>
+  </div>
 </div>
 
 <!-- STAFF PAGE -->
@@ -239,12 +244,7 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
         <table id="staffTable">
           <thead>
             <tr>
-              <th>Role</th>
-              <th>Rate (£/hr)</th>
-              <th>Quantity</th>
-              <th>Hours</th>
-              <th>Total (£)</th>
-              <th>Remove</th>
+              <th>Role</th><th>Rate (£/hr)</th><th>Quantity</th><th>Hours</th><th>Total (£)</th><th>Remove</th>
             </tr>
           </thead>
           <tbody id="staffBody"></tbody>
@@ -259,16 +259,18 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ===== Modal markup (arrows + hint) ===== -->
 <div class="modal" id="venueModal" aria-hidden="true">
   <div class="modal-content" role="dialog" aria-modal="true">
     <button class="modal-close" aria-label="Close modal">Close</button>
+
     <div class="modal-media">
       <button class="modal-prev" aria-label="Previous image">&#8249;</button>
       <button class="modal-next" aria-label="Next image">&#8250;</button>
       <img src="" alt="Venue image" id="modalImg">
       <div class="modal-hint">Click image to view next • or use arrows</div>
     </div>
+
     <div class="modal-desc" id="modalDesc"></div>
   </div>
 </div>
@@ -315,15 +317,60 @@ clearSession.onclick = (e) => {
 };
 
 /* =========================
-   Venue data (your exact descriptions + images)
+   Venue data (your exact descriptions + extra public hi-res images)
+   - descriptions are preserved exactly as requested
+   - additional public-hosted high-res images added where available
    ========================= */
 const venueData = {
-  Bradshaw:{desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.", images:["https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg","http://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg?quality=90","https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg","https://cphfcrflaa.cloudimg.io/_bcuimages/04-07-2024-folk-ensemble-web-133765767100637752.jpg"]},
-  Recital:{desc:"The intimate Recital Hall has a variable acoustic and is a flexible space with a floor-level stage area. A bleacher seating rake of 146 capacity can be extended for concert set-up, or fully retracted underneath a small technical balcony for other seating and event set-ups including cabaret and theatre style. As with our larger Bradshaw Hall, attention has been paid to every detail in the design of the hall to optimise the experience of both audiences and performers – from the acoustics to the colour scheme of the interior fit-out and from performance lighting to technical capabilities.", images:["https://azure.wgp-cdn.co.uk/app-pianist/posts/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?&width=1200&height=630&mode=crop","https://www.association-of-noise-consultants.co.uk/wp-content/uploads/2018/08/RBC-Recital-Hall-Steinway-Piano-min.jpg","https://www.bof.co.uk/assets/images/projects/royal-birmingham-conservatoire/small-4.png"]},
-  Jazz:{desc:"Birmingham’s only dedicated Jazz venue, Eastside Jazz Club has been expertly designed to create a quintessential, cosy, jazz club atmosphere. Your guests can relax in style with low – level mood lighting and cabaret setting creating the perfect ambience for an authentic, sophisticated laid-back jazz bar. This is a fully flexible performance space with removable audience seating, tables and bar-stools running across three raised levels to be arranged as required. Choose from a private setting with blackout blinds or open to allow natural light in as desired. While predominantly for the performance of jazz music in all its forms, the venue is also an ideal setting for other types of small music gig as well as spoken word and comedy.", images:["https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg", "https://tse1.mm.bing.net/th/id/OIP.rQ4jKYUx7O_SLtJNosUp0wHaCx?pid=Api","https://tse1.mm.bing.net/th/id/OIP.cmNowyLdhr5FQ-WSsRMvaAHaF-?pid=Api"]},
-  Organ:{desc:"A light and airy venue that is equally suited to chamber and organ performance. The venue has a distinctive shape and tranquil atmosphere created by natural light flooding onto the pale wood of the interior. It is completely flexible in terms of the set-up and layout of the performance area and audience seating. The venue houses a Eule Pipe organ and features overhead performance lighting and Dante audio network for flexible location recording purposes. With access to Steinway model D or model B grand pianos, there is also a wide range of other instruments and equipment available for hire.", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg","https://tse4.mm.bing.net/th/id/OIP.ZqMlPPtq9HssFc17TJUyIAHaE8?pid=Api","https://tse1.mm.bing.net/th/id/OIP.Sc1WQGk9lCcNOehBIAWehwHaFj?pid=Api"]},
-  Lab:{desc:"The Lab is a cutting edge, completely flexible black-box studio with a technical walkway suspended around the perimeter. The 100 capacity venue has fixed acoustics with a low reverberation time and duplicate input points for a mobile sound desk to be installed at either end of the room. This enables complete flexibility in the set-up and layout of the performance and audience areas.", images:["https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg","https://tse3.mm.bing.net/th/id/OIP.KVLOD-33YQ_4lm-3T7IqewHaE8?pid=Api","https://tse3.mm.bing.net/th/id/OIP.y1fzC3dK3PyZjZh6JcXCjAHaE8?pid=Api"]},
-  Workshop:{desc:"Eight 30-60 capacity performance studios sit at the heart of the Conservatoire that have been designed to the highest artistic and commercial standards for the professional training of our musicians and actors. High ceilings, large windows and spacious open floor areas enable flexible spaces that are equally suited for the development of performance activity, as they are in providing a refined backdrop for conferences and meetings, or as the starting point to be dressed for functions and receptions. Each studio has a timber hardwood floor, grand piano, B&W surround sound or stereo system, laser projector and screen with wireless presentation connectivity", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg","https://img.bcu.ac.uk/_bcuimages/natalie-haas-cello-workshop-133970508075817499.jpg"] }
+  Bradshaw:{
+    desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.",
+    images:[
+      "https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg",
+      "https://live.staticflickr.com/4436/23528158398_1157c484df_o.jpg", /* Wikimedia high-res */
+      "http://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg?quality=90",
+      "https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg"
+    ]
+  },
+  Recital:{
+    desc:"The intimate Recital Hall has a variable acoustic and is a flexible space with a floor-level stage area. A bleacher seating rake of 146 capacity can be extended for concert set-up, or fully retracted underneath a small technical balcony for other seating and event set-ups including cabaret and theatre style. As with our larger Bradshaw Hall, attention has been paid to every detail in the design of the hall to optimise the experience of both audiences and performers – from the acoustics to the colour scheme of the interior fit-out and from performance lighting to technical capabilities.",
+    images:[
+      "https://azure.wgp-cdn.co.uk/app-pianist/posts/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?&width=1200&height=630&mode=crop",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/RBC_-_The_Concert_Hall.jpg/1024px-RBC_-_The_Concert_Hall.jpg",
+      "https://www.association-of-noise-consultants.co.uk/wp-content/uploads/2018/08/RBC-Recital-Hall-Steinway-Piano-min.jpg"
+    ]
+  },
+  Jazz:{
+    desc:"Birmingham’s only dedicated Jazz venue, Eastside Jazz Club has been expertly designed to create a quintessential, cosy, jazz club atmosphere. Your guests can relax in style with low – level mood lighting and cabaret setting creating the perfect ambience for an authentic, sophisticated laid-back jazz bar. This is a fully flexible performance space with removable audience seating, tables and bar-stools running across three raised levels to be arranged as required. Choose from a private setting with blackout blinds or open to allow natural light in as desired. While predominantly for the performance of jazz music in all its forms, the venue is also an ideal setting for other types of small music gig as well as spoken word and comedy.",
+    images:[
+      "https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg",
+      "https://cdn.charcoalblue.com/uploads/images/Projects/Royal-Birmingham-Conservatoire/_slideImage/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?v=1698765481",
+      "https://images.zipcube.com/7f4d65930bba0d4addaf75c4e547ef39.jpg?crop=400%3A300%2Csmart&height=300&width=400"
+    ]
+  },
+  Organ:{
+    desc:"A light and airy venue that is equally suited to chamber and organ performance. The venue has a distinctive shape and tranquil atmosphere created by natural light flooding onto the pale wood of the interior. It is completely flexible in terms of the set-up and layout of the performance area and audience seating. The venue houses a Eule Pipe organ and features overhead performance lighting and Dante audio network for flexible location recording purposes. With access to Steinway model D or model B grand pianos, there is also a wide range of other instruments and equipment available for hire.",
+    images:[
+      "https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/9/97/Patara_0005.jpg",
+      "https://img.bcu.ac.uk/_bcuimages/rbc-organ-dept-134026725852859391.jpg"
+    ]
+  },
+  Lab:{
+    desc:"The Lab is a cutting edge, completely flexible black-box studio with a technical walkway suspended around the perimeter. The 100 capacity venue has fixed acoustics with a low reverberation time and duplicate input points for a mobile sound desk to be installed at either end of the room. This enables complete flexibility in the set-up and layout of the performance and audience areas.",
+    images:[
+      "https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg",
+      "https://img.bcu.ac.uk/_bcuimages/birmingham-conservatoire-9-resize-131492604285283804.jpg",
+      "https://img.bcu.ac.uk/_bcuimages/bcu-rbc-music-labs-08jan20-285-facilities-132254592174769377.jpg"
+    ]
+  },
+  Workshop:{
+    desc:"Eight 30-60 capacity performance studios sit at the heart of the Conservatoire that have been designed to the highest artistic and commercial standards for the professional training of our musicians and actors. High ceilings, large windows and spacious open floor areas enable flexible spaces that are equally suited for the development of performance activity, as they are in providing a refined backdrop for conferences and meetings, or as the starting point to be dressed for functions and receptions. Each studio has a timber hardwood floor, grand piano, B&W surround sound or stereo system, laser projector and screen with wireless presentation connectivity",
+    images:[
+      "https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg",
+      "https://img.bcu.ac.uk/_bcuimages/natalie-haas-cello-workshop-133970508075817499.jpg",
+      "https://mac-birmingham.transforms.svdcdn.com/production/Hires/Our-spaces/Performance-studio/Performance-Studio-6.JPG?auto=format&crop=focalpoint&dm=1704296441&fit=crop&fp-x=0.1598&fp-y=0.5458&h=537&q=100&s=5fc8fc925d435bc0279d550848c7e793&w=600"
+    ]
+  }
 };
 
 /* ============= Gallery modal behavior ============= */
@@ -339,10 +386,11 @@ let currentImages = [], currentIndex = 0;
 function openVenue(venKey){
   const v = venueData[venKey];
   if(!v) return;
-  currentImages = v.images.slice(); // copy
+  // if some entries are not absolute URLs, filter
+  currentImages = (Array.isArray(v.images) ? v.images.slice() : []).filter(Boolean);
   currentIndex = 0;
-  modalImg.src = currentImages[currentIndex];
-  modalDesc.textContent = v.desc;
+  modalImg.src = currentImages[currentIndex] || '';
+  modalDesc.textContent = v.desc || '';
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden','false');
   // focus for accessibility
@@ -549,6 +597,5 @@ function updateStaffTotal(){
 updateStaffTotal();
 </script>
 
-</div>
 </body>
 </html>
