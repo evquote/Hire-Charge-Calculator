@@ -329,27 +329,34 @@ const nextBtn = document.querySelector('.modal-next');
 
 let currentImages = [];
 let currentIndex = 0;
+let currentVenue = '';
+
+function showModalImage() {
+  modalImg.src = currentImages[currentIndex];
+  modalDesc.textContent = venueData[currentVenue].desc;
+  modal.querySelector('.modal-body').scrollTop = 0; // scroll to top
+}
 
 panels.forEach(panel=>{
   panel.addEventListener('click',()=>{
-    const venue = panel.dataset.venue;
-    currentImages = venueData[venue].images;
+    currentVenue = panel.dataset.venue;
+    currentImages = venueData[currentVenue].images;
     currentIndex = 0;
-    modalImg.src = currentImages[currentIndex];
-    modalDesc.textContent = venueData[venue].desc;
+    showModalImage();
     modal.style.display='flex';
   });
 });
 
 closeBtn.onclick = ()=>{modal.style.display='none';};
 prevBtn.onclick = ()=>{
-  currentIndex = (currentIndex-1+currentImages.length)%currentImages.length;
-  modalImg.src = currentImages[currentIndex];
+  currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+  showModalImage();
 };
 nextBtn.onclick = ()=>{
-  currentIndex = (currentIndex+1)%currentImages.length;
-  modalImg.src = currentImages[currentIndex];
+  currentIndex = (currentIndex + 1) % currentImages.length;
+  showModalImage();
 };
+
 </script>
 </div>
 </body>
