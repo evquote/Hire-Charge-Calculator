@@ -1,178 +1,788 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Royal Birmingham Conservatoire — Multi-Venue Quote Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Birmingham Conservatoire — Multi-Venue Quote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. Global & Reset Styles --- */
+        :root {
+            --primary-color: #004a99; /* A professional, corporate blue */
+            --secondary-color: #d4a300; /* An accent gold, common for conservatoires */
+            --light-grey: #f4f7f6;
+            --dark-grey: #333333;
+            --border-color: #e0e0e0;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --border-radius: 8px;
+        }
 
-<link rel="stylesheet" href="./style.css">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-grey);
+            color: var(--dark-grey);
+            line-height: 1.6;
+        }
+
+        /* --- 2. Header & Layout --- */
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 24px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-weight: 600;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* This is the main content wrapper */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* --- 3. Tab Navigation --- */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-button {
+            padding: 15px 30px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+            opacity: 0.7;
+            position: relative;
+            top: 2px; /* Aligns with the bottom border */
+        }
+
+        .tab-button.active {
+            opacity: 1;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none; /* Hide tabs by default */
+            padding-top: 30px;
+        }
+
+        .tab-content.active {
+            display: block; /* Show active tab */
+        }
+
+        /* --- 4. Venue Gallery --- */
+        .venue-gallery {
+            display: grid;
+            /* Creates a responsive grid that fits as many 300px+ cards as possible */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .venue-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden; /* Clips the image to the card's rounded corners */
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .venue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .venue-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover; /* Ensures images fill the space without stretching */
+            display: block;
+        }
+
+        .venue-card p {
+            text-align: center;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background-color: #fafafa;
+            margin: 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* --- 5. Form Styling --- */
+        .calculator-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two-column layout for the form */
+            gap: 24px;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .form-section {
+            grid-column: 1 / -1; /* Make section titles span both columns */
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .form-section h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Form group that spans the full width */
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .form-group input[type="time"],
+        .form-group select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-group input[type="time"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
+        }
+
+        /* Day Selection Checkboxes */
+        .day-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px;
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .day-selection div {
+            display: flex;
+            align-items: center;
+        }
+
+        .day-selection label {
+            font-weight: 400;
+            margin: 0 0 0 8px;
+            text-transform: none;
+            color: var(--dark-grey);
+            cursor: pointer;
+        }
+
+        .day-selection input[type="checkbox"] {
+            width: 1.3em;
+            height: 1.3em;
+            cursor: pointer;
+        }
+
+        /* --- 6. Button Styling --- */
+        .button-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #003b7a;
+            box-shadow: 0 4px 10px rgba(0, 74, 153, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: var(--white);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* --- 7. Quote Summary Table --- */
+        #quote-summary-container h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Makes the table horizontally scrollable on small screens */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .quote-table th,
+        .quote-table td {
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            text-align: left;
+        }
+
+        .quote-table th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+        }
+
+        .quote-table td:last-child {
+            text-align: center;
+        }
+        
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        /* --- 8. Totals & Footer --- */
+        .totals-section {
+            text-align: right;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        #grand-total {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+        
+        .disclaimer {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        /* --- 9. Staffing Tab Placeholder --- */
+        #staffing-tab p {
+            font-size: 1.1rem;
+            color: #777;
+            text-align: center;
+            padding: 40px;
+            background-color: #fdfdfd;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+    </style>
 </head>
 <body>
-<div class="wrapper">
 
-<header>
-  <div>
-    <h1>Royal Birmingham Conservatoire — Multi-Venue Quote</h1>
-    <div class="muted">Add multiple venues to generate a combined quote. All prices + VAT.</div>
-  </div>
-  <nav>
-        <button id="venueTab" class="active">Venue Quote</button>
-    <button id="staffTab">Staffing Costs</button>
-    <a href="#" class="button" id="clearSession" style="display:none;">Logout Staffing</a>
-  </nav>
-</header>
+    <header>
+        <h1>Royal Birmingham Conservatoire</h1>
+        <p>Multi-Venue Quote Calculator</p>
+    </header>
 
-<div id="galleryContainer">
-    <div class="gallery" id="venueGallery">
-      <div class="panel" data-venue="Bradshaw">
-        <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-24-131600593110714462.jpg" alt="Bradshaw Hall" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Bradshaw+Hall'">
-        <div class="title">Bradshaw Hall</div>
-      </div>
-      <div class="panel" data-venue="Recital">
-        <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-27-131600597991399988.jpg" alt="Recital Hall" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Recital+Hall'">
-        <div class="title">Recital Hall</div>
-      </div>
-      <div class="panel" data-venue="Jazz">
-        <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg" alt="Eastside Jazz Club" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Jazz+Club'">
-        <div class="title">Eastside Jazz Club</div>
-      </div>
-      <div class="panel" data-venue="Organ">
-        <img src="https.img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg" alt="Organ Studio" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Organ+Studio'">
-        <div class="title">Organ Studio</div>
-      </div>
-      <div class="panel" data-venue="Lab">
-        <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg" alt="The Lab" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=The+Lab'">
-        <div class="title">The Lab</div>
-      </div>
-      <div class="panel" data-venue="Workshop">
-        <img src="httpsimg.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg" alt="Workshops / Performance Studios" onerror="this.src='https://placehold.co/300x200/002e5b/white?text=Workshops'">
-        <div class="title">Workshops / Performance Studios</div>
-      </div>
-    </div>
-</div>
+    <main class="container">
+        
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="venue-tab">Venue Quote</button>
+            <button class="tab-button" data-tab="staffing-tab">Staffing Costs</button>
+        </nav>
 
-<div id="venuePage">
-<div class="card">
-  <div class="grid">
-    <div class="full">
-      <fieldset>
-        <legend><strong>Booking Times & Event Day(s)</strong></legend>
-        <div class="muted" style="margin-bottom:12px;">
-          Please include your full booking time (get-in and get-out). Minimum 4-hour booking applies.<br>
-          Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.<br>
-          After-hours surcharge: £20/hour + VAT applies outside these hours.
-        </div>
-        <div style="display:flex;gap:16px;margin-bottom:12px; flex-wrap:wrap;">
-          <div style="flex:1; min-width: 200px;">
-            <label for="startTime">Booking Start Time</label>
-            <select id="startTime"></select>
-          </div>
-          <div style="flex:1; min-width: 200px;">
-            <label for="endTime">Booking End Time</label>
-            <select id="endTime"></select>
-          </div>
-        </div>
-        <div style="margin-bottom:6px;">
-          <label style="margin-bottom: 10px;"><strong>Event Day(s)</strong></label>
-          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;">
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Mon"> Mon</label>
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Tue"> Tue</label>
-    _       <label style="font-weight:400;"><input type="checkbox" class="day" value="Wed"> Wed</label>
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Thu"> Thu</label>
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Fri"> Fri</label>
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Sat"> Sat</label>
-            <label style="font-weight:400;"><input type="checkbox" class="day" value="Sun"> Sun</label>
-          </div>
-        </div>
-      </fieldset>
-    </div>
+        <section id="venue-tab" class="tab-content active">
 
-    <div>
-      <label for="venue">Venue / Space</label>
-D     <select id="venue">
-        <option value="">— select venue —</option>
-        <option value="Bradshaw">Bradshaw Hall</option>
-        <option value="Recital">Recital Hall</option>
-        <option value="Lab">The Lab</option>
-        <option value="Jazz">Eastside Jazz Club</option>
-        <option value="Organ">Organ Studio</option>
-        <option value="Workshop">Workshop Space</option>
-      </select>
-    </div>
+            <div class="venue-gallery">
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-24-131600593110714462.jpg" alt="Bradshaw Hall">
+                    <p>Bradshaw Hall</p>
+                </div>
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-27-131600597991399988.jpg" alt="Recital Hall">
+                    <p>Recital Hall</p>
+                </div>
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg" alt="Eastside Jazz Club">
+                    <p>Eastside Jazz Club</p>
+                </div>
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg" alt="Organ Studio">
+                    <p>Organ Studio</p>
+                </div>
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg" alt="The Lab">
+                    <p>The Lab</p>
+                </div>
+                <div class="venue-card">
+                    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg" alt="Workshops / Performance Studios">
+                    <p>Workshops / Studios</p>
+                </div>
+            </div>
 
-    <div>
-      <label for="hireType">Hire Type</label>
-      <select id="hireType">
-        <option value="standard">Standard Rate (includes FOH staff)</option>
-        <option value="premium">Recording / Premium Workshop (dry hire)</option>
-      </select>
-    </div>
+            <form id="quote-form" class="calculator-form">
+                
+                <div class="form-section">
+                    <h3>Booking Details</h3>
+                </div>
 
-    <div class="full">
-      <fieldset>
-        <legend><strong>Technical / Equipment</strong></legend>
-        <div class="muted" style="margin-bottom:6px;">Quantity</div>
-        <div class="checkbox-row"><div>PA (per day)</div><div><input id="pa_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Projector (per day)</div><div><input id="projector_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Microphone (wired)</div><div><input id="mic_wired_qty" class="qty"type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Microphone (wireless)</div><div><input id="mic_wireless_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Monitor</div><div><input id="monitor_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Overhead audio recording</div><div><input id="overhead_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Static video recording</div><div><input id="video_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Laptop</div><div><input id="laptop_qty" class="qty" type="number" min="0" value="0" /></div></div>
-        <div class="checkbox-row"><div>Grand Piano</div><div><input id="piano_qty" class="qty" type="number" min="0" value="0" /></div></div>
-      </fieldset>
-    </div>
+                <div class="form-group">
+                    <label for="venue">Venue / Space</label>
+                    <select id="venue" name="venue">
+                        <option value="Bradshaw Hall">Bradshaw Hall</option>
+                        <option value="Recital Hall">Recital Hall</option>
+                        <option value="The Lab">The Lab</option>
+                        <option value="Eastside Jazz Club">Eastside Jazz Club</option>
+                        <option value="Organ Studio">Organ Studio</option>
+                        <option value="Workshop Space">Workshop Space</option>
+                    </select>
+                </div>
 
-    <div id="form-error" class="form-error"></div>
+                <div class="form-group">
+                    <label for="hire-type">Hire Type</label>
+                    <select id="hire-type" name="hire-type">
+                        <option value="Standard Rate">Standard Rate (includes FOH staff)</option>
+                        <option value="Recording / Premium Workshop">Recording / Premium Workshop (dry hire)</option>
+                    </select>
+                </div>
 
-    <div class="full" style="margin-top:10px;">
-      <button id="addBtn" class="mainBtn">Add to Quote</button>
-      <button id="emailBtn" class="mainBtn">Email Quote</button>
-      <button id="downloadBtn" class="mainBtn">Download HTML</button>
-    </div>
-  </div>
-</div>
+                <div class="form-group">
+                    <label for="start-time">Booking Start Time</label>
+                    <input type="time" id="start-time" name="start-time" value="09:00" step="1800">
+                </div>
 
-<div class="card">
-<h3 style="margin-top:0">Quote Summary</h3>
-<div style="overflow-x: auto;"> <table id="orderTable">
-<thead>
-<tr>
-<th>Venue</th><th>Hire Type</th><th>Hours</th><th>Base (£)</th><th>Equipment (£)</th><th>Subtotal (£)</th><th>VAT (£)</th><th>Total (£)</th><th>After-Hours (£)</th><th>Remove</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-<div id="grandTotal">Grand Total: £0.00</div>
-<div class="muted" style="margin-top:6px;">Technician hours will be quoted separately based on the technical requirements of the event.</div>
-<div class="muted" style="margin-top:6px;">After-hours surcharge: £20/hour + VAT applies outside regular opening hours.</div>
-<div class="muted">For booking & detailed technical quotes contact: conservatoireevents@bcu.ac.uk</div>
-<div class="muted" style="margin-top:8px;"><strong>Disclaimer:</strong> Quote is for reference purposes only. All costs are subject to review.</div>
-</div>
-</div> <div id="staffPage" class="card" style="display: none;">
-    <h3>Staffing Costs</h3>
-    <p>This feature is not yet built. You can add your staffing calculator form here.</p>
-</div>
+                <div class="form-group">
+                    <label for="end-time">Booking End Time</label>
+                    <input type="time" id="end-time" name="end-time" value="17:00" step="1800">
+                </div>
+                
+                <div class="form-group form-group-full">
+                    <label>Event Day(s)</label>
+                    <div class="day-selection">
+                        <div><input type="checkbox" id="mon" name="day" value="Mon"><label for="mon">Mon</label></div>
+                        <div><input type="checkbox" id="tue" name="day" value="Tue"><label for="tue">Tue</label></div>
+                        <div><input type="checkbox" id="wed" name="day" value="Wed"><label for="wed">Wed</label></div>
+                        <div><input type="checkbox" id="thu" name="day" value="Thu"><label for="thu">Thu</label></div>
+                        <div><input type="checkbox" id="fri" name="day" value="Fri"><label for="fri">Fri</label></div>
+                        <div><input type="checkbox" id="sat" name="day" value="Sat"><label for="sat">Sat</label></div>
+                        <div><input type="checkbox" id="sun" name="day" value="Sun"><label for="sun">Sun</label></div>
+                    </div>
+                </div>
 
-<div id="venueModal" class="modal">
-  <div class="modal-content">
-    <button class="modal-close">×</button>
-    <button class="modal-arrow modal-prev">❮</button>
-    <button class="modal-arrow modal-next">❯</button>
-    <div id="modalImageContainer"></div>
-    <div class="desc" id="modalDesc"></div>
-  </div>
-</div>
+                <div class="form-section">
+                    <h3>Technical / Equipment (per day)</h3>
+                </div>
 
-</div> <script src="./app.js" defer></script>
+                <div class="form-group">
+                    <label for="pa">PA (per day)</label>
+                    <select id="pa" name="pa" class="equipment">
+                        <option value="0">0</option><option value="1">1</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="projector">Projector (per day)</label>
+                    <select id="projector" name="projector" class="equipment">
+                        <option value="0">0</option><option value="1">1</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mic-wired">Microphone (wired)</label>
+                    <select id="mic-wired" name="mic-wired" class="equipment">
+                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mic-wireless">Microphone (wireless)</label>
+                    <select id="mic-wireless" name="mic-wireless" class="equipment">
+                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="monitor">Monitor</label>
+                    <select id="monitor" name="monitor" class="equipment">
+                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="laptop">Laptop</label>
+                    <select id="laptop" name="laptop" class="equipment">
+                        <option value="0">0</option><option value="1">1</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="piano">Grand Piano</label>
+                    <select id="piano" name="piano" class="equipment">
+                        <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="audio-rec">Overhead Audio Recording</label>
+                    <select id="audio-rec" name="audio-rec" class="equipment">
+                        <option value="0">0</option><option value="1">1</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" id="add-quote-btn" class="btn btn-primary">Add to Quote</button>
+                    <button type="button" id="email-btn" class="btn btn-secondary">Email Quote</button>
+                    <button type="button" id="download-btn" class="btn btn-secondary">Download HTML</button>
+                </div>
+            </form>
+
+            <section id="quote-summary-container">
+                <h2>Quote Summary</h2>
+                <div class="table-wrapper">
+                    <table class="quote-table">
+                        <thead>
+                            <tr>
+                                <th>Venue</th>
+                                <th>Hire Type</th>
+                                <th>Hours</th>
+                                <th>Days</th>
+                                <th>Base (£)</th>
+                                <th>Equipment (£)</th>
+                                <th>After-Hours (£)</th>
+                                <th>Subtotal (£)</th>
+                                <th>VAT (£)</th>
+                                <th>Total (£)</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quote-summary-body">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="totals-section">
+                    <strong>Grand Total (inc. VAT)</strong>
+                    <div id="grand-total">£0.00</div>
+                </div>
+                <div class="disclaimer">
+                    <p><strong>Note:</strong> All prices + VAT. Minimum 4-hour booking applies.
+                    <br>Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.
+                    <br>After-hours surcharge: £20/hour + VAT applies outside these hours.
+                    <br>Technician hours will be quoted separately based on the technical requirements of the event.
+                    <br>For booking & detailed technical quotes contact: <strong>conservatoireevents@bcu.ac.uk</strong>
+                    <br><strong>Disclaimer:</strong> Quote is for reference purposes only. All costs are subject to review.
+                    </p>
+                </div>
+            </section>
+        </section>
+
+        <section id="staffing-tab" class="tab-content">
+            <p>This feature is not yet built. You can add your staffing calculator form here.</p>
+        </section>
+    </main>
+
+
+    <script>
+        // Wait for the page to be fully loaded before running scripts
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. Tab Switching Logic ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Get the target tab ID from the data-tab attribute
+                    const targetTab = button.getAttribute('data-tab');
+
+                    // Deactivate all tabs and buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Activate the clicked button and its corresponding tab
+                    button.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            // --- 2. Calculator Logic ---
+
+            // Define rates (these are for demonstration)
+            const venueRates = {
+                'Bradshaw Hall': { 'Standard Rate': 180, 'Recording / Premium Workshop': 150 },
+                'Recital Hall': { 'Standard Rate': 120, 'Recording / Premium Workshop': 100 },
+                'The Lab': { 'Standard Rate': 90, 'Recording / Premium Workshop': 70 },
+                'Eastside Jazz Club': { 'Standard Rate': 100, 'Recording / Premium Workshop': 80 },
+                'Organ Studio': { 'Standard Rate': 70, 'Recording / Premium Workshop': 50 },
+                'Workshop Space': { 'Standard Rate': 60, 'Recording / Premium Workshop': 40 },
+            };
+
+            const equipmentRates = {
+                'pa': 150,
+                'projector': 80,
+                'mic-wired': 10,
+                'mic-wireless': 25,
+                'monitor': 20,
+                'laptop': 40,
+                'piano': 100,
+                'audio-rec': 75,
+            };
+
+            const VAT_RATE = 0.20; // 20%
+            const MIN_HOURS = 4;
+            const AFTER_HOURS_SURCHARGE = 20;
+
+            // DOM element references
+            const addQuoteBtn = document.getElementById('add-quote-btn');
+            const quoteBody = document.getElementById('quote-summary-body');
+            const grandTotalEl = document.getElementById('grand-total');
+
+            // Store all quote items in an array
+            let quoteItems = [];
+
+            // Main function to add an item to the quote
+            addQuoteBtn.addEventListener('click', () => {
+                // Get all form values
+                const venue = document.getElementById('venue').value;
+                const hireType = document.getElementById('hire-type').value;
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
+                
+                const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked'));
+                const days = selectedDays.map(day => day.value);
+                const dayCount = days.length;
+
+                // --- Validation ---
+                if (!startTime || !endTime) {
+                    alert('Please select a start and end time.');
+                    return;
+                }
+
+                if (dayCount === 0) {
+                    alert('Please select at least one event day.');
+                    return;
+                }
+
+                const duration = calculateDuration(startTime, endTime);
+                if (duration < MIN_HOURS) {
+                    alert(`Minimum booking is ${MIN_HOURS} hours. Your selection is ${duration.toFixed(2)} hours.`);
+                    return;
+                }
+
+                // --- Calculations ---
+                const rate = venueRates[venue][hireType];
+                const baseHire = rate * duration * dayCount;
+
+                // Calculate equipment costs
+                let equipmentCost = 0;
+                const equipmentInputs = document.querySelectorAll('.equipment');
+                equipmentInputs.forEach(input => {
+                    const rateKey = input.id;
+                    const quantity = parseInt(input.value, 10);
+                    if (quantity > 0 && equipmentRates[rateKey]) {
+                        equipmentCost += equipmentRates[rateKey] * quantity;
+                    }
+                });
+                const totalEquipmentCost = equipmentCost * dayCount; // Equipment is per day
+
+                // Calculate after-hours surcharge
+                const surcharge = calculateSurcharge(startTime, endTime, days);
+                const totalSurcharge = surcharge * dayCount;
+                
+                // Calculate totals
+                const subtotal = baseHire + totalEquipmentCost + totalSurcharge;
+                const vat = subtotal * VAT_RATE;
+                const total = subtotal + vat;
+
+                // Create a quote object
+                const quoteItem = {
+                    id: Date.now(), // Unique ID for removal
+                    venue,
+                    hireType,
+                    duration,
+                    days: days.join(', '),
+                    dayCount,
+                    baseHire,
+                    totalEquipmentCost,
+                    totalSurcharge,
+                    subtotal,
+                    vat,
+                    total
+                };
+                
+                // Add to array and re-render
+                quoteItems.push(quoteItem);
+                renderQuoteTable();
+            });
+
+            // Function to parse time and calculate duration in hours
+            function calculateDuration(start, end) {
+                const [startH, startM] = start.split(':').map(Number);
+                const [endH, endM] = end.split(':').map(Number);
+
+                const startDate = new Date(0, 0, 0, startH, startM);
+                let endDate = new Date(0, 0, 0, endH, endM);
+
+                // Handle overnight bookings
+                if (endDate < startDate) {
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+
+                const diffMs = endDate - startDate;
+                return diffMs / (1000 * 60 * 60); // Convert milliseconds to hours
+            }
+            
+            // Function to calculate after-hours surcharge
+            function calculateSurcharge(start, end, days) {
+                const [startH, startM] = start.split(':').map(Number);
+                const [endH, endM] = end.split(':').map(Number);
+                
+                let totalSurchargeHours = 0;
+
+                // Check for each day type (Week or Weekend)
+                days.forEach(day => {
+                    const isWeekend = (day === 'Sat' || day === 'Sun');
+                    const regularStart = 8; // 08:00
+                    const regularEnd = isWeekend ? 19 : 23; // 19:00 or 23:00
+
+                    const bookingStart = startH + startM / 60;
+                    let bookingEnd = endH + endM / 60;
+                    
+                    // Handle overnight
+                    if (bookingEnd < bookingStart) {
+                        bookingEnd += 24; 
+                    }
+                    
+                    // Note: This is a simplified calculation.
+                    // A real one would check hour by hour.
+                    if (bookingStart < regularStart) {
+                        totalSurchargeHours += (regularStart - bookingStart);
+                    }
+                    if (bookingEnd > regularEnd) {
+                        totalSurchargeHours += (bookingEnd - regularEnd);
+                    }
+                });
+                
+                // We return the average surcharge hours per day
+                const averageSurchargeHours = totalSurchargeHours / days.length;
+                return averageSurchargeHours * AFTER_HOURS_SURCHARGE;
+            }
+
+            // Function to render the entire quote table
+            function renderQuoteTable() {
+                // Clear existing table body
+                quoteBody.innerHTML = '';
+                let grandTotal = 0;
+
+                quoteItems.forEach(item => {
+                    grandTotal += item.total;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.venue}</td>
+                        <td>${item.hireType}</td>
+                        <td>${item.duration.toFixed(2)} x ${item.dayCount} days</td>
+                        <td>${item.days}</td>
+                        <td>${item.baseHire.toFixed(2)}</td>
+                        <td>${item.totalEquipmentCost.toFixed(2)}</td>
+                        <td>${item.totalSurcharge.toFixed(2)}</td>
+                        <td><strong>${item.subtotal.toFixed(2)}</strong></td>
+                        <td>${item.vat.toFixed(2)}</td>
+                        <td><strong>${item.total.toFixed(2)}</strong></td>
+                        <td><button class="remove-btn" data-id="${item.id}">X</button></td>
+                    `;
+                    quoteBody.appendChild(row);
+                });
+
+                // Update grand total display
+                grandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
+
+                // Add event listeners to new remove buttons
+                addRemoveListeners();
+            }
+
+            // Function to add listeners to all "remove" buttons
+            function addRemoveListeners() {
+                document.querySelectorAll('.remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const idToRemove = parseInt(e.target.getAttribute('data-id'), 10);
+                        // Filter out the item to be removed
+                        quoteItems = quoteItems.filter(item => item.id !== idToRemove);
+                        // Re-render the table
+                        renderQuoteTable();
+                    });
+                });
+            }
+
+            // --- 3. Staffing Cost Logic (Placeholder) ---
+            // You can add the logic for your staffing tab here.
+            // It would follow the same pattern:
+            // 1. Get inputs from the #staffing-tab section.
+            // 2. Calculate costs.
+            // 3. Display them (perhaps in a separate table or add to the main total).
+
+        });
+    </script>
 
 </body>
 </html>
-
