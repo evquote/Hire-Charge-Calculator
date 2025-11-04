@@ -37,17 +37,17 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 /* ===== Gallery styles ===== */
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
 .panel{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,0.1);transition:transform 0.3s;}
-.panel:hover{transform:scale(1.05);}
-.panel img{width:100%;height:120px;object-fit:cover;display:block;}
+.panel img{width:100%;height:120px;object-fit:cover;display:block;transition:transform 0.3s;}
+.panel:hover img{transform:scale(1.05);}
 .panel .title{position:absolute;bottom:0;width:100%;background:rgba(0,46,91,0.8);color:white;text-align:center;padding:6px;font-size:14px;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:9999;}
-.modal-content{background:white;max-width:800px;width:90%;max-height:90vh;padding:20px;border-radius:8px;position:relative;overflow-y:auto;}
-.modal-content img{width:100%;height:auto;border-radius:6px;cursor:pointer;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:9999;overflow:auto;}
+.modal-content{background:white;max-width:800px;width:90%;padding:20px;border-radius:8px;position:relative;overflow-y:auto;max-height:90vh;}
+.modal-content img{width:100%;height:auto;border-radius:6px;cursor:pointer;margin-bottom:10px;}
 .modal-content .desc{margin-top:10px;color:#222;font-size:14px;}
 .modal-close{position:absolute;top:10px;right:10px;background:var(--brand);color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;}
-.modal-arrow{position:absolute;top:50%;transform:translateY(-50%);background:var(--brand);color:white;border:none;padding:6px 10px;border-radius:50%;cursor:pointer;font-size:18px;}
-.modal-arrow.left{left:10px;}
-.modal-arrow.right{right:10px;}
+.modal-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,46,91,0.8);color:white;border:none;padding:10px;border-radius:50%;cursor:pointer;font-size:18px;}
+.modal-prev{left:10px;}
+.modal-next{right:10px;}
 
 @media (max-width:700px){.grid{grid-template-columns:1fr;}header{flex-direction:column;align-items:flex-start;}}
 </style>
@@ -236,8 +236,8 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 <div class="modal" id="venueModal">
   <div class="modal-content">
     <button class="modal-close">Close</button>
-    <button class="modal-arrow left">&#10094;</button>
-    <button class="modal-arrow right">&#10095;</button>
+    <button class="modal-arrow modal-prev">&#10094;</button>
+    <button class="modal-arrow modal-next">&#10095;</button>
     <img src="" alt="Venue Image" id="modalImg">
     <div class="desc" id="modalDesc"></div>
   </div>
@@ -271,11 +271,28 @@ staffTab.onclick = () => {
     clearSession.style.display = 'inline-block';
   }else{ alert('Incorrect password.'); }
 };
-clearSession.onclick = (e)=>{ e.preventDefault(); sessionStorage.removeItem('staffAccess'); clearSession.style.display = 'none'; venuePage.classList.remove('hidden'); staffPage.classList.add('hidden'); alert('Staffing access cleared.'); };
+clearSession.onclick = (e)=>{
+  e.preventDefault();
+  sessionStorage.removeItem('staffAccess');
+  clearSession.style.display = 'none';
+  venuePage.classList.remove('hidden');
+  staffPage.classList.add('hidden');
+  alert('Staffing access cleared.');
+};
 
-// ========================= Gallery Modal
+// ========================= Fill Time Selects
+const startTime = document.getElementById('startTime'), endTime=document.getElementById('endTime');
+for(let h=0;h<24;h++){
+  for(let m=0;m<60;m+=30){
+    const val = (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+    const opt1 = document.createElement('option'); opt1.value=val; opt1.textContent=val; startTime.appendChild(opt1);
+    const opt2 = document.createElement('option'); opt2.value=val; opt2.textContent=val; endTime.appendChild(opt2);
+  }
+}
+
+// ========================= Venue Data
 const venueData = {
-  Bradshaw:{desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-24-131600593110714462.jpg","http://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg","https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg","https://cphfcrflaa.cloudimg.io/_bcuimages/04-07-2024-folk-ensemble-web-133765767100637752.jpg"]},
+  Bradshaw:{desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.", images:["https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg","http://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg?quality=90","https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg","https://cphfcrflaa.cloudimg.io/_bcuimages/04-07-2024-folk-ensemble-web-133765767100637752.jpg"]},
   Recital:{desc:"The intimate Recital Hall has a variable acoustic and is a flexible space with a floor-level stage area. A bleacher seating rake of 146 capacity can be extended for concert set-up, or fully retracted underneath a small technical balcony for other seating and event set-ups including cabaret and theatre style. As with our larger Bradshaw Hall, attention has been paid to every detail in the design of the hall to optimise the experience of both audiences and performers – from the acoustics to the colour scheme of the interior fit-out and from performance lighting to technical capabilities.", images:["https://azure.wgp-cdn.co.uk/app-pianist/posts/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?&width=1200&height=630&mode=crop","https://www.association-of-noise-consultants.co.uk/wp-content/uploads/2018/08/RBC-Recital-Hall-Steinway-Piano-min.jpg","https://www.bof.co.uk/assets/images/projects/royal-birmingham-conservatoire/small-4.png"]},
   Jazz:{desc:"Birmingham’s only dedicated Jazz venue, Eastside Jazz Club has been expertly designed to create a quintessential, cosy, jazz club atmosphere. Your guests can relax in style with low – level mood lighting and cabaret setting creating the perfect ambience for an authentic, sophisticated laid-back jazz bar. This is a fully flexible performance space with removable audience seating, tables and bar-stools running across three raised levels to be arranged as required. Choose from a private setting with blackout blinds or open to allow natural light in as desired. While predominantly for the performance of jazz music in all its forms, the venue is also an ideal setting for other types of small music gig as well as spoken word and comedy.", images:["https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg", "https://tse1.mm.bing.net/th/id/OIP.rQ4jKYUx7O_SLtJNosUp0wHaCx?pid=Api","https://tse1.mm.bing.net/th/id/OIP.cmNowyLdhr5FQ-WSsRMvaAHaF-?pid=Api"]},
   Organ:{desc:"A light and airy venue that is equally suited to chamber and organ performance. The venue has a distinctive shape and tranquil atmosphere created by natural light flooding onto the pale wood of the interior. It is completely flexible in terms of the set-up and layout of the performance area and audience seating. The venue houses a Eule Pipe organ and features overhead performance lighting and Dante audio network for flexible location recording purposes. With access to Steinway model D or model B grand pianos, there is also a wide range of other instruments and equipment available for hire.", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg","https://tse4.mm.bing.net/th/id/OIP.ZqMlPPt9HssFc17TJUyIAHaE8?pid=Api","https://tse1.mm.bing.net/th/id/OIP.Sc1WQGk9lCcNOehBIAWehwHaFj?pid=Api"]},
@@ -283,48 +300,77 @@ const venueData = {
   Workshop:{desc:"Eight 30-60 capacity performance studios sit at the heart of the Conservatoire that have been designed to the highest artistic and commercial standards for the professional training of our musicians and actors. High ceilings, large windows and spacious open floor areas enable flexible spaces that are equally suited for the development of performance activity, as they are in providing a refined backdrop for conferences and meetings, or as the starting point to be dressed for functions and receptions. Each studio has a timber hardwood floor, grand piano, B&W surround sound or stereo system, laser projector and screen with wireless presentation connectivity", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg","https://img.bcu.ac.uk/_bcuimages/natalie-haas-cello-workshop-133970508075817499.jpg"]}
 };
 
+// ========================= Modal Gallery
+const galleryPanels = document.querySelectorAll('.gallery .panel');
 const modal = document.getElementById('venueModal');
 const modalImg = document.getElementById('modalImg');
 const modalDesc = document.getElementById('modalDesc');
-const panels = document.querySelectorAll('.panel');
-const modalClose = modal.querySelector('.modal-close');
-const modalLeft = modal.querySelector('.modal-arrow.left');
-const modalRight = modal.querySelector('.modal-arrow.right');
+let currentImages = [], currentIndex=0;
 
-let currentImages = [], currentIndex = 0;
-
-panels.forEach(p=>{
-  p.addEventListener('click',()=>{
-    const venue = p.dataset.venue;
+galleryPanels.forEach(panel=>{
+  panel.addEventListener('click',()=>{
+    const venue = panel.dataset.venue;
     currentImages = venueData[venue].images;
-    currentIndex = 0;
+    currentIndex=0;
     modalImg.src = currentImages[currentIndex];
     modalDesc.textContent = venueData[venue].desc;
-    modal.style.display = 'flex';
+    modal.style.display='flex';
   });
 });
 
-modalClose.onclick = ()=> modal.style.display = 'none';
-modalLeft.onclick = ()=>{
-  currentIndex = (currentIndex-1+currentImages.length)%currentImages.length;
-  modalImg.src = currentImages[currentIndex];
+document.querySelector('.modal-close').onclick=()=>{modal.style.display='none';};
+document.querySelector('.modal-prev').onclick=()=>{
+  if(currentImages.length===0) return;
+  currentIndex=(currentIndex-1+currentImages.length)%currentImages.length;
+  modalImg.src=currentImages[currentIndex];
 };
-modalRight.onclick = ()=>{
-  currentIndex = (currentIndex+1)%currentImages.length;
-  modalImg.src = currentImages[currentIndex];
+document.querySelector('.modal-next').onclick=()=>{
+  if(currentImages.length===0) return;
+  currentIndex=(currentIndex+1)%currentImages.length;
+  modalImg.src=currentImages[currentIndex];
 };
 
-window.onclick = e => { if(e.target===modal) modal.style.display='none'; };
+// ========================= QUOTE LOGIC
+const addBtn = document.getElementById('addBtn');
+const orderTableBody = document.querySelector('#orderTable tbody');
+const grandTotalDiv = document.getElementById('grandTotal');
 
-// ========================= Populate Time Selects
-const startTime = document.getElementById('startTime'),
-      endTime = document.getElementById('endTime');
-for(let h=0;h<24;h++){
-  for(let m=0;m<60;m+=30){
-    const val=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
-    const opt1=document.createElement('option'); opt1.value=val; opt1.textContent=val; startTime.appendChild(opt1);
-    const opt2=document.createElement('option'); opt2.value=val; opt2.textContent=val; endTime.appendChild(opt2);
-  }
+addBtn.onclick = ()=>{
+  const venue = document.getElementById('venue').value;
+  if(!venue){ alert('Please select a venue'); return;}
+  const hireType = document.getElementById('hireType').value;
+  const start = startTime.value;
+  const end = endTime.value;
+  if(!start||!end){ alert('Please select start and end times'); return; }
+  const days = [...document.querySelectorAll('.day:checked')].map(c=>c.value);
+  if(days.length===0){alert('Please select event day(s)');return;}
+  
+  const hours = Math.max(1,(parseInt(end.split(':')[0])+parseInt(end.split(':')[1])/60)-(parseInt(start.split(':')[0])+parseInt(start.split(':')[1])/60));
+  const baseRate= 100; // placeholder, could adjust per venue
+  const equipmentRate = parseInt(document.getElementById('pa_qty').value)*10
+                      +parseInt(document.getElementById('projector_qty').value)*5
+                      +parseInt(document.getElementById('mic_wired_qty').value)*2
+                      +parseInt(document.getElementById('mic_wireless_qty').value)*3
+                      +parseInt(document.getElementById('monitor_qty').value)*5
+                      +parseInt(document.getElementById('overhead_qty').value)*15
+                      +parseInt(document.getElementById('video_qty').value)*15
+                      +parseInt(document.getElementById('laptop_qty').value)*3
+                      +parseInt(document.getElementById('piano_qty').value)*25;
+  const subtotal = (baseRate+equipmentRate)*hours*days.length;
+  const vat = subtotal*0.2;
+  const afterHours = 0; // simplified
+  const tr = document.createElement('tr');
+  tr.innerHTML=`<td>${venue}</td><td>${hireType}</td><td>${hours}</td><td>${baseRate}</td><td>${equipmentRate}</td><td>${subtotal.toFixed(2)}</td><td>${vat.toFixed(2)}</td><td>${(subtotal+vat).toFixed(2)}</td><td>${afterHours}</td><td><button onclick="this.parentNode.parentNode.remove();updateGrandTotal();">Remove</button></td>`;
+  orderTableBody.appendChild(tr);
+  updateGrandTotal();
+};
+
+function updateGrandTotal(){
+  let sum=0;
+  orderTableBody.querySelectorAll('tr').forEach(r=>{
+    sum+=parseFloat(r.children[7].textContent);
+  });
+  grandTotalDiv.textContent='Grand Total: £'+sum.toFixed(2);
 }
 </script>
 
