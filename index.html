@@ -36,14 +36,14 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 
 /* ===== Gallery styles ===== */
 .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
-.panel{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,0.1);transition:transform 0.3s, box-shadow 0.3s;}
-.panel:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.15);}
+.panel{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,0.1);transition:transform 0.3s;}
+.panel:hover{transform:scale(1.05);}
 .panel img{width:100%;height:120px;object-fit:cover;display:block;}
 .panel .title{position:absolute;bottom:0;width:100%;background:rgba(0,46,91,0.8);color:white;text-align:center;padding:6px;font-size:14px;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:9999;overflow:auto;}
-.modal-content{background:white;max-width:600px;width:90%;padding:20px;border-radius:8px;position:relative;overflow:auto;max-height:90vh;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:9999;overflow:auto;padding:20px;}
+.modal-content{background:white;max-width:800px;width:90%;padding:20px;border-radius:8px;position:relative;overflow:auto;max-height:90vh;}
 .modal-content img{width:100%;height:auto;border-radius:6px;cursor:pointer;}
-.modal-content .desc{margin-top:10px;color:#222;font-size:14px;overflow:auto;max-height:300px;}
+.modal-content .desc{margin-top:10px;color:#222;font-size:14px;white-space:pre-wrap;}
 .modal-close{position:absolute;top:10px;right:10px;background:var(--brand);color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;}
 
 @media (max-width:700px){.grid{grid-template-columns:1fr;}header{flex-direction:column;align-items:flex-start;}}
@@ -67,27 +67,27 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
 <!-- ===== Venue Gallery ===== -->
 <div class="gallery" id="venueGallery">
   <div class="panel" data-venue="Bradshaw">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Bradshaw_Hall_BCU.jpg" alt="Bradshaw Hall">
+    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-24-131600593110714462.jpg" alt="Bradshaw Hall">
     <div class="title">Bradshaw Hall</div>
   </div>
   <div class="panel" data-venue="Recital">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Recital_Hall_BCU.jpg" alt="Recital Hall">
+    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-27-131600597991399988.jpg" alt="Recital Hall">
     <div class="title">Recital Hall</div>
   </div>
   <div class="panel" data-venue="Jazz">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Eastside_Jazz_Club_BCU.jpg" alt="Eastside Jazz Club">
+    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg" alt="Eastside Jazz Club">
     <div class="title">Eastside Jazz Club</div>
   </div>
   <div class="panel" data-venue="Organ">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Organ_Studio_BCU.jpg" alt="Organ Studio">
+    <img src="https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg" alt="Organ Studio">
     <div class="title">Organ Studio</div>
   </div>
   <div class="panel" data-venue="Lab">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/The_Lab_BCU.jpg" alt="The Lab">
+    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg" alt="The Lab">
     <div class="title">The Lab</div>
   </div>
   <div class="panel" data-venue="Workshop">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Workshops_BCU.jpg" alt="Workshops / Performance Studios">
+    <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg" alt="Workshops / Performance Studios">
     <div class="title">Workshops / Performance Studios</div>
   </div>
 </div>
@@ -156,7 +156,6 @@ input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;
       </select>
     </div>
 
-    <!-- Equipment -->
     <div class="full">
       <fieldset>
         <legend><strong>Technical / Equipment</strong></legend>
@@ -276,14 +275,64 @@ clearSession.onclick = (e)=>{
   alert('Staffing access cleared.');
 };
 
-// ========================= Gallery Modal
+// ========================= Fill Time Selects
+const startTime = document.getElementById('startTime'), endTime=document.getElementById('endTime');
+for(let h=0;h<24;h++){
+  for(let m=0;m<60;m+=30){
+    const val = (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+    const opt1 = document.createElement('option'); opt1.value=val; opt1.textContent=val; startTime.appendChild(opt1);
+    const opt2 = document.createElement('option'); opt2.value=val; opt2.textContent=val; endTime.appendChild(opt2);
+  }
+}
+
+// ========================= Quote Calculator
+const addBtn = document.getElementById('addBtn');
+const orderTable = document.querySelector('#orderTable tbody');
+const grandTotalEl = document.getElementById('grandTotal');
+
+const equipmentPrices = {pa:50, projector:20, mic_wired:5, mic_wireless:15, monitor:10, overhead:25, video:40, laptop:15, piano:150};
+
+addBtn.onclick = ()=>{
+  const venue=document.getElementById('venue').value;
+  if(!venue){ alert('Select a venue'); return; }
+  const hireType=document.getElementById('hireType').value;
+  const start=startTime.value, end=endTime.value;
+  const startH=parseInt(start.split(':')[0])+parseInt(start.split(':')[1])/60;
+  const endH=parseInt(end.split(':')[0])+parseInt(end.split(':')[1])/60;
+  let hours=endH-startH;
+  if(hours<0){ hours+=24; }
+  if(hours<4){ alert('Minimum booking 4 hours'); return; }
+
+  const equipmentTotal = Object.keys(equipmentPrices).reduce((sum,key)=>{
+    const qty = parseInt(document.getElementById(key+'_qty').value)||0;
+    return sum+qty*equipmentPrices[key];
+  },0);
+  const baseRate = 100*hours; // placeholder
+  const subtotal = baseRate+equipmentTotal;
+  const vat = subtotal*0.2;
+  const total = subtotal+vat;
+  const row = document.createElement('tr');
+  row.innerHTML=`<td>${venue}</td><td>${hireType}</td><td>${hours}</td><td>${baseRate.toFixed(2)}</td><td>${equipmentTotal.toFixed(2)}</td><td>${subtotal.toFixed(2)}</td><td>${vat.toFixed(2)}</td><td>${total.toFixed(2)}</td><td>—</td><td><button class="removeBtn">X</button></td>`;
+  orderTable.appendChild(row);
+  row.querySelector('.removeBtn').onclick=()=>{row.remove(); updateGrandTotal();};
+  updateGrandTotal();
+};
+function updateGrandTotal(){
+  let sum=0;
+  orderTable.querySelectorAll('tr').forEach(r=>{
+    sum+=parseFloat(r.children[7].textContent);
+  });
+  grandTotalEl.textContent='Grand Total: £'+sum.toFixed(2);
+}
+
+// ========================= Venue Gallery Modal
 const venueData = {
-  Bradshaw:{desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.", images:["https://upload.wikimedia.org/wikipedia/commons/7/7e/Bradshaw_Hall_BCU.jpg"]},
-  Recital:{desc:"The intimate Recital Hall has a variable acoustic and is a flexible space with a floor-level stage area. A bleacher seating rake of 146 capacity can be extended for concert set-up, or fully retracted underneath a small technical balcony for other seating and event set-ups including cabaret and theatre style. As with our larger Bradshaw Hall, attention has been paid to every detail in the design of the hall to optimise the experience of both audiences and performers – from the acoustics to the colour scheme of the interior fit-out and from performance lighting to technical capabilities.", images:["https://upload.wikimedia.org/wikipedia/commons/2/2b/Recital_Hall_BCU.jpg"]},
-  Jazz:{desc:"Birmingham’s only dedicated Jazz venue, Eastside Jazz Club has been expertly designed to create a quintessential, cosy, jazz club atmosphere. Your guests can relax in style with low – level mood lighting and cabaret setting creating the perfect ambience for an authentic, sophisticated laid-back jazz bar. This is a fully flexible performance space with removable audience seating, tables and bar-stools running across three raised levels to be arranged as required. Choose from a private setting with blackout blinds or open to allow natural light in as desired. While predominantly for the performance of jazz music in all its forms, the venue is also an ideal setting for other types of small music gig as well as spoken word and comedy.", images:["https://upload.wikimedia.org/wikipedia/commons/0/0f/Eastside_Jazz_Club_BCU.jpg"]},
-  Organ:{desc:"A light and airy venue that is equally suited to chamber and organ performance. The venue has a distinctive shape and tranquil atmosphere created by natural light flooding onto the pale wood of the interior. It is completely flexible in terms of the set-up and layout of the performance area and audience seating. The venue houses a Eule Pipe organ and features overhead performance lighting and Dante audio network for flexible location recording purposes. With access to Steinway model D or model B grand pianos, there is also a wide range of other instruments and equipment available for hire.", images:["https://upload.wikimedia.org/wikipedia/commons/a/ac/Organ_Studio_BCU.jpg"]},
-  Lab:{desc:"The Lab is a cutting edge, completely flexible black-box studio with a technical walkway suspended around the perimeter. The 100 capacity venue has fixed acoustics with a low reverberation time and duplicate input points for a mobile sound desk to be installed at either end of the room. This enables complete flexibility in the set-up and layout of the performance and audience areas.", images:["https://upload.wikimedia.org/wikipedia/commons/9/97/The_Lab_BCU.jpg"]},
-  Workshop:{desc:"Eight 30-60 capacity performance studios sit at the heart of the Conservatoire that have been designed to the highest artistic and commercial standards for the professional training of our musicians and actors. High ceilings, large windows and spacious open floor areas enable flexible spaces that are equally suited for the development of performance activity, as they are in providing a refined backdrop for conferences and meetings, or as the starting point to be dressed for functions and receptions. Each studio has a timber hardwood floor, grand piano, B&W surround sound or stereo system, laser projector and screen with wireless presentation connectivity", images:["https://upload.wikimedia.org/wikipedia/commons/4/45/Workshops_BCU.jpg"]}
+  Bradshaw:{desc:"The Bradshaw Hall has been acoustically modelled to optimise the experience of performers and to ensure the best auditory experience from every seat. From the soft pallets of the colour scheme to state-of-the-art performance lighting and technical capabilities, each aspect of the hall has been expertly designed to provide an inspiring backdrop for the performances and other activity being presented there. The hall has a raised platform stage with three retractable risers and a stage extension, large enough for a full symphony orchestra. Audience seating graduates across a gentle rake with further seating provided on a small balcony above the back section of the 440 capacity hall. The hall is serviced by an extensive back-of house area with soloist and green rooms and access to our spacious atrium and foyer, and our range of performance studios and function rooms when the hall is booked as part of a larger event.", images:["https://www.tagvenue.com/resize/98/a1/widen-1680-noupsize;68138-bradshaw-hall-room-enhanced-v1-3027435.jpg","http://www.bcu.ac.uk/mediaitem/royal-birmingham-conservatoire-symphony-orchestra-and-chorus-131855489657224296.jpg","https://bcuassets.blob.core.windows.net/img/the-bradshaw-hall-131735296676445133.jpg","https://cphfcrflaa.cloudimg.io/_bcuimages/04-07-2024-folk-ensemble-web-133765767100637752.jpg"]},
+  Recital:{desc:"The intimate Recital Hall has a variable acoustic and is a flexible space with a floor-level stage area. A bleacher seating rake of 146 capacity can be extended for concert set-up, or fully retracted underneath a small technical balcony for other seating and event set-ups including cabaret and theatre style. As with our larger Bradshaw Hall, attention has been paid to every detail in the design of the hall to optimise the experience of both audiences and performers – from the acoustics to the colour scheme of the interior fit-out and from performance lighting to technical capabilities.", images:["https://azure.wgp-cdn.co.uk/app-pianist/posts/Royal-Birmingham-Conservatoire_Charcoalblue_credit-Hufton-and-Crow_lowres-023.jpg?&width=1200&height=630&mode=crop","https://www.association-of-noise-consultants.co.uk/wp-content/uploads/2018/08/RBC-Recital-Hall-Steinway-Piano-min.jpg","https://www.bof.co.uk/assets/images/projects/royal-birmingham-conservatoire/small-4.png"]},
+  Jazz:{desc:"Birmingham’s only dedicated Jazz venue, Eastside Jazz Club has been expertly designed to create a quintessential, cosy, jazz club atmosphere. Your guests can relax in style with low – level mood lighting and cabaret setting creating the perfect ambience for an authentic, sophisticated laid-back jazz bar. This is a fully flexible performance space with removable audience seating, tables and bar-stools running across three raised levels to be arranged as required. Choose from a private setting with blackout blinds or open to allow natural light in as desired. While predominantly for the performance of jazz music in all its forms, the venue is also an ideal setting for other types of small music gig as well as spoken word and comedy.", images:["https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-25-131600600782377259.jpg", "https://tse1.mm.bing.net/th/id/OIP.rQ4jKYUx7O_SLtJNosUp0wHaCx?pid=Api","https://tse1.mm.bing.net/th/id/OIP.cmNowyLdhr5FQ-WSsRMvaAHaF-?pid=Api"]},
+  Organ:{desc:"A light and airy venue that is equally suited to chamber and organ performance. The venue has a distinctive shape and tranquil atmosphere created by natural light flooding onto the pale wood of the interior. It is completely flexible in terms of the set-up and layout of the performance area and audience seating. The venue houses a Eule Pipe organ and features overhead performance lighting and Dante audio network for flexible location recording purposes. With access to Steinway model D or model B grand pianos, there is also a wide range of other instruments and equipment available for hire.", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg","https://tse4.mm.bing.net/th/id/OIP.ZqMlPPt9HssFc17TJUyIAHaE8?pid=Api","https://tse1.mm.bing.net/th/id/OIP.Sc1WQGk9lCcNOehBIAWehwHaFj?pid=Api"]},
+  Lab:{desc:"The Lab is a cutting edge, completely flexible black-box studio with a technical walkway suspended around the perimeter. The 100 capacity venue has fixed acoustics with a low reverberation time and duplicate input points for a mobile sound desk to be installed at either end of the room. This enables complete flexibility in the set-up and layout of the performance and audience areas.", images:["https://img.bcu.ac.uk/_bcuimages/tom-bird-birmingham-conservatoire-8-131600601961613750.jpg","https://tse3.mm.bing.net/th/id/OIP.KVLOD-33YQ_4lm-3T7IqewHaE8?pid=Api","https://tse3.mm.bing.net/th/id/OIP.y1fzC3dK3PyZjZh6JcXCjAHaE8?pid=Api"]},
+  Workshop:{desc:"Eight 30-60 capacity performance studios sit at the heart of the Conservatoire that have been designed to the highest artistic and commercial standards for the professional training of our musicians and actors. High ceilings, large windows and spacious open floor areas enable flexible spaces that are equally suited for the development of performance activity, as they are in providing a refined backdrop for conferences and meetings, or as the starting point to be dressed for functions and receptions. Each studio has a timber hardwood floor, grand piano, B&W surround sound or stereo system, laser projector and screen with wireless presentation connectivity", images:["https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg","https://img.bcu.ac.uk/_bcuimages/natalie-haas-cello-workshop-133970508075817499.jpg"]}
 };
 
 const galleryPanels = document.querySelectorAll('.gallery .panel');
@@ -292,32 +341,25 @@ const modalImg = document.getElementById('modalImg');
 const modalDesc = document.getElementById('modalDesc');
 const modalClose = document.querySelector('.modal-close');
 
-galleryPanels.forEach(panel=>{
-  panel.onclick = ()=>{
+galleryPanels.forEach(panel => {
+  panel.onclick = () => {
     const venue = panel.dataset.venue;
-    modalImg.src = venueData[venue].images[0];
+    let currentIndex = 0;
+    modalImg.src = venueData[venue].images[currentIndex];
     modalDesc.textContent = venueData[venue].desc;
     modal.style.display = 'flex';
+
+    modalImg.onclick = () => {
+      currentIndex = (currentIndex + 1) % venueData[venue].images.length;
+      modalImg.src = venueData[venue].images[currentIndex];
+    };
   };
 });
 
-modalClose.onclick = ()=>modal.style.display='none';
-modal.onclick = (e)=>{if(e.target===modal) modal.style.display='none';};
+modalClose.onclick = () => modal.style.display = 'none';
+modal.onclick = e => { if(e.target === modal) modal.style.display = 'none'; };
 
-// ========================= Populate time dropdowns
-const startSelect = document.getElementById('startTime');
-const endSelect = document.getElementById('endTime');
-for(let h=8;h<=23;h++){
-  ['00','30'].forEach(min=>{
-    const val = `${h.toString().padStart(2,'0')}:${min}`;
-    const option = document.createElement('option');
-    option.value = val; option.textContent = val;
-    startSelect.appendChild(option.cloneNode(true));
-    endSelect.appendChild(option.cloneNode(true));
-  });
-}
 </script>
-
 </div>
 </body>
 </html>
