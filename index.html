@@ -6,11 +6,19 @@
     <title>Royal Birmingham Conservatoire — Multi-Venue Quote</title>
     <!-- 
       This imports the 'Poppins' font from Google Fonts. 
-      It's a clean, modern, professional sans-serif font.
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 
+      NEW: Libraries for PDF generation
+      jsPDF: The library to create the PDF
+      html2canvas: The library to take a "screenshot" of an HTML element
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibjNQVbXyFMyRcnwwnmdV9zD4CViQeLw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSZnIDU4VcNZ8qHMnZKIJYiMaxLdKjJ2a9/rtKOWVquzEaOIGvVjdIY3KzE+K1LzCyNWAe9Yg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 
     <!-- 
       CSS is now inside the <style> tag instead of a separate file.
@@ -696,7 +704,7 @@
                     <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg" alt="Organ Studio">
                     <div class="venue-card-content">
                         <h3>The Organ Studio</h3>
-                        <span class="capacity">Capacity: 60</span>
+                        <span class="capacity">Capacity: 80</span>
                         <p>A light and airy venue with a Eule Pipe organ, suited to chamber music...</p>
                     </div>
                 </div>
@@ -831,8 +839,9 @@
                 <!-- Action Buttons -->
                 <div class="button-group">
                     <button type="button" id="add-quote-btn" class="btn btn-primary">Add to Quote</button>
-                    <button type="button" id="email-btn" class="btn btn-secondary">Email Quote</button>
-                    <button type="button" id="download-btn" class="btn btn-secondary">Download HTML</button>
+                    <!-- UPDATED BUTTONS -->
+                    <button type="button" id="download-pdf-btn" class="btn btn-primary" style="background-color: var(--secondary-color); color: var(--primary-color);">Download PDF</button>
+                    <button type="button" id="email-quote-btn" class="btn btn-secondary">Email Quote</button>
                 </div>
             </form>
 
@@ -842,7 +851,7 @@
                 <div id="quote-message-bar"></div>
                 
                 <h2>Venue Quote Summary</h2>
-                <div class="table-wrapper">
+                <div class="table-wrapper" id="quote-table-wrapper"> <!-- Added ID for PDF export -->
                     <table class="quote-table">
                         <thead>
                             <tr>
@@ -898,7 +907,7 @@
                     <h3>Staffing Timesheet</h3>
                 </div>
 
-                <!-- NEW: Staffing Timesheet Table -->
+                <!-- NEW: Staffing Timesheet Table with Quantity -->
                 <div class="table-wrapper">
                     <table class="staffing-table">
                         <thead>
@@ -1020,6 +1029,18 @@
     <script>
         // Wait for the page to be fully loaded before running scripts
         document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 0. PDF/Email Library Check ---
+            // Check if jsPDF and html2canvas are loaded
+            if (typeof jspdf === 'undefined' || typeof html2canvas === 'undefined') {
+                console.error("Error: PDF libraries (jsPDF or html2canvas) failed to load. PDF/Email functionality will be disabled.");
+                // Optionally disable the buttons
+                const downloadPdfBtn = document.getElementById('download-pdf-btn');
+                const emailQuoteBtn = document.getElementById('email-quote-btn');
+                if(downloadPdfBtn) downloadPdfBtn.disabled = true;
+                if(emailQuoteBtn) emailQuoteBtn.disabled = true;
+            }
+
 
             // --- 1. Tab Switching Logic ---
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -1265,14 +1286,17 @@
                 const averageSurchargeHours = totalSurchargeHours / days.length;
                 return averageSurchargeHours * AFTER_HOURS_SURCHARGE;
             }
-
+            
+            let currentVenueTotal = 0; // Make total globally accessible for PDF
+            
             // Function to render the entire quote table
             function renderQuoteTable() {
                 quoteBody.innerHTML = '';
-                let currentVenueTotal = 0;
+                currentVenueTotal = 0;
                 quoteItems.forEach(item => {
                     currentVenueTotal += item.total;
                     const row = document.createElement('tr');
+                    // Hide remove button column by default (for PDF)
                     row.innerHTML = `
                         <td>${item.venue}</td>
                         <td>${item.hireType}</td>
@@ -1284,7 +1308,7 @@
                         <td><strong>${item.subtotal.toFixed(2)}</strong></td>
                         <td>${item.vat.toFixed(2)}</td>
                         <td><strong>${item.total.toFixed(2)}</strong></td>
-                        <td><button class="remove-btn" data-id="${item.id}">X</button></td>
+                        <td class="no-print"><button class="remove-btn" data-id="${item.id}">X</button></td>
                     `;
                     quoteBody.appendChild(row);
                 });
@@ -1453,9 +1477,130 @@
                 }
             });
 
+
+            // --- 6. NEW: PDF & Email Logic ---
+            
+            const { jsPDF } = window.jspdf;
+
+            // --- Download PDF ---
+            document.getElementById('download-pdf-btn').addEventListener('click', () => {
+                if (quoteItems.length === 0) {
+                    showMessage('Quote is empty. Please add at least one item to download a PDF.', 3000);
+                    return;
+                }
+                
+                // Get the elements
+                const quoteTable = document.querySelector('#quote-table-wrapper .quote-table');
+                const totalsSection = document.getElementById('venue-grand-total').parentElement;
+                
+                // Temporarily hide the "Remove" column
+                quoteTable.querySelectorAll('.no-print, th:last-child, td:last-child').forEach(el => el.style.display = 'none');
+                
+                // Use html2canvas to render the table and totals separately
+                Promise.all([
+                    html2canvas(quoteTable),
+                    html2canvas(totalsSection)
+                ]).then(([tableCanvas, totalsCanvas]) => {
+                    
+                    // Show the "Remove" column again
+                    quoteTable.querySelectorAll('.no-print, th:last-child, td:last-child').forEach(el => el.style.display = '');
+
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: 'a4'
+                    });
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                    // --- Add Logo and Title ---
+                    // Simple text title
+                    pdf.setFontSize(22);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Royal Birmingham Conservatoire', 20, 30);
+                    pdf.setFontSize(16);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Venue Hire Quote (Estimate)', 20, 45);
+
+                    // --- Add Table Image ---
+                    const tableImgProps = pdf.getImageProperties(tableCanvas);
+                    const tableImgWidth = pdfWidth - 40; // 20px padding each side
+                    const tableImgHeight = (tableImgProps.height * tableImgWidth) / tableImgProps.width;
+                    pdf.addImage(tableCanvas, 'PNG', 20, 60, tableImgWidth, tableImgHeight);
+
+                    // --- Add Totals Image ---
+                    const totalsImgProps = pdf.getImageProperties(totalsCanvas);
+                    const totalsImgWidth = 200; // Fixed width for totals
+                    const totalsImgHeight = (totalsImgProps.height * totalsImgWidth) / totalsImgProps.width;
+                    
+                    // Position totals under the table
+                    let totalsY = 60 + tableImgHeight + 10;
+                    if (totalsY > pdfHeight - totalsImgHeight - 20) { // Check if it fits
+                        pdf.addPage();
+                        totalsY = 30; // New page
+                    }
+                    const totalsX = pdfWidth - totalsImgWidth - 20; // Align right
+                    
+                    pdf.addImage(totalsCanvas, 'PNG', totalsX, totalsY, totalsImgWidth, totalsImgHeight);
+                    
+                    // --- Add Disclaimer ---
+                    const disclaimerText = pdf.splitTextToSize(document.querySelector('.disclaimer').innerText, pdfWidth - 40);
+                    let disclaimerY = totalsY + totalsImgHeight + 15;
+                    pdf.setFontSize(8);
+                    pdf.text(disclaimerText, 20, disclaimerY);
+
+                    // --- Save PDF ---
+                    const safeTotal = currentVenueTotal.toFixed(2).replace('.', '-');
+                    pdf.save(`rbc-quote-£${safeTotal}.pdf`);
+                });
+            });
+
+
+            // --- Email Quote ---
+            document.getElementById('email-quote-btn').addEventListener('click', () => {
+                if (quoteItems.length === 0) {
+                    showMessage('Quote is empty. Please add at least one item to email.', 3000);
+                    return;
+                }
+
+                const email = 'conservatoireevents@bcu.ac.uk';
+                const subject = 'Venue Hire Quote Enquiry';
+                let body = 'Hello,\n\nI have generated the following venue hire quote estimate:\n\n';
+
+                // Format each item
+                quoteItems.forEach(item => {
+                    body += `-------------------------------------------------\n`;
+                    body += `Venue: ${item.venue}\n`;
+                    body += `Hire Type: ${item.hireType}\n`;
+                    body += `Duration: ${item.durationDisplay}\n`;
+                    body += `Days: ${item.days}\n`;
+                    body += `\n`;
+                    body += `Base Hire: £${item.baseHire.toFixed(2)}\n`;
+                    body += `Equipment: £${item.totalEquipmentCost.toFixed(2)}\n`;
+                    body += `After-Hours: £${item.totalSurcharge.toFixed(2)}\n`;
+                    body += `Subtotal: £${item.subtotal.toFixed(2)}\n`;
+                    body += `VAT: £${item.vat.toFixed(2)}\n`;
+                    body += `TOTAL: £${item.total.toFixed(2)}\n`;
+                });
+                
+                body += `-------------------------------------------------\n`;
+                body += `GRAND TOTAL (inc. VAT): £${currentVenueTotal.toFixed(2)}\n`;
+                body += `-------------------------------------------------\n\n`;
+                body += `Please note this is an estimate. I would like to discuss this quote further.\n\n`;
+                body += `(Please add any questions here...)\n\n`;
+                body += `Kind regards,`;
+
+                // Create and "click" the mailto link
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                // Using window.open is more reliable than creating and clicking an <a> tag
+                window.open(mailtoLink, '_self');
+            });
+
+
         });
     </script>
 
 </body>
 </html>
-
