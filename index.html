@@ -28,6 +28,8 @@
         :root {
             --primary-color: #004a99; /* A professional, corporate blue */
             --secondary-color: #d4a300; /* An accent gold, common for conservatoires */
+            --danger-color: #dc3545; /* Red for clear button */
+            --danger-hover: #c82333;
             --light-grey: #f4f7f6;
             --dark-grey: #333333;
             --border-color: #e0e0e0;
@@ -333,6 +335,15 @@
             background-color: #5a6268;
         }
         
+        /* NEW: Danger button for "Clear" */
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+        
         /* --- 7. Quote Summary & Message Bar --- */
 
         /* NEW: Message bar for conflicts */
@@ -359,15 +370,6 @@
         /* Makes the table horizontally scrollable on small screens */
         .table-wrapper {
             overflow-x: auto;
-        }
-
-        .quote-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-            table-layout: auto; 
-            min-width: 1000px;
         }
         
         /* NEW: Staffing timesheet table */
@@ -417,6 +419,15 @@
             margin: 0;
         }
 
+        /* UPDATED: Simplified Quote Table */
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            table-layout: auto; 
+            min-width: 800px;
+        }
 
         .quote-table th,
         .quote-table td {
@@ -425,18 +436,36 @@
             text-align: left;
             white-space: nowrap;
         }
-
+        
         .quote-table th {
             background-color: #f9f9f9;
             font-weight: 600;
-        }
-
-        .quote-table td:last-child {
-            text-align: center;
+            vertical-align: top;
         }
         
+        /* Align cost and remove columns */
+        .quote-table th:nth-child(3),
+        .quote-table td:nth-child(3) {
+            text-align: right;
+            white-space: nowrap;
+            width: 15%;
+        }
+        .quote-table th:nth-child(4),
+        .quote-table td:nth-child(4) {
+            text-align: center;
+            width: 10%;
+        }
+        
+        /* Column for description */
+        .quote-table td:nth-child(2) {
+            white-space: normal;
+            font-size: 0.9rem;
+            color: #555;
+            width: 40%;
+        }
+
         .remove-btn {
-            background: #dc3545;
+            background: var(--danger-color);
             color: white;
             border: none;
             padding: 8px 12px;
@@ -445,7 +474,7 @@
         }
         
         .remove-btn:hover {
-            background: #c82333;
+            background: var(--danger-hover);
         }
         
         /* Styles for Password Protection */
@@ -485,8 +514,20 @@
             text-align: right;
             font-size: 1.2rem;
             margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
         }
         
+        /* NEW: Separate Subtotal/VAT display */
+        #venue-subtotal,
+        #venue-vat {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
         #venue-grand-total,
         #staffing-grand-total { /* staffing-grand-total is now for the new timesheet total */
             font-size: 2rem;
@@ -708,12 +749,13 @@
                         <p>A light and airy venue with a Eule Pipe organ, suited to chamber music...</p>
                     </div>
                 </div>
-                <div class="venue-card" data-venue="Workshop Space">
+                <!-- UPDATED: Single Workshops Card -->
+                <div class="venue-card" data-venue="Workshops">
                     <img src="https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg" alt="Workshops / Performance Studios">
                     <div class="venue-card-content">
-                        <h3>Performance Studios</h3>
-                        <span class="capacity">Capacity: 30-60</span>
-                        <p>Eight flexible studios designed for rehearsals, workshops, and intimate...</p>
+                        <h3>Workshops / Studios</h3>
+                        <span class="capacity">Capacity: 1-60</span>
+                        <p>Flexible studios for rehearsals, workshops, and intimate performances...</p>
                     </div>
                 </div>
             </div>
@@ -734,7 +776,9 @@
                         <option value="The Lab">The Lab</option>
                         <option value="Eastside Jazz Club">Eastside Jazz Club</option>
                         <option value="Organ Studio">Organ Studio</option>
-                        <option value="Workshop Space">Workshop Space</option>
+                        <!-- UPDATED: Workshop dropdowns -->
+                        <option value="Large Workshop">Workshop (Large, up to 60)</option>
+                        <option value="Small Workshop">Workshop (Small, up to 40)</option>
                         <option value="Whole Building Hire">Whole Building Hire</option>
                     </select>
                 </div>
@@ -777,19 +821,19 @@
 
                 <div class="form-group">
                     <label for="pa">PA (per day)</label>
-                    <select id="pa" name="pa" class="equipment">
+                    <select id="pa" name="pa" class="equipment" data-label="PA (per day)">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="projector">Projector (per day)</label>
-                    <select id="projector" name="projector" class="equipment">
+                    <select id="projector" name="projector" class="equipment" data-label="Projector (per day)">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="mic-wired">Microphone (wired)</label>
-                    <select id="mic-wired" name="mic-wired" class="equipment">
+                    <select id="mic-wired" name="mic-wired" class="equipment" data-label="Microphone (wired)">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
                         <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
                         <option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
@@ -799,38 +843,38 @@
                 </div>
                 <div class="form-group">
                     <label for="mic-wireless">Microphone (wireless)</label>
-                    <select id="mic-wireless" name="mic-wireless" class="equipment">
+                    <select id="mic-wireless" name="mic-wireless" class="equipment" data-label="Microphone (wireless)">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="monitor">Monitor</label>
-                    <select id="monitor" name="monitor" class="equipment">
+                    <select id="monitor" name="monitor" class="equipment" data-label="Monitor">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="laptop">Laptop</label>
-                    <select id="laptop" name="laptop" class="equipment">
+                    <select id="laptop" name="laptop" class="equipment" data-label="Laptop">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="piano">Grand Piano</label>
-                    <select id="piano" name="piano" class="equipment">
+                    <select id="piano" name="piano" class="equipment" data-label="Grand Piano">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="audio-rec">Overhead Audio Recording</label>
-                    <select id="audio-rec" name="audio-rec" class="equipment">
+                    <select id="audio-rec" name="audio-rec" class="equipment" data-label="Overhead Audio Recording">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <!-- NEW: Static Video Recording -->
                 <div class="form-group">
                     <label for="video-rec">Static Video Recording</label>
-                    <select id="video-rec" name="video-rec" class="equipment">
+                    <select id="video-rec" name="video-rec" class="equipment" data-label="Static Video Recording">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
@@ -842,6 +886,8 @@
                     <!-- UPDATED BUTTONS -->
                     <button type="button" id="download-pdf-btn" class="btn btn-primary" style="background-color: var(--secondary-color); color: var(--primary-color);">Download PDF</button>
                     <button type="button" id="email-quote-btn" class="btn btn-secondary">Email Quote</button>
+                    <!-- NEW: Clear Button -->
+                    <button type="button" id="clear-quote-btn" class="btn btn-danger" style="margin-left: auto;">Clear Quote</button>
                 </div>
             </form>
 
@@ -852,20 +898,14 @@
                 
                 <h2>Venue Quote Summary</h2>
                 <div class="table-wrapper" id="quote-table-wrapper"> <!-- Added ID for PDF export -->
+                    <!-- UPDATED: Simplified Table Structure -->
                     <table class="quote-table">
                         <thead>
                             <tr>
-                                <th>Venue</th>
-                                <th>Hire Type</th>
-                                <th>Hours / Days</th>
-                                <th>Days</th>
-                                <th>Base (£)</th>
-                                <th>Equipment (£)</th>
-                                <th>After-Hours (£)</th>
-                                <th>Subtotal (£)</th>
-                                <th>VAT (£)</th>
-                                <th>Total (£)</th>
-                                <th>Remove</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Cost (£)</th>
+                                <th class="no-print">Remove</th>
                             </tr>
                         </thead>
                         <tbody id="quote-summary-body">
@@ -873,7 +913,12 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- UPDATED: Totals Section -->
                 <div class="totals-section">
+                    Subtotal
+                    <div id="venue-subtotal">£0.00</div>
+                    VAT (20%)
+                    <div id="venue-vat">£0.00</div>
                     <strong>Venue Grand Total (inc. VAT)</strong>
                     <div id="venue-grand-total">£0.00</div>
                 </div>
@@ -882,6 +927,7 @@
                     <br>Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.
                     <br>After-hours surcharge: £20/hour + VAT applies outside these hours.
                     <br>Technician hours will be quoted separately based on the technical requirements of the event.
+                    <B>All technical hire is per day. Laptop and audio recording are not included in the standard hire.</B>
                     <br>For booking & detailed technical quotes contact: <strong>conservatoireevents@bcu.ac.uk</strong>
                     <br>**Disclaimer:** Quote is for reference purposes only. All costs are subject to review.
                     </p>
@@ -959,14 +1005,14 @@
                             <!-- NEW CUSTOM ROWS -->
                             <tr class="staff-row-custom">
                                 <td><input type="text" placeholder="Custom Role 1..." class="staff-role"></td>
-                                <td><input type="number" class="staff-rate" value="0" min="0" step="0.5"></td>
+                                <td><input type="number" class="staff-rate" value="0" min="0" step="0.5" placeholder="0.00"></td>
                                 <td><input type="number" class="staff-quantity" value="1" min="1" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
                                 <td class="row-cost">£0.00</td>
                             </tr>
                             <tr class="staff-row-custom">
                                 <td><input type="text" placeholder="Custom Role 2..." class="staff-role"></td>
-                                <td><input type="number" class="staff-rate" value="0" min="0" step="0.5"></td>
+                                <td><input type="number" class="staff-rate" value="0" min="0" step="0.5" placeholder="0.00"></td>
                                 <td><input type="number" class="staff-quantity" value="1" min="1" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
                                 <td class="row-cost">£0.00</td>
@@ -1106,34 +1152,52 @@
             const MIN_HOURS = 4;
             const AFTER_HOURS_SURCHARGE = 20;
 
-            // --- 3. Venue Quote Logic ---
+            // --- 3. Venue Quote Logic (REWORKED FOR LINE ITEMS) ---
 
-            // Define rates
+            // --- NEW RATES (as of last update) ---
             const venueRates = {
-                'Bradshaw Hall': { 'Standard Rate': 180, 'Recording / Premium Workshop': 150 },
-                'Recital Hall': { 'Standard Rate': 120, 'Recording / Premium Workshop': 100 },
-                'The Lab': { 'Standard Rate': 90, 'Recording / Premium Workshop': 70 },
-                'Eastside Jazz Club': { 'Standard Rate': 100, 'Recording / Premium Workshop': 80 },
-                'Organ Studio': { 'Standard Rate': 70, 'Recording / Premium Workshop': 50 },
-                'Workshop Space': { 'Standard Rate': 60, 'Recording / Premium Workshop': 40 },
-                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }, // NEW
+                // Standard Rate (new), Premium Rate (80% of Standard)
+                'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 200 },
+                'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 160 },
+                'The Lab': { 'Standard Rate': 175, 'Recording / Premium Workshop': 140 },
+                'Eastside Jazz Club': { 'Standard Rate': 175, 'Recording / Premium Workshop': 140 },
+                'Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 120 },
+                'Large Workshop': { 'Standard Rate': 60, 'Recording / Premium Workshop': 48 },
+                'Small Workshop': { 'Standard Rate': 50, 'Recording / Premium Workshop': 40 },
+                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 },
             };
 
             const equipmentRates = {
-                'pa': 150,
-                'projector': 80,
-                'mic-wired': 10,
-                'mic-wireless': 25,
-                'monitor': 20,
-                'laptop': 40,
-                'piano': 100,
-                'audio-rec': 75,
-                'video-rec': 250, // NEW
+                'pa': 100,
+                'projector': 250,
+                'mic-wired': 20,
+                'mic-wireless': 40,
+                'monitor': 15,
+                'laptop': 0, // Not in the table, assuming 0 or add rate
+                'piano': 250,
+                'audio-rec': 0, // Not in the table, assuming 0 or add rate
+                'video-rec': 250, 
+            };
+            
+            // Labels for equipment (for itemized list)
+            const equipmentLabels = {
+                'pa': 'PA (per day)',
+                'projector': 'Projector (per day)',
+                'mic-wired': 'Microphone (wired)',
+                'mic-wireless': 'Microphone (wireless)',
+                'monitor': 'Monitor',
+                'laptop': 'Laptop',
+                'piano': 'Grand Piano',
+                'audio-rec': 'Overhead Audio Recording',
+                'video-rec': 'Static Video Recording'
             };
 
             // DOM element references
             const addQuoteBtn = document.getElementById('add-quote-btn');
+            const clearQuoteBtn = document.getElementById('clear-quote-btn'); // NEW
             const quoteBody = document.getElementById('quote-summary-body');
+            const venueSubtotalEl = document.getElementById('venue-subtotal'); // NEW
+            const venueVatEl = document.getElementById('venue-vat'); // NEW
             const venueGrandTotalEl = document.getElementById('venue-grand-total');
             const venueSelect = document.getElementById('venue'); 
             const quoteForm = document.getElementById('quote-form');
@@ -1180,7 +1244,7 @@
                 
                 // --- Conflict Handling (NEW) ---
                 const isAddingWholeBuilding = (venue === 'Whole Building Hire');
-                const hasWholeBuilding = quoteItems.some(item => item.venue === 'Whole Building Hire');
+                const hasWholeBuilding = quoteItems.some(item => item.isWholeBuilding);
                 
                 if (isAddingWholeBuilding && quoteItems.length > 0 && !hasWholeBuilding) {
                     // User is adding Whole Building to a quote with other items
@@ -1196,14 +1260,29 @@
 
                 // --- Logic for Whole Building Hire (daily rate) ---
                 let duration, baseHire, totalSurcharge;
-                let durationDisplay = ''; // For the table
+                let description = ''; // For the table
                 const rate = venueRates[venue][hireType];
+                
+                // Get venue name from dropdown text
+                const venueName = venueSelect.options[venueSelect.selectedIndex].text;
+
 
                 if (venue === 'Whole Building Hire') {
                     duration = 1; // Represents 1 day
                     baseHire = rate * dayCount; // Daily rate * number of days
                     totalSurcharge = 0; // No surcharge for whole building
-                    durationDisplay = `1 Day x ${dayCount} days`;
+                    description = `${hireType} (${dayCount} ${dayCount > 1 ? 'Days' : 'Day'}: ${days.join(', ')})`;
+                    
+                    // Add the main venue item
+                    quoteItems.push({
+                        id: Date.now(),
+                        item: venueName, // Use display name
+                        description: description,
+                        cost: baseHire,
+                        isVenue: true, // Flag for identification
+                        isWholeBuilding: true // Flag for conflict
+                    });
+
                 } else {
                     // Original hourly logic
                     if (!startTime || !endTime) {
@@ -1216,36 +1295,58 @@
                         return;
                     }
                     baseHire = rate * duration * dayCount;
-                    const surcharge = calculateSurcharge(startTime, endTime, days);
-                    totalSurcharge = surcharge * dayCount;
-                    durationDisplay = `${duration.toFixed(2)}hrs x ${dayCount} days`;
+                    totalSurcharge = calculateSurcharge(startTime, endTime, days) * dayCount;
+                    
+                    description = `${hireType} (${duration.toFixed(2)} hrs x ${dayCount} ${dayCount > 1 ? 'Days' : 'Day'}: ${days.join(', ')})`;
+                    
+                    // Add the main venue item
+                    quoteItems.push({
+                        id: Date.now(),
+                        item: venueName, // Use display name
+                        description: description,
+                        cost: baseHire,
+                        isVenue: true,
+                        isWholeBuilding: false
+                    });
+                    
+                    // Add surcharge as a separate item if it exists
+                    if (totalSurcharge > 0) {
+                         quoteItems.push({
+                            id: Date.now() + 1, // unique id
+                            item: 'After-Hours Surcharge',
+                            description: `Applied for booking outside regular hours (${dayCount} ${dayCount > 1 ? 'Days' : 'Day'})`,
+                            cost: totalSurcharge,
+                            isVenue: false
+                        });
+                    }
                 }
 
-                // --- Calculations (Shared) ---
-                let equipmentCost = 0;
+                // --- Add Equipment as Line Items (Shared) ---
                 const equipmentInputs = document.querySelectorAll('.equipment');
+                
                 equipmentInputs.forEach(input => {
                     const rateKey = input.id;
                     const quantity = parseInt(input.value, 10);
                     if (quantity > 0 && equipmentRates[rateKey]) {
-                        equipmentCost += equipmentRates[rateKey] * quantity;
+                        // Special check for rates that are 0 (not in the list)
+                        if (equipmentRates[rateKey] === 0) {
+                            console.warn(`Item ${rateKey} has a rate of 0 and was not added to the quote.`);
+                            return; // Skip this item
+                        }
+                        
+                        const cost = equipmentRates[rateKey] * quantity * dayCount; // Total cost for all days
+                        const label = equipmentLabels[rateKey] || rateKey;
+                        
+                        quoteItems.push({
+                            id: Date.now() + Math.random(), // unique id
+                            item: label,
+                            description: `(Qty: ${quantity}) x ${dayCount} ${dayCount > 1 ? 'Days' : 'Day'}`,
+                            cost: cost,
+                            isVenue: false
+                        });
                     }
                 });
-                const totalEquipmentCost = equipmentCost * dayCount;
                 
-                const subtotal = baseHire + totalEquipmentCost + totalSurcharge;
-                const vat = subtotal * VAT_RATE;
-                const total = subtotal + vat;
-
-                // Create a quote object
-                const quoteItem = {
-                    id: Date.now(), venue, hireType, duration,
-                    days: days.join(', '), dayCount, baseHire,
-                    totalEquipmentCost, totalSurcharge, subtotal, vat, total,
-                    durationDisplay // NEW: Store the display string
-                };
-                
-                quoteItems.push(quoteItem);
                 renderQuoteTable();
             });
 
@@ -1292,27 +1393,30 @@
             // Function to render the entire quote table
             function renderQuoteTable() {
                 quoteBody.innerHTML = '';
-                currentVenueTotal = 0;
+                let subtotal = 0;
+                
                 quoteItems.forEach(item => {
-                    currentVenueTotal += item.total;
+                    subtotal += item.cost;
                     const row = document.createElement('tr');
-                    // Hide remove button column by default (for PDF)
+                    
                     row.innerHTML = `
-                        <td>${item.venue}</td>
-                        <td>${item.hireType}</td>
-                        <td>${item.durationDisplay}</td> <!-- UPDATED -->
-                        <td>${item.days}</td>
-                        <td>${item.baseHire.toFixed(2)}</td>
-                        <td>${item.totalEquipmentCost.toFixed(2)}</td>
-                        <td>${item.totalSurcharge.toFixed(2)}</td>
-                        <td><strong>${item.subtotal.toFixed(2)}</strong></td>
-                        <td>${item.vat.toFixed(2)}</td>
-                        <td><strong>${item.total.toFixed(2)}</strong></td>
+                        <td><strong>${item.item}</strong></td>
+                        <td>${item.description}</td>
+                        <td><strong>£${item.cost.toFixed(2)}</strong></td>
                         <td class="no-print"><button class="remove-btn" data-id="${item.id}">X</button></td>
                     `;
                     quoteBody.appendChild(row);
                 });
+                
+                // Calculate totals
+                const vat = subtotal * VAT_RATE;
+                currentVenueTotal = subtotal + vat; // This is the Grand Total
+                
+                // Update totals display
+                venueSubtotalEl.textContent = `£${subtotal.toFixed(2)}`;
+                venueVatEl.textContent = `£${vat.toFixed(2)}`;
                 venueGrandTotalEl.textContent = `£${currentVenueTotal.toFixed(2)}`;
+                
                 addRemoveListeners();
             }
 
@@ -1320,12 +1424,20 @@
             function addRemoveListeners() {
                 document.querySelectorAll('.remove-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const idToRemove = parseInt(e.target.getAttribute('data-id'), 10);
+                        // Use getAttribute for number
+                        const idToRemove = parseFloat(e.target.getAttribute('data-id'));
                         quoteItems = quoteItems.filter(item => item.id !== idToRemove);
-                        renderQuoteTable();
+                        renderQuoteTable(); // Re-render the table and update totals
                     });
                 });
             }
+            
+            // NEW: Listener for Clear Quote button
+            clearQuoteBtn.addEventListener('click', () => {
+                quoteItems = [];
+                renderQuoteTable();
+                showMessage('Quote has been cleared.', 3000);
+            });
 
 
             // --- 4. Staffing Cost Logic (REBUILT as Timesheet) ---
@@ -1341,7 +1453,7 @@
             calculateStaffBtn.addEventListener('click', calculateStaffingTotals);
 
             // Add listeners to all inputs to re-calculate on change
-            staffingBody.querySelectorAll('input.staff-hours, input.staff-rate, input.staff-quantity').forEach(input => {
+            staffingBody.querySelectorAll('input').forEach(input => {
                 input.addEventListener('input', calculateStaffingTotals);
             });
 
@@ -1418,10 +1530,10 @@
                     image: 'https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-30-131600603623200315.jpg',
                     link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-organ-studio' // NEW
                 },
-                'Workshop Space': { // Renamed to match the select dropdown
-                    title: 'Performance Studios',
-                    capacity: 'Capacity: 30-60',
-                    description: 'Eight flexible studios designed for rehearsals, workshops, and intimate performances. Each studio has a timber hardwood floor and grand piano.',
+                'Workshops': { // UPDATED: Single workshop modal
+                    title: 'Workshops / Studios',
+                    capacity: 'Capacity: 1-60',
+                    description: 'Flexible studios designed for rehearsals, workshops, and intimate performances. Small studios (up to 40) are perfect for individual practice, while Large studios (up to 60) suit group rehearsals.',
                     image: 'https://img.bcu.ac.uk/_bcuimages/copyright-hufton-crow-2-131600605710728764.jpg',
                     link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/performance-studios' // NEW
                 },
@@ -1478,9 +1590,15 @@
             });
 
 
-            // --- 6. NEW: PDF & Email Logic ---
+            // --- 6. NEW: PDF & Email Logic (UPDATED for line items) ---
             
-            const { jsPDF } = window.jspdf;
+            // Check if libraries are loaded before assigning
+            let jsPDF;
+            if (typeof window.jspdf !== 'undefined') {
+                 jsPDF = window.jspdf.jsPDF;
+            } else {
+                console.error("jsPDF is not loaded");
+            }
 
             // --- Download PDF ---
             document.getElementById('download-pdf-btn').addEventListener('click', () => {
@@ -1489,12 +1607,17 @@
                     return;
                 }
                 
+                if (typeof jsPDF === 'undefined' || typeof html2canvas === 'undefined') {
+                    showMessage('PDF libraries failed to load. Cannot download PDF.', 3000);
+                    return;
+                }
+                
                 // Get the elements
                 const quoteTable = document.querySelector('#quote-table-wrapper .quote-table');
-                const totalsSection = document.getElementById('venue-grand-total').parentElement;
+                const totalsSection = document.getElementById('venue-grand-total').parentElement; // Get the whole totals block
                 
                 // Temporarily hide the "Remove" column
-                quoteTable.querySelectorAll('.no-print, th:last-child, td:last-child').forEach(el => el.style.display = 'none');
+                quoteTable.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                 
                 // Use html2canvas to render the table and totals separately
                 Promise.all([
@@ -1503,7 +1626,7 @@
                 ]).then(([tableCanvas, totalsCanvas]) => {
                     
                     // Show the "Remove" column again
-                    quoteTable.querySelectorAll('.no-print, th:last-child, td:last-child').forEach(el => el.style.display = '');
+                    quoteTable.querySelectorAll('.no-print').forEach(el => el.style.display = '');
 
                     const pdf = new jsPDF({
                         orientation: 'landscape',
@@ -1547,6 +1670,10 @@
                     // --- Add Disclaimer ---
                     const disclaimerText = pdf.splitTextToSize(document.querySelector('.disclaimer').innerText, pdfWidth - 40);
                     let disclaimerY = totalsY + totalsImgHeight + 15;
+                     if (disclaimerY > pdfHeight - 40) { // Check if it fits
+                        pdf.addPage();
+                        disclaimerY = 30; // New page
+                    }
                     pdf.setFontSize(8);
                     pdf.text(disclaimerText, 20, disclaimerY);
 
@@ -1557,7 +1684,7 @@
             });
 
 
-            // --- Email Quote ---
+            // --- Email Quote (UPDATED for line items) ---
             document.getElementById('email-quote-btn').addEventListener('click', () => {
                 if (quoteItems.length === 0) {
                     showMessage('Quote is empty. Please add at least one item to email.', 3000);
@@ -1567,26 +1694,27 @@
                 const email = 'conservatoireevents@bcu.ac.uk';
                 const subject = 'Venue Hire Quote Enquiry';
                 let body = 'Hello,\n\nI have generated the following venue hire quote estimate:\n\n';
-
+                body += '====================================\n';
+                
+                let subtotal = 0;
                 // Format each item
                 quoteItems.forEach(item => {
-                    body += `-------------------------------------------------\n`;
-                    body += `Venue: ${item.venue}\n`;
-                    body += `Hire Type: ${item.hireType}\n`;
-                    body += `Duration: ${item.durationDisplay}\n`;
-                    body += `Days: ${item.days}\n`;
-                    body += `\n`;
-                    body += `Base Hire: £${item.baseHire.toFixed(2)}\n`;
-                    body += `Equipment: £${item.totalEquipmentCost.toFixed(2)}\n`;
-                    body += `After-Hours: £${item.totalSurcharge.toFixed(2)}\n`;
-                    body += `Subtotal: £${item.subtotal.toFixed(2)}\n`;
-                    body += `VAT: £${item.vat.toFixed(2)}\n`;
-                    body += `TOTAL: £${item.total.toFixed(2)}\n`;
+                    body += `Item: ${item.item}\n`;
+                    body += `Desc: ${item.description}\n`;
+                    body += `Cost: £${item.cost.toFixed(2)}\n`;
+                    body += `------------------------------------\n`;
+                    subtotal += item.cost;
                 });
                 
-                body += `-------------------------------------------------\n`;
-                body += `GRAND TOTAL (inc. VAT): £${currentVenueTotal.toFixed(2)}\n`;
-                body += `-------------------------------------------------\n\n`;
+                // Add totals
+                const vat = subtotal * VAT_RATE;
+                const total = subtotal + vat;
+                
+                body += `====================================\n`;
+                body += `Subtotal: £${subtotal.toFixed(2)}\n`;
+                body += `VAT (20%): £${vat.toFixed(2)}\n`;
+                body += `GRAND TOTAL (inc. VAT): £${total.toFixed(2)}\n`;
+                body += `====================================\n\n`;
                 body += `Please note this is an estimate. I would like to discuss this quote further.\n\n`;
                 body += `(Please add any questions here...)\n\n`;
                 body += `Kind regards,`;
