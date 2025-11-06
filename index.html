@@ -346,7 +346,8 @@
 
         /* --- 7. Quote Summary Table --- */
         #quote-summary-container h2,
-        #staffing-summary-container h2 {
+        #staffing-summary-container h2,
+        #global-gallery-container h2 { /* Style for new gallery title */
             color: var(--primary-color);
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
@@ -539,6 +540,13 @@
             border-top: 1px solid var(--border-color);
             padding-top: 20px;
         }
+        
+        /* --- 9. NEW: Global Gallery Container --- */
+        #global-gallery-container {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border-color);
+        }
 
         /* --- 10. NEW: Venue Modal Styles --- */
         .modal-overlay {
@@ -619,17 +627,18 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            cursor: zoom-in; /* NEW: Add magnify cursor */
         }
         
-        /* Thumbnail Gallery Fix */
-        .modal-gallery .thumbnail-container {
+        /* Thumbnail Gallery Fix & Global Gallery Style */
+        .thumbnail-container {
             width: 100%;
             overflow-x: auto; /* Allow horizontal scrolling */
             white-space: nowrap; /* Keep thumbnails in one line */
             padding-bottom: 10px; /* Space for scrollbar */
         }
 
-        .modal-gallery .thumbnail {
+        .thumbnail {
             width: 60px;
             height: 60px;
             border-radius: 6px;
@@ -641,14 +650,37 @@
             transition: border-color 0.2s;
         }
         
-        .modal-gallery .thumbnail img {
+        /* NEW: Style for global gallery thumbnails */
+        .global-thumbnail {
+            width: 120px;
+            height: 80px;
+            border-radius: 6px;
+            overflow: hidden;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: zoom-in;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.2s;
+        }
+        
+        .global-thumbnail:hover {
+             border-color: var(--primary-color);
+        }
+        
+        .global-thumbnail img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .modal-gallery .thumbnail.active,
-        .modal-gallery .thumbnail:hover {
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail.active,
+        .thumbnail:hover {
             border-color: var(--primary-color);
         }
         
@@ -675,6 +707,41 @@
             display: inline-block;
             text-align: center;
         }
+        
+        /* --- 11. NEW: Lightbox Modal Styles --- */
+        #lightbox-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 2000; /* Higher than the other modal */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            cursor: zoom-out;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: var(--white);
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        #lightbox-image {
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            border-radius: 4px;
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 900px) {
@@ -1050,6 +1117,14 @@
             </div>
         </section>
 
+        <!-- NEW: Global Gallery Section -->
+        <section id="global-gallery-container">
+            <h2>Venue Gallery</h2>
+            <div class="thumbnail-container" id="global-gallery-scroll">
+                <!-- Global thumbnails will be injected here by JS -->
+            </div>
+        </section>
+
     </main>
 
     <!-- NEW: Modal HTML structure -->
@@ -1076,6 +1151,12 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- NEW: Lightbox Modal HTML -->
+    <div id="lightbox-overlay">
+        <span id="lightbox-close">&times;</span>
+        <img id="lightbox-image" src="" alt="Magnified View">
     </div>
 
 
@@ -1153,6 +1234,9 @@
             
             // Store all quote items in an array
             let quoteItems = [];
+            
+            // --- Base URL for all GitHub images ---
+            const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
 
             // --- 3. Venue Quote Logic ---
 
@@ -1510,12 +1594,9 @@
             }
 
 
-            // --- 5. NEW: Modal Logic ---
+            // --- 5. NEW: Modal & Gallery Logic ---
 
-            // Store all venue details in an object
-            // *** UPDATED with all image URLs from screenshots ***
-            const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
-            
+            // --- All Venue Details and Image Galleries ---
             const venueDetails = {
                 'Bradshaw Hall': {
                     title: 'Bradshaw Hall',
@@ -1603,8 +1684,44 @@
                     ]
                 }
             };
+            
+            // --- NEW: Global Gallery Image List ---
+            // Combine all gallery images and add the new 'venue' folder images
+            const globalGalleryImages = [
+                ...venueDetails['Bradshaw Hall'].gallery,
+                ...venueDetails['Recital Hall'].gallery,
+                ...venueDetails['Eastside Jazz Club'].gallery,
+                ...venueDetails['The Lab'].gallery,
+                ...venueDetails['Organ Studio'].gallery,
+                ...venueDetails['Workshop Space'].gallery,
+                // Add new 'venue' folder images
+                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23555.jpg`,
+                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23556.jpg`,
+                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23557.jpg`,
+                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire_11104.jpg`,
+                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire_11105.jpg`,
+                `${baseURL}venue/rb_The-Conservatoire's-logo-Outside_32065.jpg`
+            ];
+            
+            // --- NEW: Lightbox Modal ---
+            const lightbox = document.getElementById('lightbox-overlay');
+            const lightboxImg = document.getElementById('lightbox-image');
+            const lightboxClose = document.getElementById('lightbox-close');
+            
+            function openLightbox(imgUrl) {
+                lightboxImg.src = imgUrl;
+                lightbox.style.display = 'flex';
+            }
+            
+            function closeLightbox() {
+                lightbox.style.display = 'none';
+                lightboxImg.src = ''; // Clear image
+            }
+            
+            lightbox.addEventListener('click', closeLightbox);
+            lightboxClose.addEventListener('click', closeLightbox);
 
-            // Modal DOM Elements
+            // --- Venue Modal (Pop-up) ---
             const modal = document.getElementById('venue-modal');
             const modalCloseBtn = document.getElementById('modal-close-btn');
             const modalTitle = document.getElementById('modal-title');
@@ -1613,6 +1730,11 @@
             const modalMainImage = document.getElementById('modal-main-image');
             const modalLink = document.getElementById('modal-link');
             const modalThumbnailContainer = document.getElementById('modal-thumbnail-container');
+            
+            // Add click listener to main image to open lightbox
+            modalMainImage.addEventListener('click', () => {
+                openLightbox(modalMainImage.src);
+            });
             
             // Open Modal Logic
             document.querySelectorAll('.venue-card').forEach(card => {
@@ -1666,10 +1788,14 @@
                             
                             // Add click listener to change main image
                             thumbDiv.addEventListener('click', () => {
-                                modalMainImage.src = imgUrl;
+                                // NEW: Open lightbox instead of changing main image
+                                openLightbox(imgUrl);
+                                
+                                // Old logic:
+                                // modalMainImage.src = imgUrl;
                                 // Update active state
-                                modalThumbnailContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-                                thumbDiv.classList.add('active');
+                                // modalThumbnailContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                                // thumbDiv.classList.add('active');
                             });
                             
                             modalThumbnailContainer.appendChild(thumbDiv);
@@ -1696,9 +1822,34 @@
             
             // Close with Escape key
             window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                if (e.key === 'Escape') {
                     closeModal();
+                    closeLightbox(); // Close lightbox too
                 }
+            });
+            
+            // --- NEW: Populate Global Gallery ---
+            const globalGalleryScroll = document.getElementById('global-gallery-scroll');
+            
+            // Use Set to remove duplicate images
+            const uniqueImageUrls = [...new Set(globalGalleryImages)];
+            
+            uniqueImageUrls.forEach(imgUrl => {
+                const thumbDiv = document.createElement('div');
+                thumbDiv.className = 'global-thumbnail';
+                
+                const thumbImg = document.createElement('img');
+                thumbImg.src = imgUrl;
+                thumbImg.alt = 'Venue Gallery Image';
+                
+                thumbDiv.appendChild(thumbImg);
+                
+                // Add click listener to open lightbox
+                thumbDiv.addEventListener('click', () => {
+                    openLightbox(imgUrl);
+                });
+                
+                globalGalleryScroll.appendChild(thumbDiv);
             });
 
         });
