@@ -718,10 +718,18 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.9);
-            cursor: zoom-out;
+            cursor: pointer; /* Changed from zoom-out */
             padding: 20px;
             align-items: center;
             justify-content: center;
+            /* NEW: Animation */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        #lightbox-overlay.show {
+            display: flex;
+            opacity: 1;
         }
         
         #lightbox-close {
@@ -732,6 +740,7 @@
             font-size: 3rem;
             font-weight: bold;
             cursor: pointer;
+            z-index: 2002;
         }
         
         #lightbox-image {
@@ -740,6 +749,41 @@
             max-height: 90%;
             margin: auto;
             border-radius: 4px;
+            cursor: default; /* Clicks on image shouldn't close it */
+            /* NEW: Animation */
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        #lightbox-overlay.show #lightbox-image {
+            transform: scale(1);
+        }
+        
+        /* NEW: Lightbox Arrows */
+        .lightbox-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2001;
+            padding: 10px 20px;
+            user-select: none; /* Prevent text selection */
+            transition: color 0.2s ease;
+        }
+        
+        .lightbox-arrow:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+        
+        #lightbox-prev {
+            left: 20px;
+        }
+        
+        #lightbox-next {
+            right: 20px;
         }
 
 
@@ -771,6 +815,17 @@
             }
             .modal-header h2 {
                 font-size: 1.5rem;
+            }
+            /* NEW: Adjust lightbox arrows for mobile */
+            .lightbox-arrow {
+                font-size: 2rem;
+                padding: 10px;
+            }
+            #lightbox-prev {
+                left: 5px;
+            }
+            #lightbox-next {
+                right: 5px;
             }
         }
 
@@ -1156,7 +1211,10 @@
     <!-- NEW: Lightbox Modal HTML -->
     <div id="lightbox-overlay">
         <span id="lightbox-close">&times;</span>
+        <!-- NEW: Lightbox Arrows -->
+        <span class="lightbox-arrow" id="lightbox-prev">&lt;</span>
         <img id="lightbox-image" src="" alt="Magnified View">
+        <span class="lightbox-arrow" id="lightbox-next">&gt;</span>
     </div>
 
 
@@ -1707,19 +1765,66 @@
             const lightbox = document.getElementById('lightbox-overlay');
             const lightboxImg = document.getElementById('lightbox-image');
             const lightboxClose = document.getElementById('lightbox-close');
+            const lightboxPrev = document.getElementById('lightbox-prev');
+            const lightboxNext = document.getElementById('lightbox-next');
             
-            function openLightbox(imgUrl) {
+            let currentLightboxGallery = [];
+            let currentLightboxIndex = 0;
+            
+            function openLightbox(imgUrl, galleryArray) {
+                currentLightboxGallery = galleryArray;
+                currentLightboxIndex = currentLightboxGallery.indexOf(imgUrl);
+                
                 lightboxImg.src = imgUrl;
-                lightbox.style.display = 'flex';
+                lightbox.classList.add('show');
+                updateLightboxArrows();
             }
             
             function closeLightbox() {
-                lightbox.style.display = 'none';
-                lightboxImg.src = ''; // Clear image
+                lightbox.classList.remove('show');
+                // Delay clearing the image to allow for fade-out
+                setTimeout(() => {
+                    lightboxImg.src = ''; 
+                }, 300);
             }
             
-            lightbox.addEventListener('click', closeLightbox);
+            function updateLightboxArrows() {
+                lightboxPrev.style.display = (currentLightboxIndex > 0) ? 'block' : 'none';
+                lightboxNext.style.display = (currentLightboxIndex < currentLightboxGallery.length - 1) ? 'block' : 'none';
+            }
+            
+            function showPrevImage() {
+                if (currentLightboxIndex > 0) {
+                    currentLightboxIndex--;
+                    lightboxImg.src = currentLightboxGallery[currentLightboxIndex];
+                    updateLightboxArrows();
+                }
+            }
+            
+            function showNextImage() {
+                 if (currentLightboxIndex < currentLightboxGallery.length - 1) {
+                    currentLightboxIndex++;
+                    lightboxImg.src = currentLightboxGallery[currentLightboxIndex];
+                    updateLightboxArrows();
+                }
+            }
+            
+            // Lightbox Event Listeners
+            lightbox.addEventListener('click', (e) => {
+                // Close *only* if clicking the dark overlay, not the image or arrows
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
             lightboxClose.addEventListener('click', closeLightbox);
+            lightboxPrev.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop click from bubbling up to the overlay
+                showPrevImage();
+            });
+            lightboxNext.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop click from bubbling up to the overlay
+                showNextImage();
+            });
 
             // --- Venue Modal (Pop-up) ---
             const modal = document.getElementById('venue-modal');
@@ -1731,9 +1836,13 @@
             const modalLink = document.getElementById('modal-link');
             const modalThumbnailContainer = document.getElementById('modal-thumbnail-container');
             
+            // Store the modal's current gallery
+            let currentModalGallery = [];
+            
             // Add click listener to main image to open lightbox
             modalMainImage.addEventListener('click', () => {
-                openLightbox(modalMainImage.src);
+                // Open the lightbox with *this modal's* gallery
+                openLightbox(modalMainImage.src, currentModalGallery);
             });
             
             // Open Modal Logic
@@ -1761,19 +1870,20 @@
                         
                         // Use main image as first thumbnail
                         const mainImageSrc = details.image;
-                        let allImages = [mainImageSrc];
+                        // Reset and set the current modal's gallery
+                        currentModalGallery = [mainImageSrc];
                         
                         // Add gallery images, avoiding duplicates
                         if (details.gallery && details.gallery.length > 0) {
                             details.gallery.forEach(imgUrl => {
                                 if (imgUrl !== mainImageSrc) {
-                                    allImages.push(imgUrl);
+                                    currentModalGallery.push(imgUrl);
                                 }
                             });
                         }
                         
                         // Create thumbnails
-                        allImages.forEach((imgUrl, index) => {
+                        currentModalGallery.forEach((imgUrl, index) => {
                             const thumbDiv = document.createElement('div');
                             thumbDiv.className = 'thumbnail';
                             if (index === 0) {
@@ -1786,16 +1896,12 @@
                             
                             thumbDiv.appendChild(thumbImg);
                             
-                            // Add click listener to change main image
+                            // Add click listener to change main image (NOT open lightbox)
                             thumbDiv.addEventListener('click', () => {
-                                // NEW: Open lightbox instead of changing main image
-                                openLightbox(imgUrl);
-                                
-                                // Old logic:
-                                // modalMainImage.src = imgUrl;
+                                modalMainImage.src = imgUrl;
                                 // Update active state
-                                // modalThumbnailContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-                                // thumbDiv.classList.add('active');
+                                modalThumbnailContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                                thumbDiv.classList.add('active');
                             });
                             
                             modalThumbnailContainer.appendChild(thumbDiv);
@@ -1826,6 +1932,15 @@
                     closeModal();
                     closeLightbox(); // Close lightbox too
                 }
+                
+                // NEW: Handle arrow keys for lightbox
+                if (lightbox.style.display === 'flex') {
+                    if (e.key === 'ArrowLeft') {
+                        showPrevImage();
+                    } else if (e.key === 'ArrowRight') {
+                        showNextImage();
+                    }
+                }
             });
             
             // --- NEW: Populate Global Gallery ---
@@ -1846,7 +1961,8 @@
                 
                 // Add click listener to open lightbox
                 thumbDiv.addEventListener('click', () => {
-                    openLightbox(imgUrl);
+                    // Open the lightbox with the FULL global gallery
+                    openLightbox(imgUrl, uniqueImageUrls);
                 });
                 
                 globalGalleryScroll.appendChild(thumbDiv);
