@@ -206,6 +206,63 @@
             margin-bottom: 10px;
         }
         
+        /* NEW: Workshop package section */
+        #workshop-package-section {
+            display: none; /* Hide by default */
+            grid-column: 1 / -1;
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+        }
+        
+        #workshop-package-section h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .workshop-package-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .package-option {
+            display: flex;
+            align-items: center;
+            background-color: var(--white);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .package-option:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .package-option input[type="radio"] {
+            margin-right: 12px;
+            width: 1.2em;
+            height: 1.2em;
+        }
+        
+        .package-option label {
+            font-weight: 500;
+            color: var(--dark-grey);
+            line-height: 1.4;
+        }
+        
+        .package-option label span {
+            display: block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        
         .form-section h3 {
             color: var(--primary-color);
             font-size: 1.5rem;
@@ -955,18 +1012,49 @@
                         <div><input type="checkbox" id="sun" name="day" value="Sun"><label for="sun">Sun</label></div>
                     </div>
                 </div>
+                
+                <!-- NEW: Workshop Package Section -->
+                <div id="workshop-package-section">
+                    <h3>Workshop Package</h3>
+                    <div class="workshop-package-options">
+                        <div class="package-option">
+                            <input type="radio" id="pkg-dry" name="workshop-package" value="dry" checked>
+                            <label for="pkg-dry">Dry Hire
+                                <span id="price-dry">£0.00</span>
+                            </label>
+                        </div>
+                        <div class="package-option">
+                            <input type="radio" id="pkg-av" name="workshop-package" value="av">
+                            <label for="pkg-av">With AV
+                                <span id="price-av">£0.00</span>
+                            </label>
+                        </div>
+                        <div class="package-option">
+                            <input type="radio" id="pkg-piano" name="workshop-package" value="piano">
+                            <label for="pkg-piano">With Piano
+                                <span id="price-piano">£0.00</span>
+                            </label>
+                        </div>
+                        <div class="package-option">
+                            <input type="radio" id="pkg-av-piano" name="workshop-package" value="av-piano">
+                            <label for="pkg-av-piano">With AV & Piano
+                                <span id="price-av-piano">£0.00</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="form-section">
+                <div class="form-section" id="tech-section-header">
                     <h3>Technical / Equipment (per day)</h3>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="pa-group">
                     <label for="pa">PA (per day)</label>
                     <select id="pa" name="pa" class="equipment" data-name="PA (per day)">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="projector-group">
                     <label for="projector">Projector (per day)</label>
                     <select id="projector" name="projector" class="equipment" data-name="Projector (per day)">
                         <option value="0">0</option><option value="1">1</option>
@@ -996,7 +1084,7 @@
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="piano-group">
                     <label for="piano">Grand Piano</label>
                     <select id="piano" name="piano" class="equipment" data-name="Grand Piano">
                         <option value="0">0</option><option value="1">1</option>
@@ -1300,26 +1388,42 @@
 
             // Define rates
             const venueRates = {
-                'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 200 }, // 250 * 0.8
-                'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 160 }, // 200 * 0.8
-                'The Lab': { 'Standard Rate': 175, 'Recording / Premium Workshop': 140 }, // 175 * 0.8
-                'Eastside Jazz Club': { 'Standard Rate': 175, 'Recording / Premium Workshop': 140 }, // 175 * 0.8
-                'The Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 120 }, // 150 * 0.8
-                'Workshop (Large, up to 60)': { 'Standard Rate': 60, 'Recording / Premium Workshop': 48 }, // 60 * 0.8
-                'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 40 }, // 50 * 0.8
-                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }, // Flat daily rates
+                'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 125 }, // PDF pg 10
+                'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 100 }, // PDF pg 13
+                'The Lab': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 }, // PDF pg 16
+                'Eastside Jazz Club': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 }, // PDF pg 19
+                'The Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 75 }, // PDF pg 21
+                'Workshop (Large, up to 60)': { 'Standard Rate': 60, 'Recording / Premium Workshop': 30 }, // PDF pg 23, 50%
+                'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 25 }, // PDF pg 23, 50%
+                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 5000 }, // PDF pg 23, listed as "Dry hire of the entire venue", one price.
+            };
+            
+            // Workshop Package Rates (from PDF pg 23)
+            const workshopPackageRates = {
+                'Workshop (Large, up to 60)': {
+                    'dry': 60,
+                    'av': 100,
+                    'piano': 100,
+                    'av-piano': 150
+                },
+                'Workshop (Small, up to 40)': {
+                    'dry': 50,
+                    'av': 90,
+                    'piano': 90,
+                    'av-piano': 135
+                }
             };
 
             const equipmentRates = {
-                'pa': 100.00,
-                'projector': 250.00,
-                'mic-wired': 20.00,
-                'mic-wireless': 40.00,
-                'monitor': 15.00,
-                'laptop': 40.00, // Not in table, using old value
-                'piano': 250.00,
-                'audio-rec': 75.00, // Not in table, using old value
-                'video-rec': 250.00, // Static Video Recording
+                'pa': 100.00, // PDF pg 29
+                'projector': 250.00, // PDF pg 30
+                'mic-wired': 20.00, // PDF pg 29
+                'mic-wireless': 40.00, // PDF pg 29
+                'monitor': 15.00, // PDF pg 29
+                'laptop': 50.00, // PDF pg 29
+                'piano': 250.00, // Not listed, using old
+                'audio-rec': 150.00, // PDF pg 29
+                'video-rec': 250.00, // PDF pg 29 (Archive Video)
             };
 
             // DOM element references
@@ -1329,17 +1433,137 @@
             const venueVatEl = document.getElementById('venue-vat');
             const venueGrandTotalEl = document.getElementById('venue-grand-total');
             const venueSelect = document.getElementById('venue');
+            const hireTypeSelect = document.getElementById('hire-type');
             const startTimeGroup = document.getElementById('start-time-group');
             const endTimeGroup = document.getElementById('end-time-group');
             const quoteMessageBar = document.getElementById('quote-message-bar');
             const clearQuoteBtn = document.getElementById('clear-quote-btn');
+            
+            const techSectionHeader = document.getElementById('tech-section-header');
+            const workshopPackageSection = document.getElementById('workshop-package-section');
+            
+            // Tech items to hide
+            const paGroup = document.getElementById('pa-group');
+            const projectorGroup = document.getElementById('projector-group');
+            const pianoGroup = document.getElementById('piano-group');
 
-            // Handle "Whole Building Hire" show/hide logic
-            venueSelect.addEventListener('change', (e) => {
-                const isWholeBuilding = e.target.value === 'Whole Building Hire';
+            // Handle "Whole Building Hire" & Workshop logic
+            function toggleFormSections() {
+                const venue = venueSelect.value;
+                const hireType = hireTypeSelect.value;
+                const isWholeBuilding = venue === 'Whole Building Hire';
+                const isWorkshop = venue.includes('Workshop');
+                
+                // Toggle time groups
                 startTimeGroup.style.display = isWholeBuilding ? 'none' : 'flex';
                 endTimeGroup.style.display = isWholeBuilding ? 'none' : 'flex';
+                
+                // Toggle Workshop vs Tech sections
+                workshopPackageSection.style.display = isWorkshop ? 'grid' : 'none';
+                techSectionHeader.style.display = isWorkshop ? 'none' : 'grid';
+                
+                // Show/Hide ALL equipment for workshops, show for others
+                document.querySelectorAll('.equipment').forEach(el => {
+                    const parentGroup = el.closest('.form-group');
+                    if (parentGroup) { // Check if parent exists
+                        parentGroup.style.display = isWorkshop ? 'none' : 'flex';
+                    }
+                });
+
+                if (isWorkshop) {
+                    updateWorkshopPackagePrices();
+                    // Manually trigger the package change handler to hide relevant tech items
+                    handlePackageChange(); 
+                } else {
+                    // Ensure all tech items are visible when not a workshop
+                    paGroup.style.display = 'flex';
+                    projectorGroup.style.display = 'flex';
+                    pianoGroup.style.display = 'flex';
+                }
+            }
+            
+            // NEW: Update prices in workshop package labels
+            function updateWorkshopPackagePrices() {
+                const venue = venueSelect.value;
+                const hireType = hireTypeSelect.value;
+                
+                // Only run if a workshop is selected
+                if (!venue.includes('Workshop')) return;
+
+                const rates = workshopPackageRates[venue];
+                
+                // Calculate premium rate (50% of standard)
+                const rateModifier = (hireType === 'Standard Rate') ? 1 : 0.5;
+
+                document.getElementById('price-dry').textContent = `£${(rates.dry * rateModifier).toFixed(2)}`;
+                document.getElementById('price-av').textContent = `£${(rates.av * rateModifier).toFixed(2)}`;
+                document.getElementById('price-piano').textContent = `£${(rates.piano * rateModifier).toFixed(2)}`;
+                document.getElementById('price-av-piano').textContent = `£${(rates['av-piano'] * rateModifier).toFixed(2)}`;
+            }
+            
+            // NEW: Handle hiding/showing tech items based on package
+            function handlePackageChange() {
+                const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
+                const isWorkshop = venueSelect.value.includes('Workshop');
+
+                if (!isWorkshop) {
+                     // Show all if not a workshop
+                    paGroup.style.display = 'flex';
+                    projectorGroup.style.display = 'flex';
+                    pianoGroup.style.display = 'flex';
+                    techSectionHeader.style.display = 'grid'; // Show tech header
+                    // Show all other tech items
+                    document.querySelectorAll('.equipment').forEach(el => {
+                        const parentGroup = el.closest('.form-group');
+                        if (parentGroup) parentGroup.style.display = 'flex';
+                    });
+                    return;
+                }
+
+                // If it IS a workshop, hide the main tech header
+                techSectionHeader.style.display = 'none';
+
+                // Hide/Show PA
+                const showsPA = selectedPackage === 'dry' || selectedPackage === 'piano';
+                paGroup.style.display = showsPA ? 'flex' : 'none';
+                
+                // Hide/Show Projector
+                const showsProjector = selectedPackage === 'dry' || selectedPackage === 'piano';
+                projectorGroup.style.display = showsProjector ? 'flex' : 'none';
+
+                // Hide/Show Piano
+                const showsPiano = selectedPackage === 'dry' || selectedPackage === 'av';
+                pianoGroup.style.display = showsPiano ? 'flex' : 'none';
+                
+                // Show all *other* tech items (mics, laptops, etc.)
+                document.querySelectorAll('.equipment').forEach(el => {
+                    const parentGroup = el.closest('.form-group');
+                    // Check if it's one of the ones we toggle
+                    const isToggled = parentGroup.id === 'pa-group' || parentGroup.id === 'projector-group' || parentGroup.id === 'piano-group';
+                    if (parentGroup && !isToggled) {
+                        parentGroup.style.display = 'flex';
+                    }
+                });
+                
+                // But now, we must show the Tech Header if *any* of them are visible
+                const anyTechVisible = (showsPA || showsProjector || showsPiano || document.querySelectorAll('.equipment').length > 3); // >3 because we check the 3 toggled ones
+                techSectionHeader.style.display = anyTechVisible ? 'grid' : 'none';
+            }
+            
+            // Add listeners
+            venueSelect.addEventListener('change', toggleFormSections);
+            hireTypeSelect.addEventListener('change', () => {
+                if (venueSelect.value.includes('Workshop')) {
+                    updateWorkshopPackagePrices();
+                }
             });
+            document.querySelectorAll('input[name="workshop-package"]').forEach(radio => {
+                radio.addEventListener('change', handlePackageChange);
+            });
+            
+            // Initial call to set form state
+            toggleFormSections();
+            
             
             // Handle "Clear Quote"
             clearQuoteBtn.addEventListener('click', () => {
@@ -1352,7 +1576,7 @@
             addQuoteBtn.addEventListener('click', () => {
                 // Get all form values
                 const venue = venueSelect.value;
-                const hireType = document.getElementById('hire-type').value;
+                const hireType = hireTypeSelect.value;
                 const startTime = document.getElementById('start-time').value;
                 const endTime = document.getElementById('end-time').value;
                 
@@ -1361,6 +1585,7 @@
                 const dayCount = days.length;
 
                 const isWholeBuilding = (venue === 'Whole Building Hire');
+                const isWorkshop = venue.includes('Workshop');
 
                 // --- Validation ---
                 if (dayCount === 0) {
@@ -1399,35 +1624,54 @@
                 }
 
                 // --- Calculations ---
-                const rate = venueRates[venue][hireType];
                 
                 let unitPrice, quantity, description;
                 
-                if (isWholeBuilding) {
-                    // Flat daily rate
+                if (isWorkshop) {
+                    // WORKSHOP LOGIC
+                    const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
+                    const packageRate = workshopPackageRates[venue][selectedPackage];
+                    const rateModifier = (hireType === 'Standard Rate') ? 1 : 0.5;
+                    
+                    unitPrice = packageRate * rateModifier;
+                    quantity = duration * dayCount;
+                    
+                    const packageLabel = document.querySelector(`label[for="pkg-${selectedPackage}"]`).childNodes[0].textContent.trim();
+                    description = `${venue} - ${hireType} - ${packageLabel} (${duration.toFixed(2)} hrs x ${dayCount} days on ${days.join(', ')})`;
+                    
+                    addQuoteItem(description, unitPrice, quantity, false, false);
+
+                } else if (isWholeBuilding) {
+                    // WHOLE BUILDING LOGIC
+                    const rate = venueRates[venue][hireType];
                     unitPrice = rate;
                     quantity = dayCount;
                     description = `${venue} - ${hireType} (${days.join(', ')})`;
+                    addQuoteItem(description, unitPrice, quantity, false, true);
+                    
                 } else {
-                    // Hourly rate
+                    // STANDARD VENUE LOGIC
+                    const rate = venueRates[venue][hireType];
                     unitPrice = rate;
                     quantity = duration * dayCount;
                     description = `${venue} - ${hireType} (${duration.toFixed(2)} hrs x ${dayCount} days on ${days.join(', ')})`;
+                    addQuoteItem(description, unitPrice, quantity, false, false);
                 }
-
-                // Add Venue Item
-                addQuoteItem(description, unitPrice, quantity, false, isWholeBuilding);
 
                 // Add Equipment Items (per day)
                 const equipmentInputs = document.querySelectorAll('.equipment');
                 equipmentInputs.forEach(input => {
-                    const quantity = parseInt(input.value, 10);
-                    if (quantity > 0) {
-                        const rateKey = input.id;
-                        const unitPrice = equipmentRates[rateKey];
-                        const description = input.dataset.name;
-                        // Equipment quantity is (items * days)
-                        addQuoteItem(description, unitPrice, quantity * dayCount, true, false);
+                    const parentGroup = input.closest('.form-group');
+                    // Only add if the item is visible (not hidden by package logic)
+                    if (parentGroup.style.display !== 'none') {
+                        const quantity = parseInt(input.value, 10);
+                        if (quantity > 0) {
+                            const rateKey = input.id;
+                            const unitPrice = equipmentRates[rateKey];
+                            const description = input.dataset.name;
+                            // Equipment quantity is (items * days)
+                            addQuoteItem(description, unitPrice, quantity * dayCount, true, false);
+                        }
                     }
                 });
                 
@@ -1739,7 +1983,7 @@
                         `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11151.jpg`,
                         `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11152.jpg`,
                         `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11153.jpg`
-                    ] // <-- SYNTAX ERROR FIX: This ']' was missing.
+                    ]
                 }
             };
             
@@ -1934,7 +2178,7 @@
                 }
                 
                 // NEW: Handle arrow keys for lightbox
-                if (lightbox.style.display === 'flex') {
+                if (lightbox.classList.contains('show')) {
                     if (e.key === 'ArrowLeft') {
                         showPrevImage();
                     } else if (e.key === 'ArrowRight') {
@@ -1973,4 +2217,3 @@
 
 </body>
 </html>
-
