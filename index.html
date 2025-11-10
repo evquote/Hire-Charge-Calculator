@@ -1048,6 +1048,12 @@
                     <h3>Technical / Equipment (per day)</h3>
                 </div>
 
+                <!-- NEW: Technician Hours Input -->
+                <div class="form-group" id="tech-hours-group">
+                    <label for="tech-hours">Technician Hours (4hr min)</label>
+                    <input type="number" id="tech-hours" name="tech-hours" value="0" min="0" step="0.5" data-name="Technician Hours">
+                </div>
+
                 <div class="form-group" id="pa-group">
                     <label for="pa">PA (per day)</label>
                     <select id="pa" name="pa" class="equipment" data-name="PA (per day)">
@@ -1377,6 +1383,8 @@
             const VAT_RATE = 0.20; // 20%
             const MIN_HOURS = 4;
             const AFTER_HOURS_SURCHARGE = 20;
+            const TECHNICIAN_RATE = 35; // NEW: Technician hourly rate
+            const TECHNICIAN_MIN_HOURS = 4; // NEW: Technician minimum hours
             
             // Store all quote items in an array
             let quoteItems = [];
@@ -1446,6 +1454,8 @@
             const paGroup = document.getElementById('pa-group');
             const projectorGroup = document.getElementById('projector-group');
             const pianoGroup = document.getElementById('piano-group');
+            const techHoursGroup = document.getElementById('tech-hours-group'); // NEW: Tech hours group
+            const allTechGroups = document.querySelectorAll('.equipment, #tech-hours'); // NEW: All tech inputs
 
             // Handle "Whole Building Hire" & Workshop logic
             function toggleFormSections() {
@@ -1463,7 +1473,7 @@
                 techSectionHeader.style.display = isWorkshop ? 'none' : 'grid';
                 
                 // Show/Hide ALL equipment for workshops, show for others
-                document.querySelectorAll('.equipment').forEach(el => {
+                allTechGroups.forEach(el => {
                     const parentGroup = el.closest('.form-group');
                     if (parentGroup) { // Check if parent exists
                         parentGroup.style.display = isWorkshop ? 'none' : 'flex';
@@ -1479,6 +1489,7 @@
                     paGroup.style.display = 'flex';
                     projectorGroup.style.display = 'flex';
                     pianoGroup.style.display = 'flex';
+                    techHoursGroup.style.display = 'flex'; // NEW: Show tech hours
                 }
             }
             
@@ -1511,6 +1522,7 @@
                     paGroup.style.display = 'flex';
                     projectorGroup.style.display = 'flex';
                     pianoGroup.style.display = 'flex';
+                    techHoursGroup.style.display = 'flex'; // NEW: Show tech hours
                     techSectionHeader.style.display = 'grid'; // Show tech header
                     // Show all other tech items
                     document.querySelectorAll('.equipment').forEach(el => {
@@ -1535,6 +1547,9 @@
                 const showsPiano = selectedPackage === 'dry' || selectedPackage === 'av';
                 pianoGroup.style.display = showsPiano ? 'flex' : 'none';
                 
+                // Hide/Show Tech Hours
+                techHoursGroup.style.display = 'flex'; // Always show tech hours for now
+                
                 // Show all *other* tech items (mics, laptops, etc.)
                 document.querySelectorAll('.equipment').forEach(el => {
                     const parentGroup = el.closest('.form-group');
@@ -1546,7 +1561,15 @@
                 });
                 
                 // But now, we must show the Tech Header if *any* of them are visible
-                const anyTechVisible = (showsPA || showsProjector || showsPiano || document.querySelectorAll('.equipment').length > 3); // >3 because we check the 3 toggled ones
+                // Check if any *other* tech items are visible, or if the toggled ones are
+                let anyTechVisible = showsPA || showsProjector || showsPiano || techHoursGroup.style.display === 'flex';
+                // Check other items
+                document.querySelectorAll('.equipment').forEach(el => {
+                     const parentGroup = el.closest('.form-group');
+                     const isToggled = parentGroup.id === 'pa-group' || parentGroup.id === 'projector-group' || parentGroup.id === 'piano-group';
+                     if(parentGroup && !isToggled) anyTechVisible = true;
+                });
+                
                 techSectionHeader.style.display = anyTechVisible ? 'grid' : 'none';
             }
             
@@ -1576,7 +1599,7 @@
             addQuoteBtn.addEventListener('click', () => {
                 // Get all form values
                 const venue = venueSelect.value;
-                const hireType = hireTypeSelect.value;
+                const hireType = document.getElementById('hire-type').value;
                 const startTime = document.getElementById('start-time').value;
                 const endTime = document.getElementById('end-time').value;
                 
@@ -1675,6 +1698,17 @@
                     }
                 });
                 
+                // NEW: Add Technician Hours
+                const techHoursInput = document.getElementById('tech-hours');
+                let techHours = parseFloat(techHoursInput.value) || 0;
+                if (techHours > 0) {
+                    if (techHours < TECHNICIAN_MIN_HOURS) {
+                        techHours = TECHNICIAN_MIN_HOURS; // Enforce minimum
+                    }
+                    // Tech hours are per day
+                    addQuoteItem("Technician Hours", TECHNICIAN_RATE, techHours * dayCount, true, false);
+                }
+                
                 // Add After-Hours Surcharge (if not whole building)
                 if (!isWholeBuilding) {
                     const surchargeHours = calculateSurcharge(startTime, endTime, days);
@@ -1686,6 +1720,9 @@
 
                 // Re-render the table with new items
                 renderQuoteTable();
+                
+                // Reset tech hours input
+                techHoursInput.value = 0;
             });
             
             function addQuoteItem(description, unitPrice, quantity, isTech, isWholeBuilding) {
