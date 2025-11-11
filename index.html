@@ -134,7 +134,7 @@
         }
 
         .tab-content {
-            display: none; /* Hidden by default */
+            display: none; /* Hide tabs by default */
             padding-top: 30px;
         }
 
@@ -512,11 +512,11 @@
         }
         
         /* NEW: Admin mode editable fields */
-        .admin-editable-total { /* Only total is editable */
+        .admin-editable {
             padding: 0 !important;
             border-width: 0 !important;
         }
-        .admin-editable-total input {
+        .admin-editable input {
             width: 100%;
             height: 100%;
             border: 2px dashed var(--primary-color);
@@ -526,6 +526,12 @@
             text-align: right;
             font-family: 'Poppins', sans-serif;
             background-color: #f0f6ff;
+        }
+        
+        /* Admin mode for totals - REVERTED */
+        .admin-editable-total {
+            /* This style is no longer used for input fields */
+            padding: 5px 0;
         }
         
         /* Hide remove column for printing */
@@ -539,12 +545,17 @@
         }
         
         /* Remove borders from admin inputs when printing */
-        .printing .admin-editable-total input {
+        .printing .admin-editable input {
             border: none;
             background-color: transparent;
             padding: 12px;
-            font-weight: 700;
-            color: var(--dark-grey);
+            font-weight: bold;
+            color: var(--dark-grey); /* Match normal text */
+        }
+        .printing .admin-editable-total {
+             padding: 5px 0;
+             border: none;
+             background-color: transparent;
         }
         /* End Admin Mode styles */
 
@@ -1171,11 +1182,12 @@
                 </div>
                 <div class="totals-section">
                     Subtotal
-                    <div id="venue-subtotal-display">£0.00</div>
+                    <!-- REVERTED: Totals are display-only -->
+                    <div id="venue-subtotal" class="admin-editable-total">£0.00</div>
                     VAT (20%)
-                    <div id="venue-vat-display">£0.00</div>
+                    <div id="venue-vat" class="admin-editable-total">£0.00</div>
                     <strong>Venue Grand Total (inc. VAT)</strong>
-                    <div id="venue-grand-total-display">£0.00</div>
+                    <div id="venue-grand-total" class="admin-editable-total">£0.00</div>
                 </div>
                 <div class="disclaimer">
                     <p><strong>Note:</strong> All prices + VAT. Minimum 4-hour booking applies (except Whole Building Hire).
@@ -1538,9 +1550,9 @@
             
             // Main elements
             const quoteBody = $('quote-summary-body');
-            const venueSubtotalEl = $('venue-subtotal-display');
-            const venueVatEl = $('venue-vat-display');
-            const venueGrandTotalEl = $('venue-grand-total-display');
+            const venueSubtotalEl = $('venue-subtotal');
+            const venueVatEl = $('venue-vat');
+            const venueGrandTotalEl = $('venue-grand-total');
             const quoteMessageBar = $('quote-message-bar');
             
             // Admin elements
@@ -1948,7 +1960,7 @@
                 });
                 
                 // Add After-Hours Surcharge
-                if (!isWholeBuilding) {
+                if (!isWholeBuilding && !isWorkshop) { // Only add for standard venues
                     const surchargeHours = calculateSurcharge(startTime, endTime, days);
                     if (surchargeHours > 0) {
                         const surchargeTotalHours = surchargeHours * dayCount;
@@ -2052,21 +2064,19 @@
                     currentSubtotal += item.total;
                     const row = document.createElement('tr');
                     
-                    // CORRECTED: Only Total is editable
+                    // CORRECTED: Admin Mode logic
                     const totalCell = (isAdmin) ? `
-                        <td class="admin-editable-total" data-id="${item.id}">
+                        <td class="admin-editable" data-id="${item.id}" data-field="total">
                             <input type="number" value="${item.total.toFixed(2)}" min="0" step="0.01">
                         </td>
                     ` : `
                         <td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>
                     `;
                     
-                    // CORRECTED: Unit Price is NOT editable
                     const unitPriceCell = `
                         <td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>
                     `;
                     
-                    // CORRECTED: Quantity is NOT editable
                      const quantityCell = `
                         <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
                     `;
@@ -2102,22 +2112,29 @@
 
             // --- Admin Mode Event Listeners (CORRECTED) ---
             function addAdminInputListeners() {
-                quoteBody.querySelectorAll('.admin-editable-total input').forEach(input => {
+                quoteBody.querySelectorAll('.admin-editable input').forEach(input => {
                     input.addEventListener('change', (e) => {
                         const inputEl = e.target;
                         const id = parseFloat(inputEl.closest('td').dataset.id);
-                        const newTotal = parseFloat(inputEl.value);
+                        const field = inputEl.closest('td').dataset.field; // This will be "total"
+                        const newValue = parseFloat(inputEl.value);
                         
                         const item = quoteItems.find(i => i.id === id);
                         if (!item) return;
 
-                        // Update the item's total
-                        item.total = newTotal;
+                        // Update the item
+                        item[field] = newValue; // Update the total
                         
-                        // Recalculate the entire subtotal from the quoteItems array
+                        // CORRECTED: Recalculate Unit Price
+                        if (field === 'total') {
+                            item.unitPrice = (item.quantity !== 0) ? item.total / item.quantity : 0;
+                        }
+
+                        // Recalculate the entire subtotal
                         const newSubtotal = quoteItems.reduce((acc, i) => acc + i.total, 0);
                         
-                        // Update the main totals display
+                        // Re-render the table and update totals
+                        renderQuoteTable(); // This will show the new unit price
                         updateTotals(newSubtotal);
                     });
                 });
@@ -2343,7 +2360,7 @@
                         `${baseURL}lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11123.jpg`
                     ]
                 },
-                'Organ Studio': {
+                'The Organ Studio': {
                     title: 'The Organ Studio',
                     capacity: 'Capacity: 80',
                     description: 'A light and airy venue with a Eule Pipe organ, suited to chamber music and organ recitals. The venue has a distinctive shape and tranquil atmosphere.',
