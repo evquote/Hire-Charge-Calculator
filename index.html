@@ -105,6 +105,20 @@
             display: none; /* Hidden by default */
             background: var(--danger-color);
             color: var(--white);
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        #admin-logout-button:hover {
+            background: var(--danger-hover);
         }
 
         /* This is the main content wrapper */
@@ -960,7 +974,7 @@
             #lightbox-next {
                 right: 5px;
             }
-            #admin-login-button {
+            #admin-login-button, #admin-logout-button {
                 padding: 6px 10px;
                 font-size: 0.8rem;
                 top: 10px;
@@ -1263,7 +1277,7 @@
                 <br>
                 <button type="button" id="staff-login-btn" class="btn btn-primary">Login</button>
                 <p id="staffing-password-error">Incorrect password. Please try again.</p>
-                <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p>
+                <!-- REMOVED: <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p> -->
             </div>
 
             <!-- Staffing Calculator (wrapper is hidden by default) -->
@@ -1360,7 +1374,7 @@
                 <br>
                 <button type="button" id="perc-login-btn" class="btn btn-primary">Login</button>
                 <p id="percussion-password-error">Incorrect password. Please try again.</p>
-                <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p>
+                <!-- REMOVED: <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p> -->
             </div>
 
             <!-- Percussion Calculator (wrapper is hidden by default) -->
@@ -1660,7 +1674,7 @@
             });
             
             // --- NEW: Admin Login Logic ---
-            const adminLoginBtn = document.getElementById('admin-login-button');
+            const adminLoginButton = document.getElementById('admin-login-button');
             
             function toggleAdminMode(loggedIn) {
                 isAdmin = loggedIn;
@@ -1695,22 +1709,8 @@
                 // Re-render the quote table to add/remove editable fields
                 renderQuoteTable();
             }
-
-            adminLoginBtn.addEventListener('click', () => {
-                if (isAdmin) {
-                    toggleAdminMode(false); // Logout
-                } else {
-                    // Prompt for password
-                    const password = prompt('Enter Admin Password:');
-                    if (password === correctPassword) {
-                        toggleAdminMode(true); // Login
-                    } else if (password) {
-                        alert('Incorrect password.');
-                    }
-                }
-            });
             
-            // Re-grab button on subsequent clicks
+            // CONSOLIDATED: Admin Login/Logout Button Listener
             document.querySelector('header').addEventListener('click', (e) => {
                 if(e.target.id === 'admin-login-button' && !isAdmin) {
                      const password = prompt('Enter Admin Password:');
@@ -2183,18 +2183,22 @@
                     
                     // NEW: Admin Mode Check
                     const priceCell = isAdmin ? 
-                        `<td class="editable"><input type="number" class="admin-edit" data-id="${item.id}" data-field="unitPrice" value="${item.unitPrice.toFixed(2)}"></td>` : 
+                        `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>` : // Not editable
                         `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
                         
                     const quantityCell = isAdmin ?
-                        `<td class="editable"><input type="number" class="admin-edit" data-id="${item.id}" data-field="quantity" value="${item.quantity.toFixed(2)}"></td>` :
+                        `<td style="text-align: right;">${item.quantity.toFixed(2)}</td>` : // Not editable
                         `<td style="text-align: right;">${item.quantity.toFixed(2)}</td>`;
+
+                    const totalCell = isAdmin ?
+                        `<td class="editable"><input type="number" class="admin-edit-total" data-id="${item.id}" value="${item.total.toFixed(2)}"></td>` :
+                        `<td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>`;
                     
                     row.innerHTML = `
                         <td>${item.description}</td>
                         ${priceCell}
                         ${quantityCell}
-                        <td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>
+                        ${totalCell}
                         <td><button class="remove-btn" data-id="${item.id}">X</button></td>
                     `;
                     quoteBody.appendChild(row);
@@ -2215,28 +2219,30 @@
                 }
             }
             
-            // NEW: Add listeners for admin input fields
+            // NEW: Add listeners for admin input fields (Total)
             function addAdminEditListeners() {
-                document.querySelectorAll('.admin-edit').forEach(input => {
+                document.querySelectorAll('.admin-edit-total').forEach(input => {
                     input.addEventListener('input', (e) => {
                         const idToEdit = parseFloat(e.target.dataset.id);
-                        const field = e.target.dataset.field;
-                        const newValue = parseFloat(e.target.value) || 0;
+                        const newTotal = parseFloat(e.target.value) || 0;
                         
                         // Find item in array and update it
                         const item = quoteItems.find(i => i.id === idToEdit);
                         if (item) {
-                            item[field] = newValue;
-                            // Recalculate total for that item
-                            item.total = item.unitPrice * item.quantity;
+                            item.total = newTotal;
+                            // Recalculate unitPrice
+                            if (item.quantity !== 0) {
+                                item.unitPrice = newTotal / item.quantity;
+                            } else {
+                                item.unitPrice = 0; // Avoid division by zero
+                            }
                         }
                         
                         // Re-render the table to update totals
                         renderQuoteTable();
                         
                         // HACK: Re-focus the edited cell
-                        // This is needed because renderQuoteTable() rebuilds the DOM
-                        const newElement = document.querySelector(`.admin-edit[data-id="${idToEdit}"][data-field="${field}"]`);
+                        const newElement = document.querySelector(`.admin-edit-total[data-id="${idToEdit}"]`);
                         if (newElement) {
                             newElement.focus();
                             // Move cursor to the end
@@ -2332,6 +2338,7 @@
                         // Clear inputs
                         row.querySelector('.staff-quantity').value = 1;
                         row.querySelector('.staff-hours').value = 0;
+                        row.querySelector('.row-cost').textContent = '£0.00';
                     }
                 });
                 
@@ -2353,6 +2360,7 @@
                         row.querySelector('.custom-rate').value = 0;
                         row.querySelector('.staff-quantity').value = 1;
                         row.querySelector('.staff-hours').value = 0;
+                        row.querySelector('.row-cost').textContent = '£0.00';
                     }
                 });
                 
@@ -2367,6 +2375,25 @@
                 } else {
                     alert('No staffing hours entered.');
                 }
+            });
+            
+             // Add listeners to all inputs to re-calculate on change
+            staffingBody.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => {
+                    // Recalculate just the row costs, not the main total
+                    staffingBody.querySelectorAll('.staff-row').forEach(row => {
+                        const rate = parseFloat(row.dataset.rate);
+                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                        const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                        row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
+                    });
+                    staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
+                        const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
+                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                        const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                        row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
+                    });
+                });
             });
             
             // --- 5. Percussion Hire Logic (UNIFIED) ---
@@ -2390,6 +2417,7 @@
                         // Clear input
                         row.querySelector('.perc-quantity').value = 0;
                         row.querySelector('.perc-days').value = 1;
+                        row.querySelector('.row-cost').textContent = '£0.00';
                     }
                 });
                 
@@ -2404,6 +2432,18 @@
                 } else {
                     alert('No percussion items selected.');
                 }
+            });
+            
+            percussionBody.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => {
+                    // Recalculate just the row costs
+                    percussionBody.querySelectorAll('.perc-row').forEach(row => {
+                        const rate = parseFloat(row.dataset.rate);
+                        const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
+                        const days = parseFloat(row.querySelector('.perc-days').value) || 0;
+                        row.querySelector('.row-cost').textContent = `£${(rate * quantity * days).toFixed(2)}`;
+                    });
+                });
             });
 
 
@@ -2446,7 +2486,7 @@
                     capacity: 'Capacity: 60-100',
                     description: "Birmingham's only dedicated Jazz venue, designed for a quintessential, cosy club atmosphere. Features low-level mood lighting and cabaret seating.",
                     image: `${baseURL}jazz/rb_RBC-Music---Jazz_30928.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club',
+                    link: 'https->www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club',
                     gallery: [
                         `${baseURL}jazz/rb_RBC-Music---Jazz_30928.jpg`,
                         `${baseURL}jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11138.jpg`,
