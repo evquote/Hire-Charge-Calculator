@@ -54,22 +54,6 @@
             color: var(--dark-grey);
             line-height: 1.6;
         }
-        
-        /* Style for the Admin Login link */
-        .admin-login-link {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--white);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-            margin-left: 20px;
-        }
-        
-        .admin-login-link:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
 
         /* --- 2. Header & Layout --- */
         header {
@@ -78,16 +62,16 @@
             background-size: cover;
             background-position: center;
             color: var(--white);
-            padding: 40px 0;
+            padding: 40px 20px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         header h1 {
             font-weight: 700;
             font-size: 2.8rem;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            display: inline-block; /* To align with admin link */
         }
 
         header p {
@@ -96,6 +80,35 @@
             opacity: 0.9;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
+        
+        /* NEW: Admin Login Button */
+        #admin-login-button, #admin-logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: var(--dark-grey);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        #admin-login-button:hover, #admin-logout-button:hover {
+            background-color: #b38b00;
+        }
+        #admin-logout-button {
+            display: none; /* Hidden by default */
+            background: var(--danger-color);
+            color: var(--white);
+        }
+        #admin-logout-button:hover {
+            background: var(--danger-hover);
+        }
+
 
         /* This is the main content wrapper */
         .container {
@@ -110,8 +123,8 @@
         /* --- 3. Tab Navigation --- */
         .tabs {
             display: flex;
-            border-bottom: 2px solid var(--border-color);
             flex-wrap: wrap; /* Allow tabs to wrap on small screens */
+            border-bottom: 2px solid var(--border-color);
         }
 
         .tab-button {
@@ -125,18 +138,24 @@
             opacity: 0.7;
             position: relative;
             top: 2px; /* Aligns with the bottom border */
-            white-space: nowrap;
-        }
-        
-        /* NEW: Admin-only tabs are hidden by default */
-        .tab-button[data-tab="staffing-tab"],
-        .tab-button[data-tab="percussion-tab"] {
-            display: none;
         }
 
         .tab-button.active {
             opacity: 1;
             border-bottom: 3px solid var(--primary-color);
+        }
+        
+        /* NEW: Hide admin tabs by default */
+        #staffing-tab-button, #percussion-tab-button {
+            display: none;
+        }
+        
+        /* Class to show admin items */
+        .admin-visible {
+            display: block !important;
+        }
+        .admin-visible-inline {
+            display: inline-block !important;
         }
 
         .tab-content {
@@ -255,52 +274,23 @@
 
         .form-group input[type="time"],
         .form-group input[type="number"],
-        .form-group select,
-        .form-group input[type="radio"] { /* Added radio */
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
             font-family: 'Poppins', sans-serif;
             background-color: var(--white); /* Fix for iOS styling */
-        }
-        
-        /* Specific overrides for radios */
-        .form-group input[type="radio"] {
-            padding: 0;
-            margin-right: 8px;
-            width: 1.2em;
-            height: 1.2em;
-        }
-        
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 12px;
-            background-color: #fcfcfc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-        
-        .radio-group div {
-            display: flex;
-            align-items: center;
-        }
-        
-        .radio-group label {
-            font-weight: 400;
-            margin-bottom: 0;
-            text-transform: none;
-            color: var(--dark-grey);
-            cursor: pointer;
-        }
-        
-        .form-group select,
-        .form-group input[type="number"] {
             -webkit-appearance: none; 
             -moz-appearance: none;
             appearance: none;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
         }
         
         .form-group input[type="number"] {
@@ -315,6 +305,8 @@
 
         .form-group input[type="time"]:focus,
         .form-group input[type="number"]:focus,
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -350,6 +342,46 @@
             height: 1.3em;
             cursor: pointer;
         }
+        
+        /* Workshop Package Selection */
+        #workshop-package-group {
+            display: none; /* Hide by default */
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+        }
+        
+        .package-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .package-option:last-child {
+            margin-bottom: 0;
+        }
+        
+        .package-option input[type="radio"] {
+            width: 1.3em;
+            height: 1.3em;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        
+        .package-option label {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark-grey);
+            cursor: pointer;
+        }
+        
+        .package-option .price {
+            margin-left: auto;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
 
         /* --- 6. Button Styling --- */
         .button-group {
@@ -406,6 +438,8 @@
 
         /* --- 7. Quote Summary Table --- */
         #quote-summary-container h2,
+        #staffing-summary-container h2,
+        #percussion-summary-container h2,
         #global-gallery-container h2 { /* Style for new gallery title */
             color: var(--primary-color);
             border-bottom: 2px solid var(--border-color);
@@ -424,12 +458,10 @@
             border-radius: var(--border-radius);
             font-weight: 500;
         }
-        
-        /* Class to hide elements during PDF generation */
-        .print-hide {
-            /* This will be targeted by JS */
+        /* Class for PDF cleanup */
+        .pdf-hide {
+            display: none !important;
         }
-
 
         /* Makes the table horizontally scrollable on small screens */
         .table-wrapper {
@@ -445,43 +477,33 @@
             min-width: 800px;
         }
         
-        /* NEW: Grouped table rows */
-        .quote-table tbody tr.group-header td {
-            background-color: #f4f7f6;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary-color);
-            border-top: 2px solid var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        /* Staffing & Percussion tables */
-        .data-table {
+        /* NEW: Staffing & Percussion timesheet table */
+        .timesheet-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 1rem;
         }
-        .data-table th,
-        .data-table td {
+        .timesheet-table th,
+        .timesheet-table td {
             border: 1px solid var(--border-color);
             padding: 12px;
             text-align: left;
         }
-        .data-table th {
+        .timesheet-table th {
             background-color: #f9f9f9;
         }
-        .data-table td:nth-child(2), /* Rate */
-        .data-table td:nth-child(5) { /* Cost */
+        .timesheet-table td:nth-child(2), /* Rate */
+        .timesheet-table td:last-child { /* Cost */
             text-align: right;
             font-weight: 600;
         }
-        .data-table .row-cost {
+        .timesheet-table .row-cost {
             font-family: monospace, sans-serif;
             font-size: 1.1rem;
             color: var(--primary-color);
         }
-        .data-table input {
+        .timesheet-table input {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border-color);
@@ -490,17 +512,14 @@
             font-family: 'Poppins', sans-serif;
             -moz-appearance: textfield;
         }
-        
-        .data-table input[type="number"] {
+        .timesheet-table input[type="number"] {
             text-align: right;
         }
-        
-        .data-table input[type="text"] {
+        .timesheet-table input[type="text"] {
             text-align: left;
         }
-        
-        .data-table input::-webkit-inner-spin-button,
-        .data-table input::-webkit-outer-spin-button {
+        .timesheet-table input::-webkit-inner-spin-button,
+        .timesheet-table input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
@@ -524,48 +543,51 @@
             background-color: #f9f9f9;
             font-weight: 600;
         }
-        
-        /* NEW: Admin mode editable fields */
-        .admin-editable-total {
-            padding: 0 !important;
-        }
-        
-        .admin-editable-total input {
-            width: 100%;
-            height: 100%;
-            border: 2px dashed var(--primary-color);
-            padding: 12px; /* Match cell padding */
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: right;
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f6ff;
-        }
-        
-        /* Hide remove column for printing */
-        .print-hide,
-        .quote-table .print-hide {
-            display: table-cell; /* Default */
-        }
-
-        .printing .print-hide {
-            display: none !important;
-        }
-        
-        /* Remove borders from admin inputs when printing */
-        .printing .admin-editable-total input {
-            border: none;
-            background-color: transparent;
-            padding: 12px;
-            font-weight: bold;
-            color: var(--dark-grey) !important; /* Match normal text */
-        }
-        /* End Admin Mode styles */
-
 
         .quote-table td:last-child {
             text-align: center;
         }
+        
+        /* NEW: Group header row */
+        .group-header-row {
+            background-color: var(--primary-color) !important;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .group-header-row td {
+            border: none;
+        }
+        
+        /* NEW: Admin mode editable fields */
+        .admin-editable-total {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            border: 1px dashed var(--primary-color);
+            border-radius: 6px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-color);
+            -moz-appearance: textfield;
+        }
+        
+        /* PDF Cleanup for Admin mode */
+        .printing .admin-editable-total {
+            border: none;
+            padding: 0;
+            width: auto;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        /* PDF Cleanup for Remove column */
+        .printing .remove-col {
+            display: none;
+        }
+        
         
         .remove-btn {
             background: var(--danger-color);
@@ -581,24 +603,24 @@
         }
         
         /* Styles for Password Protection */
-        .password-prompt {
+        #staffing-password-prompt, #percussion-password-prompt {
             text-align: center;
             padding: 40px;
             border: 2px dashed var(--border-color);
             border-radius: var(--border-radius);
             background-color: #fdfdfd;
         }
-        .password-prompt p {
+        #staffing-password-prompt p, #percussion-password-prompt p {
             font-size: 1.1rem;
             margin-bottom: 20px;
         }
-        .password-error {
+        #staffing-password-error {
             color: var(--danger-color);
             font-weight: 600;
             display: none; /* Hidden by default */
             margin-top: 15px;
         }
-        .password-prompt input[type="password"] {
+        #staffing-password-prompt input[type="password"] {
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -608,42 +630,53 @@
             max-width: 300px;
             margin-bottom: 15px;
         }
-        
-        #staffing-calculator-wrapper,
-        #percussion-calculator-wrapper,
-        #admin-logout-btn {
-            display: none; /* Hidden by default */
-        }
 
         /* --- 8. Totals & Footer --- */
         .totals-section {
             text-align: right;
-            font-size: 1.1rem; /* Smaller base font */
+            font-size: 1.2rem;
             margin-bottom: 20px;
-            border-top: 2px solid var(--border-color);
-            padding-top: 20px;
+            padding: 20px;
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
         }
         
-        .totals-section div {
-            font-size: 1.3rem;
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .totals-row.subtotal {
             font-weight: 600;
             color: var(--dark-grey);
-            margin-top: 5px;
-            margin-bottom: 15px;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 10px;
+            padding-top: 10px;
         }
-        
-        /* Final totals are larger */
-        #combined-subtotal,
-        #combined-vat {
-             font-size: 1.5rem;
-        }
-        
-        #venue-grand-total {
-            font-size: 2rem;
+        .totals-row.grand-total {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--primary-color);
+            border-top: 2px solid var(--dark-grey);
             margin-top: 10px;
+            padding-top: 10px;
         }
+        
+        .totals-label {
+            font-weight: 500;
+            text-align: left;
+        }
+        .totals-value {
+            font-weight: 700;
+            text-align: right;
+            font-family: monospace, sans-serif;
+            font-size: 1.3rem;
+        }
+        .totals-row.grand-total .totals-value {
+            font-size: 1.8rem;
+        }
+        
         
         .disclaimer {
             font-size: 0.9rem;
@@ -675,6 +708,10 @@
             justify-content: center;
             padding: 20px;
         }
+        /* NEW: Password Modal */
+        #admin-password-modal {
+            z-index: 1001; /* Above main overlay */
+        }
 
         .modal-content {
             background-color: var(--white);
@@ -687,6 +724,37 @@
             flex-direction: column;
             overflow: hidden; /* For containing the scrolling content */
         }
+        
+        /* NEW: Password Modal content */
+        .password-modal-content {
+            max-width: 400px;
+            max-height: auto;
+            padding: 30px;
+            text-align: center;
+        }
+        .password-modal-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .password-modal-content p {
+            margin-bottom: 20px;
+        }
+        #admin-password-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 20px;
+        }
+        #admin-password-error {
+            color: var(--danger-color);
+            font-weight: 600;
+            display: none; /* Hidden by default */
+            margin-bottom: 15px;
+        }
+
         
         .modal-header {
             padding: 20px 30px;
@@ -940,29 +1008,17 @@
                 right: 5px;
             }
         }
-        
-        @media (max-width: 500px) {
-            .tabs {
-                justify-content: center;
-            }
-            .tab-button {
-                padding: 12px 15px;
-                font-size: 0.9rem;
-            }
-        }
+
 
     </style>
 </head>
 <body>
 
     <header>
-        <h1>
-            Royal Birmingham Conservatoire
-            <!-- NEW: Admin Login Button -->
-            <a href="#" id="admin-login-link" class="admin-login-link">[Admin Login]</a>
-            <a href="#" id="admin-logout-btn" class="admin-login-link">[Admin Logout]</a>
-        </h1>
+        <h1>Royal Birmingham Conservatoire</h1>
         <p>Multi-Venue Quote Calculator</p>
+        <button id="admin-login-button">Admin Login</button>
+        <button id="admin-logout-button">Logout</button>
     </header>
 
     <main class="container">
@@ -970,9 +1026,8 @@
         <!-- Tab Navigation -->
         <nav class="tabs">
             <button class="tab-button active" data-tab="venue-tab">Venue Quote</button>
-            <button class="tab-button" data-tab="staffing-tab">Staffing Costs</button>
-            <!-- NEW: Percussion Tab -->
-            <button class="tab-button" data-tab="percussion-tab">Percussion Hire</button>
+            <button class="tab-button" id="staffing-tab-button" data-tab="staffing-tab">Staffing Costs</button>
+            <button class="tab-button" id="percussion-tab-button" data-tab="percussion-tab">Percussion Hire</button>
         </nav>
 
         <!-- Tab Content: Venue Quote -->
@@ -1012,7 +1067,7 @@
                         <p>A cutting-edge, completely flexible black-box studio for art, theatre...</p>
                     </div>
                 </div>
-                <div class="venue-card" data-venue="Organ Studio">
+                <div class="venue-card" data-venue="The Organ Studio">
                     <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg" alt="Organ Studio">
                     <div class="venue-card-content">
                         <h3>The Organ Studio</h3>
@@ -1048,7 +1103,6 @@
                         <option value="The Organ Studio">The Organ Studio</option>
                         <option value="Workshop (Large, up to 60)">Workshop (Large, up to 60)</option>
                         <option value="Workshop (Small, up to 40)">Workshop (Small, up to 40)</option>
-                        <!-- NEW: Practice Rooms -->
                         <option value="Practice Room (Grand Piano)">Practice Room (Grand Piano)</option>
                         <option value="Practice Room (Upright Piano)">Practice Room (Upright Piano)</option>
                         <option value="Whole Building Hire">Whole Building Hire</option>
@@ -1087,79 +1141,102 @@
                     </div>
                 </div>
                 
-                <!-- NEW: Workshop Package Section -->
-                <div class="form-section" id="workshop-package-section" style="display: none;">
-                    <h3>Workshop Package</h3>
-                    <div class="form-group-full">
-                        <div class="radio-group" id="workshop-package-radios">
-                            <!-- Radios will be dynamically generated by JS -->
-                        </div>
+                <!-- NEW: Workshop Package Selector -->
+                <div class="form-group form-group-full" id="workshop-package-group">
+                    <label>Workshop Package</label>
+                    <div class="package-option">
+                        <input type="radio" id="pkg-dry" name="workshop-package" value="dry" checked>
+                        <label for="pkg-dry">Dry Hire</label>
+                        <span class="price" id="price-dry">£0.00</span>
+                    </div>
+                    <div class="package-option">
+                        <input type="radio" id="pkg-av" name="workshop-package" value="av">
+                        <label for="pkg-av">With AV</label>
+                        <span class="price" id="price-av">£0.00</span>
+                    </div>
+                    <div class="package-option">
+                        <input type="radio" id="pkg-piano" name="workshop-package" value="piano">
+                        <label for="pkg-piano">With Piano</label>
+                        <span class="price" id="price-piano">£0.00</span>
+                    </div>
+                    <div class="package-option">
+                        <input type="radio" id="pkg-av-piano" name="workshop-package" value="av-piano">
+                        <label for="pkg-av-piano">With AV & Piano</label>
+                        <span class="price" id="price-av-piano">£0.00</span>
                     </div>
                 </div>
 
-                <div class="form-section" id="tech-equipment-section">
+                <!-- Main Technical Equipment Section -->
+                <div class="form-section" id="technical-equipment-section">
                     <h3>Technical / Equipment (per day)</h3>
                 </div>
 
-                <div class="form-group" id="tech-pa-group">
+                <div class="form-group" id="tech-group-pa">
                     <label for="pa">PA (per day)</label>
                     <select id="pa" name="pa" class="equipment" data-name="PA (per day)">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group" id="tech-projector-group">
+                <div class="form-group" id="tech-group-projector">
                     <label for="projector">Projector (per day)</label>
                     <select id="projector" name="projector" class="equipment" data-name="Projector (per day)">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-mic-wired">
                     <label for="mic-wired">Microphone (wired)</label>
                     <select id="mic-wired" name="mic-wired" class="equipment" data-name="Microphone (wired)">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-mic-wireless">
                     <label for="mic-wireless">Microphone (wireless)</label>
                     <select id="mic-wireless" name="mic-wireless" class="equipment" data-name="Microphone (wireless)">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-monitor">
                     <label for="monitor">Monitor</label>
                     <select id="monitor" name="monitor" class="equipment" data-name="Monitor">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-laptop">
                     <label for="laptop">Laptop</label>
                     <select id="laptop" name="laptop" class="equipment" data-name="Laptop">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group" id="tech-piano-group">
+                <div class="form-group" id="tech-group-piano">
                     <label for="piano">Grand Piano</label>
                     <select id="piano" name="piano" class="equipment" data-name="Grand Piano">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-audio-rec">
                     <label for="audio-rec">Overhead Audio Recording</label>
                     <select id="audio-rec" name="audio-rec" class="equipment" data-name="Overhead Audio Recording">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="tech-group-video-rec">
                     <label for="video-rec">Static Video Recording</label>
                     <select id="video-rec" name="video-rec" class="equipment" data-name="Static Video Recording">
                         <option value="0">0</option><option value="1">1</option>
                     </select>
                 </div>
                 <!-- NEW: Technician Hours -->
-                <div class="form-group" id="tech-technician-group">
-                    <label for="technician">Technician Hours (4hr min)</label>
-                    <input type="number" id="technician" name="technician" class="equipment" data-name="Technician" value="0" min="0" step="0.5">
+                <div class="form-group" id="tech-group-technician">
+                    <label for="technician-hours">Technician Hours (4hr min)</label>
+                    <input type="number" id="technician-hours" name="technician-hours" class="equipment" data-name="Technician" value="0" min="0" step="1">
                 </div>
+                
+                <!-- NEW: Quote Notes -->
+                <div class="form-group form-group-full" id="notes-group">
+                    <label for="quote-notes">Quote Notes (will appear on PDF/Email)</label>
+                    <textarea id="quote-notes" placeholder="e.g., Client Name, Event Ref, specific requirements..."></textarea>
+                </div>
+
 
                 <!-- Action Buttons -->
                 <div class="button-group">
@@ -1175,17 +1252,18 @@
                 <h2>Venue Quote Summary</h2>
                 
                 <!-- NEW: Message bar -->
-                <div id="quote-message-bar" class="print-hide"></div>
+                <div id="quote-message-bar"></div>
 
                 <div class="table-wrapper">
                     <table class="quote-table">
                         <thead>
                             <tr>
                                 <th>Item</th>
-                                <th>Unit Price (£)</th>
-                                <th>Quantity</th>
-                                <th>Total (£)</th>
-                                <th class="print-hide">Remove</th> <!-- Hidden on PDF -->
+                                <!-- NEW: Headers updated -->
+                                <th style="text-align: right;">Price per Unit/per Hour (£)</th>
+                                <th style="text-align: right;">Quantity/Hours</th>
+                                <th style="text-align: right;">Total (£)</th>
+                                <th class="remove-col">Remove</th>
                             </tr>
                         </thead>
                         <tbody id="quote-summary-body">
@@ -1193,31 +1271,38 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- NEW: Rebuilt Totals Section -->
+                <!-- NEW: Updated Totals Section -->
                 <div class="totals-section">
-                    <!-- Group Subtotals -->
-                    <div id="venue-subtotal-group" style="display: none;">
-                        Venue & Tech Subtotal
-                        <div id="venue-subtotal">£0.00</div>
+                    <div class="totals-row">
+                        <span class="totals-label">Venue Hire Subtotal</span>
+                        <span class="totals-value" id="venue-subtotal">£0.00</span>
                     </div>
-                    <div id="staffing-subtotal-group" style="display: none;">
-                        Staffing Subtotal
-                        <div id="staffing-subtotal">£0.00</div>
+                    <div class="totals-row">
+                        <span class="totals-label">Technical Hire Subtotal</span>
+                        <span class="totals-value" id="tech-subtotal">£0.00</span>
                     </div>
-                    <div id="percussion-subtotal-group" style="display: none;">
-                        Percussion Subtotal
-                        <div id="percussion-subtotal">£0.00</div>
+                    <div class="totals-row admin-visible" id="staffing-subtotal-row">
+                        <span class="totals-label">Staffing Subtotal</span>
+                        <span class="totals-value" id="staffing-subtotal">£0.00</span>
                     </div>
-                    
-                    <!-- Combined Totals -->
-                    Combined Subtotal (Ex. VAT)
-                    <div id="combined-subtotal" class="admin-editable-total">£0.00</div>
-                    VAT (20%)
-                    <div id="combined-vat" class="admin-editable-total">£0.00</div>
-                    <strong>GRAND TOTAL (Inc. VAT)</strong>
-                    <div id="venue-grand-total" class="admin-editable-total">£0.00</div>
+                    <div class="totals-row admin-visible" id="percussion-subtotal-row">
+                        <span class="totals-label">Percussion Subtotal</span>
+                        <span class="totals-value" id="percussion-subtotal">£0.00</span>
+                    </div>
+                    <div class="totals-row subtotal">
+                        <span class="totals-label">COMBINED SUBTOTAL (Ex. VAT)</span>
+                        <span class="totals-value" id="combined-subtotal">£0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <span class="totals-label">VAT (20%)</span>
+                        <span class="totals-value" id="combined-vat">£0.00</span>
+                    </div>
+                    <div class="totals-row grand-total">
+                        <span class="totals-label">GRAND TOTAL (Inc. VAT)</span>
+                        <span class="totals-value" id="combined-grand-total">£0.00</span>
+                    </div>
                 </div>
-                
+
                 <div class="disclaimer">
                     <p><strong>Note:</strong> All prices + VAT. Minimum 4-hour booking applies (except Whole Building Hire).
                     <br>Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.
@@ -1230,275 +1315,115 @@
             </section>
         </section>
 
-        <!-- Tab Content: Staffing Costs -->
+        <!-- Tab Content: Staffing Costs (Admin Only) -->
         <section id="staffing-tab" class="tab-content">
-            
-            <!-- Password Prompt Section (Now hidden by default, controlled by Admin login) -->
-            <div id="staffing-password-prompt" class="password-prompt" style="display: block;">
-                <p>This section requires the Admin password to add items to the quote.</p>
-                <p>Please use the [Admin Login] link in the header.</p>
-            </div>
-
-            <!-- Staffing Calculator (wrapper is hidden by default) -->
             <div id="staffing-calculator-wrapper">
                 <div class="form-section">
-                    <h3>Staffing Costs</h3>
+                    <h3>Staffing Timesheet</h3>
                 </div>
 
                 <div class="table-wrapper">
-                    <table class="data-table" id="staffing-timesheet-body">
+                    <table class="timesheet-table">
                         <thead>
                             <tr>
                                 <th>Staff Role</th>
                                 <th>Hourly Rate (£)</th>
                                 <th>Quantity</th>
                                 <th>Total Hours</th>
-                                <th class="print-hide">Cost (£)</th> <!-- Hide from quote -->
+                                <th>Cost (£)</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="staffing-timesheet-body">
                             <!-- Pre-defined rows -->
-                            <tr class="staff-row" data-rate="32" data-name="Duty Manager">
+                            <tr class="staff-row" data-rate="32">
                                 <td>Duty Managers</td>
                                 <td class="rate-cell">32.00</td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
-                            <tr class="staff-row" data-rate="22" data-name="Steward">
+                            <tr class="staff-row" data-rate="22">
                                 <td>Stewards</td>
                                 <td class="rate-cell">22.00</td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
-                            <tr class="staff-row" data-rate="35" data-name="Technician">
+                            <tr class="staff-row" data-rate="35">
                                 <td>Technicians</td>
                                 <td class="rate-cell">35.00</td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
-                            <tr class="staff-row" data-rate="20" data-name="Porter">
+                            <tr class="staff-row" data-rate="20">
                                 <td>Porters</td>
                                 <td class="rate-cell">20.00</td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
-                            <tr class="staff-row" data-rate="20" data-name="Security">
+                            <tr class="staff-row" data-rate="20">
                                 <td>Security</td>
                                 <td class="rate-cell">20.00</td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
                             <!-- Custom Rows -->
-                            <tr class="staff-row-custom" data-name="Custom Staff 1">
-                                <td><input type="text" class="custom-role" placeholder="Custom Role 1" data-name-input></td>
+                            <tr class="staff-row-custom">
+                                <td><input type="text" class="custom-role" placeholder="Custom Role 1"></td>
                                 <td><input type="number" class="custom-rate" value="0" min="0" step="0.50"></td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
-                            <tr class="staff-row-custom" data-name="Custom Staff 2">
-                                <td><input type="text" class="custom-role" placeholder="Custom Role 2" data-name-input></td>
+                            <tr class="staff-row-custom">
+                                <td><input type="text" class="custom-role" placeholder="Custom Role 2"></td>
                                 <td><input type="number" class="custom-rate" value="0" min="0" step="0.50"></td>
                                 <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
                                 <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost print-hide">£0.00</td>
+                                <td class="row-cost">£0.00</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="add-staff-btn" class="btn btn-primary">Add Staff to Main Quote</button>
+                    <button type="button" id="add-staff-to-quote-btn" class="btn btn-primary">Add Staff to Main Quote</button>
                 </div>
             </div>
         </section>
         
-        <!-- NEW: Percussion Tab -->
+        <!-- Tab Content: Percussion Hire (Admin Only) -->
         <section id="percussion-tab" class="tab-content">
-            <!-- Password Prompt Section (Now hidden by default, controlled by Admin login) -->
-            <div id="percussion-password-prompt" class="password-prompt" style="display: block;">
-                <p>This section requires the Admin password to add items to the quote.</p>
-                <p>Please use the [Admin Login] link in the header.</p>
-            </div>
-            
-            <!-- Percussion Calculator (wrapper is hidden by default) -->
-            <div id="percussion-calculator-wrapper">
+             <div id="percussion-calculator-wrapper">
                 <div class="form-section">
-                    <h3>Percussion Hire (per day)</h3>
+                    <h3>Percussion Hire</h3>
                 </div>
-                
+
                 <div class="table-wrapper">
-                    <table class="data-table" id="percussion-hire-body">
+                    <table class="timesheet-table">
                         <thead>
                             <tr>
                                 <th>Instrument</th>
-                                <th>Daily Rate 25/26 (£)</th>
+                                <th>Hire Rate (£)</th>
                                 <th>Quantity</th>
                                 <th>Days</th>
-                                <th class="print-hide">Cost (£)</th>
+                                <th>Cost (£)</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Rates are 23/24 * 1.1 (10% inflation) * 1.1 (10% inflation) = 1.21 -->
-                            <tr class="percussion-row" data-rate="41.93" data-name="Bass Drum">
-                                <td>Bass Drum</td><td class="rate-cell">41.93</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="22.36" data-name="Bell Tree">
-                                <td>Bell Tree</td><td class="rate-cell">22.36</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="22.36" data-name="Bongos">
-                                <td>Bongos</td><td class="rate-cell">22.36</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="83.85" data-name="Celeste">
-                                <td>Celeste</td><td class="rate-cell">83.85</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="27.95" data-name="Clash Cymbals">
-                                <td>Clash Cymbals</td><td class="rate-cell">27.95</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="12.58" data-name="Concert Toms (per tom)">
-                                <td>Concert Toms (per tom)</td><td class="rate-cell">12.58</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="19.57" data-name="Congas (per conga)">
-                                <td>Congas (per conga)</td><td class="rate-cell">19.57</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="25.16" data-name="Crotales (per octave)">
-                                <td>Crotales (per octave)</td><td class="rate-cell">25.16</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="83.85" data-name="Drum Kit">
-                                <td>Drum Kit</td><td class="rate-cell">83.85</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="30.75" data-name="Glockenspiel">
-                                <td>Glockenspiel</td><td class="rate-cell">30.75</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="25.16" data-name="Hi Hats">
-                                <td>Hi Hats</td><td class="rate-cell">25.16</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="67.08" data-name="Marimba (4.3)">
-                                <td>Marimba (4.3)</td><td class="rate-cell">67.08</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="139.76" data-name="Marimba (5 octave)">
-                                <td>Marimba (5 octave)</td><td class="rate-cell">139.76</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="20.97" data-name="Mark Tree">
-                                <td>Mark Tree</td><td class="rate-cell">20.97</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="25.16" data-name="Snare Drum">
-                                <td>Snare Drum</td><td class="rate-cell">25.16</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="16.77" data-name="Suspended Cymbal">
-                                <td>Suspended Cymbal</td><td class="rate-cell">16.77</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="30.75" data-name="Tam tam">
-                                <td>Tam tam</td><td class="rate-cell">30.75</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="25.16" data-name="Temple Blocks (set of 5)">
-                                <td>Temple Blocks (set of 5)</td><td class="rate-cell">25.16</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="44.72" data-name="Timbales (pair)">
-                                <td>Timbales (pair)</td><td class="rate-cell">44.72</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="55.90" data-name="Timpani (per timp)">
-                                <td>Timpani (per timp)</td><td class="rate-cell">55.90</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="9.79" data-name="Trap Tray">
-                                <td>Trap Tray</td><td class="rate-cell">9.79</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="53.11" data-name="Tubular Bells">
-                                <td>Tubular Bells</td><td class="rate-cell">53.11</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="48.92" data-name="Vibraphone">
-                                <td>Vibraphone</td><td class="rate-cell">48.92</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
-                            <tr class="percussion-row" data-rate="39.13" data-name="Xylophone">
-                                <td>Xylophone</td><td class="rate-cell">39.13</td>
-                                <td><input type="number" class="item-quantity" value="0" min="0" step="1"></td>
-                                <td><input type="number" class="item-days" value="1" min="1" step="1"></td>
-                                <td class="row-cost print-hide">£0.00</td>
-                            </tr>
+                        <tbody id="percussion-timesheet-body">
+                            <!-- Percussion items will be auto-populated here -->
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="add-percussion-btn" class="btn btn-primary">Add Percussion to Main Quote</button>
+                    <button type="button" id="add-percussion-to-quote-btn" class="btn btn-primary">Add Percussion to Main Quote</button>
                 </div>
             </div>
         </section>
-
 
         <!-- NEW: Global Gallery Section -->
         <section id="global-gallery-container">
@@ -1536,6 +1461,20 @@
         </div>
     </div>
     
+    <!-- NEW: Admin Password Modal -->
+    <div id="admin-password-modal" class="modal-overlay">
+        <div class="modal-content password-modal-content">
+            <h2>Admin Login</h2>
+            <p>Please enter the admin password to unlock staffing, percussion, and cost overrides.</p>
+            <input type="password" id="admin-password-input" placeholder="Password...">
+            <p id="admin-password-error">Incorrect password. Please try again.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button type="button" id="admin-login-submit" class="btn btn-primary">Login</button>
+                <button type="button" id="admin-login-cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- NEW: Lightbox Modal HTML -->
     <div id="lightbox-overlay">
         <span id="lightbox-close">&times;</span>
@@ -1543,18 +1482,6 @@
         <span class="lightbox-arrow" id="lightbox-prev">&lt;</span>
         <img id="lightbox-image" src="" alt="Magnified View">
         <span class="lightbox-arrow" id="lightbox-next">&gt;</span>
-    </div>
-    
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="modal-overlay" style="z-index: 3000; display: none;">
-        <div class="password-prompt" style="background: white; max-width: 400px; width: 100%;">
-            <p>Enter Admin Password to unlock advanced features.</p>
-            <input type="password" id="admin-password-input" placeholder="Password...">
-            <br>
-            <button type="button" id="admin-login-btn" class="btn btn-primary">Login</button>
-            <button type="button" id="admin-cancel-btn" class="btn btn-secondary">Cancel</button>
-            <p id="admin-password-error" class="password-error">Incorrect password. Please try again.</p>
-        </div>
     </div>
 
 
@@ -1565,158 +1492,105 @@
         // Wait for the page to be fully loaded before running scripts
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 1. Global State ---
+            // --- 1. Admin & Tab Switching Logic ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const correctPassword = "bcu-events-2025";
+            let isAdmin = false;
+            
+            const adminLoginBtn = document.getElementById('admin-login-button');
+            const adminLogoutBtn = document.getElementById('admin-logout-button');
+            const adminPasswordModal = document.getElementById('admin-password-modal');
+            const adminPasswordInput = document.getElementById('admin-password-input');
+            const adminPasswordError = document.getElementById('admin-password-error');
+            const adminLoginSubmit = document.getElementById('admin-login-submit');
+            const adminLoginCancel = document.getElementById('admin-login-cancel');
+            
+            const staffingTabButton = document.getElementById('staffing-tab-button');
+            const percussionTabButton = document.getElementById('percussion-tab-button');
+
+            function toggleAdminMode(state) {
+                isAdmin = state;
+                adminLoginBtn.style.display = state ? 'none' : 'block';
+                adminLogoutBtn.style.display = state ? 'block' : 'none';
+                
+                // Show/Hide Admin Tabs
+                staffingTabButton.style.display = state ? 'block' : 'none';
+                percussionTabButton.style.display = state ? 'block' : 'none';
+                
+                // Hide admin tabs if they are active and user logs out
+                if (!state && (staffingTabButton.classList.contains('active') || percussionTabButton.classList.contains('active'))) {
+                    // Switch back to the first tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    tabButtons[0].classList.add('active');
+                    tabContents[0].classList.add('active');
+                }
+                
+                // Re-render the quote table to show/hide admin features
+                renderQuoteTable();
+            }
+            
+            function showPasswordModal() {
+                adminPasswordModal.style.display = 'flex';
+                adminPasswordInput.value = '';
+                adminPasswordError.style.display = 'none';
+                adminPasswordInput.focus();
+            }
+            
+            function closePasswordModal() {
+                adminPasswordModal.style.display = 'none';
+            }
+            
+            function attemptAdminLogin() {
+                if (adminPasswordInput.value === correctPassword) {
+                    toggleAdminMode(true);
+                    closePasswordModal();
+                } else {
+                    adminPasswordError.style.display = 'block';
+                }
+            }
+            
+            adminLoginBtn.addEventListener('click', showPasswordModal);
+            adminLogoutBtn.addEventListener('click', () => toggleAdminMode(false));
+            adminLoginCancel.addEventListener('click', closePasswordModal);
+            adminLoginSubmit.addEventListener('click', attemptAdminLogin);
+            adminPasswordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') attemptAdminLogin();
+            });
+
+            // Tab Switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Deactivate all
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    // Activate clicked
+                    button.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+
+            // --- 2. Shared Constants ---
             const { jsPDF } = window.jspdf;
-            const VAT_RATE = 0.20;
+            const VAT_RATE = 0.20; // 20%
             const MIN_HOURS = 4;
             const AFTER_HOURS_SURCHARGE = 20;
-            const TECHNICIAN_RATE = 35.00;
+            const TECHNICIAN_RATE = 35;
             const TECHNICIAN_MIN_HOURS = 4;
-            const ADMIN_PASSWORD = "bcu-events-2025";
             
-            let quoteItems = []; // This is the master list for the main quote
-            let isAdmin = false; // Admin Mode status
+            // Store all quote items in an array
+            let quoteItems = [];
             
             // --- Base URL for all GitHub images ---
             const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
 
-            // --- 2. DOM Element Cache ---
-            const $ = (selector) => document.getElementById(selector);
-            
-            // Main elements
-            const quoteBody = $('quote-summary-body');
-            const quoteMessageBar = $('quote-message-bar');
-            
-            // Totals
-            const venueSubtotalGroup = $('venue-subtotal-group');
-            const staffingSubtotalGroup = $('staffing-subtotal-group');
-            const percussionSubtotalGroup = $('percussion-subtotal-group');
-            const venueSubtotalEl = $('venue-subtotal');
-            const staffingSubtotalEl = $('staffing-subtotal');
-            const percussionSubtotalEl = $('percussion-subtotal');
-            const combinedSubtotalEl = $('combined-subtotal');
-            const combinedVatEl = $('combined-vat');
-            const venueGrandTotalEl = $('venue-grand-total');
+            // --- 3. Venue Quote Logic ---
 
-            // Admin elements
-            const adminLoginLink = $('admin-login-link');
-            const adminLogoutBtn = $('admin-logout-btn');
-            
-            // Venue Form elements
-            const venueSelect = $('venue');
-            const hireTypeSelect = $('hire-type');
-            const startTimeInput = $('start-time');
-            const endTimeInput = $('end-time');
-            const startTimeGroup = $('start-time-group');
-            const endTimeGroup = $('end-time-group');
-            const workshopPackageSection = $('workshop-package-section');
-            const workshopPackageRadios = $('workshop-package-radios');
-            const techEquipmentSection = $('tech-equipment-section');
-            const techGroups = {
-                pa: $('tech-pa-group'),
-                projector: $('tech-projector-group'),
-                piano: $('tech-piano-group'),
-                technician: $('tech-technician-group')
-            };
-
-            // --- 3. Tab & Password Logic ---
-            
-            // General password checker
-            function setupPasswordTab(tabId, promptId, wrapperId) {
-                const tabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
-                const promptEl = $(promptId);
-                const wrapperEl = $(wrapperId);
-
-                function updateLock() {
-                    if (isAdmin) {
-                        tabButton.style.display = 'inline-block'; // Show tab
-                        promptEl.style.display = 'none';
-                        wrapperEl.style.display = 'block';
-                    } else {
-                        tabButton.style.display = 'none'; // Hide tab
-                        promptEl.style.display = 'block';
-                        wrapperEl.style.display = 'none';
-                    }
-                }
-                
-                // Return a function that can be called to update the lock state
-                return updateLock;
-            }
-
-            // Setup all password-protected tabs
-            const updateStaffingTabLock = setupPasswordTab('staffing-tab', 'staffing-password-prompt', 'staffing-calculator-wrapper');
-            const updatePercussionTabLock = setupPasswordTab('percussion-tab', 'percussion-password-prompt', 'percussion-calculator-wrapper');
-            
-            // Initial lock state
-            updateStaffingTabLock();
-            updatePercussionTabLock();
-            
-            // Admin Login Modal
-            const adminModal = $('admin-login-modal');
-            const adminLoginBtn = $('admin-login-btn');
-            const adminCancelBtn = $('admin-cancel-btn');
-            const adminPasswordInput = $('admin-password-input');
-            const adminPasswordError = $('admin-password-error');
-            
-            adminLoginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                adminModal.style.display = 'flex';
-                adminPasswordInput.focus();
-            });
-            
-            adminCancelBtn.addEventListener('click', () => {
-                adminModal.style.display = 'none';
-                adminPasswordError.style.display = 'none';
-                adminPasswordInput.value = '';
-            });
-
-            adminLoginBtn.addEventListener('click', () => {
-                if (adminPasswordInput.value === ADMIN_PASSWORD) {
-                    isAdmin = true;
-                    adminLoginLink.style.display = 'none';
-                    adminLogoutBtn.style.display = 'inline-block';
-                    adminModal.style.display = 'none';
-                    adminPasswordInput.value = '';
-                    showMessage('Admin Mode Unlocked. You can now edit line item totals.', 'admin');
-                    
-                    // Unlock and update tabs
-                    updateStaffingTabLock();
-                    updatePercussionTabLock();
-                    
-                    renderQuoteTable(); // Re-render to show editable fields
-                } else {
-                    adminPasswordError.style.display = 'block';
-                }
-            });
-            
-            adminLogoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                isAdmin = false;
-                adminLoginLink.style.display = 'inline-block';
-                adminLogoutBtn.style.display = 'none';
-                
-                // Re-lock tabs and switch to main
-                updateStaffingTabLock();
-                updatePercussionTabLock();
-                document.querySelector('.tab-button[data-tab="venue-tab"]').click();
-                
-                hideMessage();
-                renderQuoteTable(); // Re-render to remove editable fields
-            });
-
-            // Main Tab Button Logic
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.getAttribute('data-tab');
-                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    button.classList.add('active');
-                    $(targetTab).classList.add('active');
-                });
-            });
-
-            // --- 4. Venue Quote Data ---
-
+            // Define rates
             const venueRates = {
                 'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 125 },
                 'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 100 },
@@ -1725,10 +1599,25 @@
                 'The Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 75 },
                 'Workshop (Large, up to 60)': { 'Standard Rate': 60, 'Recording / Premium Workshop': 30 },
                 'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 25 },
-                // NEW: Practice Rooms
                 'Practice Room (Grand Piano)': { 'Standard Rate': 30, 'Recording / Premium Workshop': 30 },
                 'Practice Room (Upright Piano)': { 'Standard Rate': 25, 'Recording / Premium Workshop': 25 },
-                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 },
+                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }, // Flat daily rates
+            };
+            
+            // Workshop Package Rates (Page 23 of PDF)
+            const workshopPackageRates = {
+                'Workshop (Large, up to 60)': {
+                    'dry': 60,
+                    'av': 100,
+                    'piano': 100,
+                    'av-piano': 150
+                },
+                'Workshop (Small, up to 40)': {
+                    'dry': 50,
+                    'av': 90,
+                    'piano': 90,
+                    'av-piano': 135
+                }
             };
 
             const equipmentRates = {
@@ -1738,466 +1627,262 @@
                 'mic-wireless': 40.00,
                 'monitor': 15.00,
                 'laptop': 50.00,
-                'piano': 250.00,
+                'piano': 250.00, // This is for main venues, not workshops
                 'audio-rec': 150.00,
-                'video-rec': 250.00,
-                'technician': TECHNICIAN_RATE,
+                'video-rec': 250.00, 
+                'technician-hours': TECHNICIAN_RATE
             };
+
+            // DOM element references
+            const addQuoteBtn = document.getElementById('add-quote-btn');
+            const quoteBody = document.getElementById('quote-summary-body');
+            const venueSubtotalEl = document.getElementById('venue-subtotal');
+            const techSubtotalEl = document.getElementById('tech-subtotal');
+            const staffingSubtotalEl = document.getElementById('staffing-subtotal');
+            const percussionSubtotalEl = document.getElementById('percussion-subtotal');
+            const staffingSubtotalRow = document.getElementById('staffing-subtotal-row');
+            const percussionSubtotalRow = document.getElementById('percussion-subtotal-row');
+            const combinedSubtotalEl = document.getElementById('combined-subtotal');
+            const combinedVatEl = document.getElementById('combined-vat');
+            const combinedGrandTotalEl = document.getElementById('combined-grand-total');
             
-            // Workshop packages [Dry, AV, Piano, AV+Piano]
-            const workshopPackages = {
-                'Workshop (Large, up to 60)': {
-                    'Standard Rate': [60, 100, 100, 150],
-                    'Recording / Premium Workshop': [30, 50, 50, 75] // 50% of standard
-                },
-                'Workshop (Small, up to 40)': {
-                    'Standard Rate': [50, 90, 90, 135],
-                    'Recording / Premium Workshop': [25, 45, 45, 67.50] // 50% of standard
-                }
+            const venueSelect = document.getElementById('venue');
+            const hireTypeSelect = document.getElementById('hire-type');
+            const startTimeGroup = document.getElementById('start-time-group');
+            const endTimeGroup = document.getElementById('end-time-group');
+            const quoteMessageBar = document.getElementById('quote-message-bar');
+            const clearQuoteBtn = document.getElementById('clear-quote-btn');
+            const notesTextarea = document.getElementById('quote-notes');
+            
+            // Workshop & Tech Groups
+            const workshopPackageGroup = document.getElementById('workshop-package-group');
+            const techSection = document.getElementById('technical-equipment-section');
+            const techGroups = {
+                pa: document.getElementById('tech-group-pa'),
+                projector: document.getElementById('tech-group-projector'),
+                piano: document.getElementById('tech-group-piano'),
+                'mic-wired': document.getElementById('tech-group-mic-wired'),
+                'mic-wireless': document.getElementById('tech-group-mic-wireless'),
+                monitor: document.getElementById('tech-group-monitor'),
+                laptop: document.getElementById('tech-group-laptop'),
+                'audio-rec': document.getElementById('tech-group-audio-rec'),
+                'video-rec': document.getElementById('tech-group-video-rec'),
+                technician: document.getElementById('tech-group-technician')
             };
-            const packageLabels = [
-                'Dry Hire', 
-                'With AV', 
-                'With Piano', 
-                'With AV & Piano'
-            ];
-            // [pa, projector, piano]
-            const packageTechVisibility = [
-                [true, true, true],  // Dry Hire
-                [false, false, true], // With AV
-                [true, true, false],  // With Piano
-                [false, false, false] // With AV & Piano
-            ];
 
-            // --- 5. Venue Form Logic ---
+            // --- Form Listeners ---
+            
+            // Handle "Whole Building Hire" & "Workshop" show/hide logic
+            venueSelect.addEventListener('change', updateFormDisplay);
+            hireTypeSelect.addEventListener('change', updateFormDisplay);
+            document.querySelectorAll('input[name="workshop-package"]').forEach(radio => {
+                radio.addEventListener('change', updateFormDisplay);
+            });
 
-            function updateWorkshopUI() {
+            function updateFormDisplay() {
                 const venue = venueSelect.value;
                 const hireType = hireTypeSelect.value;
+                const isWholeBuilding = venue === 'Whole Building Hire';
                 const isWorkshop = venue.includes('Workshop');
                 const isPracticeRoom = venue.includes('Practice Room');
-                
-                workshopPackageSection.style.display = isWorkshop ? 'block' : 'none';
-                techEquipmentSection.style.display = (isWorkshop || isPracticeRoom) ? 'none' : 'grid';
-                
-                if (isWorkshop) {
-                    // Show full tech section again
-                    techEquipmentSection.style.display = 'grid';
-                    
-                    // Populate and price radio buttons
-                    const rates = workshopPackages[venue][hireType];
-                    workshopPackageRadios.innerHTML = rates.map((rate, index) => `
-                        <div>
-                            <input type="radio" id="pkg-${index}" name="workshop-package" value="${index}" ${index === 0 ? 'checked' : ''}>
-                            <label for="pkg-${index}">${packageLabels[index]} - £${rate.toFixed(2)}/hr</label>
-                        </div>
-                    `).join('');
-                    
-                    // Add change listener to new radios
-                    workshopPackageRadios.querySelectorAll('input[type="radio"]').forEach(radio => {
-                        radio.addEventListener('change', updateTechVisibility);
-                    });
-                    
-                    // Set initial tech visibility
-                    updateTechVisibility();
-                } else if (isPracticeRoom) {
-                    // Hide tech and workshop sections
-                    techEquipmentSection.style.display = 'none';
-                    workshopPackageSection.style.display = 'none';
-                }
-                 else {
-                     // Not a workshop, show all tech
-                    Object.values(techGroups).forEach(group => group.style.display = 'flex');
-                }
-            }
-            
-            function updateTechVisibility() {
-                const selectedPackageIndex = workshopPackageRadios.querySelector('input:checked').value;
-                const visibility = packageTechVisibility[selectedPackageIndex];
-                
-                techGroups.pa.style.display = visibility[0] ? 'flex' : 'none';
-                techGroups.projector.style.display = visibility[1] ? 'flex' : 'none';
-                techGroups.piano.style.display = visibility[2] ? 'flex' : 'none';
-                // Always show technician input
-                techGroups.technician.style.display = 'flex';
-            }
 
-            // Event Listeners for form
-            venueSelect.addEventListener('change', () => {
-                const venue = venueSelect.value;
-                const isWholeBuilding = venue === 'Whole Building Hire';
-                const isPracticeRoom = venue.includes('Practice Room');
-                
-                // Hide time inputs for Whole Building, show for all others
-                startTimeGroup.style.display = isWholeBuilding ? 'none' : 'flex';
-                endTimeGroup.style.display = isWholeBuilding ? 'none' : 'flex';
-                
-                // Show/hide hire type for practice rooms
-                hireTypeSelect.closest('.form-group').style.display = isPracticeRoom ? 'none' : 'flex';
+                // Toggle time groups
+                startTimeGroup.style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
+                endTimeGroup.style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
 
-                updateWorkshopUI();
-            });
-            hireTypeSelect.addEventListener('change', updateWorkshopUI);
-            
-            // Initial call to set up UI
-            updateWorkshopUI();
-
-            // --- 6. Main Quote Logic (Add, Remove, Render) ---
-            
-            function addQuoteItem(item) {
-                quoteItems.push({
-                    id: Date.now() + Math.random(),
-                    ...item
+                // Toggle workshop packages
+                workshopPackageGroup.style.display = isWorkshop ? 'block' : 'none';
+                
+                // Toggle entire tech section
+                techSection.style.display = isWorkshop ? 'none' : 'block';
+                Object.values(techGroups).forEach(group => {
+                    group.style.display = isWorkshop ? 'none' : 'block';
                 });
+
+                if (isWorkshop) {
+                    // Show/Hide tech section based on package
+                    const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
+                    const workshopRates = workshopPackageRates[venue];
+                    
+                    // Update package prices
+                    document.getElementById('price-dry').textContent = `£${(workshopRates.dry * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
+                    document.getElementById('price-av').textContent = `£${(workshopRates.av * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
+                    document.getElementById('price-piano').textContent = `£${(workshopRates.piano * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
+                    document.getElementById('price-av-piano').textContent = `£${(workshopRates['av-piano'] * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
+
+                    // Toggle individual tech items based on package
+                    const showAV = selectedPackage === 'dry' || selectedPackage === 'piano';
+                    const showPiano = selectedPackage === 'dry' || selectedPackage === 'av';
+                    
+                    techSection.style.display = 'block';
+                    techGroups.pa.style.display = showAV ? 'block' : 'none';
+                    techGroups.projector.style.display = showAV ? 'block' : 'none';
+                    techGroups.piano.style.display = showPiano ? 'block' : 'none';
+                    
+                    // Always show these
+                    techGroups['mic-wired'].style.display = 'block';
+                    techGroups['mic-wireless'].style.display = 'block';
+                    techGroups.monitor.style.display = 'block';
+                    techGroups.laptop.style.display = 'block';
+                    techGroups['audio-rec'].style.display = 'block';
+                    techGroups['video-rec'].style.display = 'block';
+                    techGroups.technician.style.display = 'block';
+                }
             }
             
-            $('add-quote-btn').addEventListener('click', () => {
+            // Initial call to set form state
+            updateFormDisplay();
+            
+            // Handle "Clear Quote"
+            clearQuoteBtn.addEventListener('click', () => {
+                quoteItems = [];
+                renderQuoteTable();
+                hideMessage();
+            });
+
+            // Main function to add an item to the quote
+            addQuoteBtn.addEventListener('click', () => {
                 const venue = venueSelect.value;
-                // Default to 'Standard Rate' for practice rooms
-                const isPracticeRoom = venue.includes('Practice Room');
-                const hireType = isPracticeRoom ? 'Standard Rate' : hireTypeSelect.value;
+                const hireType = hireTypeSelect.value;
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
                 
-                const startTime = startTimeInput.value;
-                const endTime = endTimeInput.value;
                 const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked'));
                 const days = selectedDays.map(day => day.value);
                 const dayCount = days.length;
 
                 const isWholeBuilding = (venue === 'Whole Building Hire');
                 const isWorkshop = venue.includes('Workshop');
+                const isPracticeRoom = venue.includes('Practice Room');
 
                 // --- Validation ---
                 if (dayCount === 0) {
-                    return showMessage('Please select at least one event day.', 'error');
+                    showMessage('Please select at least one event day.', 'error');
+                    return;
                 }
                 
-                let duration = 1; // Default for Whole Building Hire (1 day)
-                if (!isWholeBuilding) { // All other venues require time
-                    if (!startTime || !endTime) return showMessage('Please select a start and end time.', 'error'); 
+                let duration = 1; // Default
+                if (!isWholeBuilding && !isWorkshop && !isPracticeRoom) {
+                    if (!startTime || !endTime) {
+                        showMessage('Please select a start and end time.', 'error');
+                        return; 
+                    }
                     duration = calculateDuration(startTime, endTime);
-                    if (duration < MIN_HOURS) return showMessage(`Minimum booking is ${MIN_HOURS} hours.`, 'error');
+                    if (duration < MIN_HOURS) {
+                        showMessage(`Minimum booking is ${MIN_HOURS} hours. Your selection is ${duration.toFixed(2)} hours.`, 'error');
+                        return;
+                    }
                 }
                 
                 // --- Conflict Handling ---
-                const hasWholeBuilding = quoteItems.some(item => item.type === 'venue' && item.isWholeBuilding);
+                const hasWholeBuilding = quoteItems.some(item => item.group === 'venue' && item.isWholeBuilding);
                 if (isWholeBuilding && quoteItems.length > 0 && !hasWholeBuilding) {
-                    quoteItems = quoteItems.filter(item => item.type !== 'venue' && item.type !== 'tech'); // Clear venue/tech
+                    quoteItems = quoteItems.filter(item => item.group !== 'venue' && item.group !== 'tech');
                     showMessage('Venue & Tech items cleared to add Whole Building Hire.');
                 } else if (!isWholeBuilding && hasWholeBuilding) {
-                    quoteItems = quoteItems.filter(item => item.type !== 'venue' && item.type !== 'tech'); // Clear venue/tech
+                    quoteItems = quoteItems.filter(item => item.group !== 'venue' && item.group !== 'tech');
                     showMessage('Quote cleared to add individual items.');
                 } else {
                     hideMessage();
                 }
 
-                // --- Add Venue/Package Item ---
-                if (isWorkshop) {
-                    const packageIndex = workshopPackageRadios.querySelector('input:checked').value;
-                    const rate = workshopPackages[venue][hireType][packageIndex];
-                    addQuoteItem({
-                        description: `${venue} - ${packageLabels[packageIndex]} (${duration.toFixed(2)} hrs x ${dayCount} days)`,
-                        unitPrice: rate,
-                        quantity: duration * dayCount,
-                        total: rate * duration * dayCount,
-                        type: 'venue'
-                    });
-                } else if (isWholeBuilding) {
-                    const rate = venueRates[venue][hireType];
-                    addQuoteItem({
-                        description: `${venue} - ${hireType} (${days.join(', ')})`,
-                        unitPrice: rate,
-                        quantity: dayCount,
-                        total: rate * dayCount,
-                        type: 'venue',
-                        isWholeBuilding: true
-                    });
-                } else { // Standard Venue or Practice Room
-                    const rate = venueRates[venue][hireType];
-                    addQuoteItem({
-                        description: `${venue} - ${hireType} (${duration.toFixed(2)} hrs x ${dayCount} days on ${days.join(', ')})`,
-                        unitPrice: rate,
-                        quantity: duration * dayCount,
-                        total: rate * duration * dayCount,
-                        type: 'venue'
-                    });
-                }
-
-                // --- Add Tech Items (if not practice room) ---
-                if (!isPracticeRoom) {
-                    const techInputs = document.querySelectorAll('#tech-equipment-section .equipment');
-                    techInputs.forEach(input => {
-                        // Check if input is visible
-                        const parentGroup = input.closest('.form-group');
-                        if (parentGroup && parentGroup.style.display === 'none') {
-                            return; // Don't add hidden items
-                        }
-
-                        const rateKey = input.id;
-                        const unitPrice = equipmentRates[rateKey];
-                        const description = input.dataset.name;
-                        let quantity = 0;
-                        
-                        if (rateKey === 'technician') {
-                            quantity = parseFloat(input.value) || 0;
-                            if (quantity > 0 && quantity < TECHNICIAN_MIN_HOURS) {
-                                quantity = TECHNICIAN_MIN_HOURS; // Enforce minimum
-                            }
-                            if (quantity > 0) {
-                                addQuoteItem({
-                                    description: `${description} (per hour)`,
-                                    unitPrice: unitPrice,
-                                    quantity: quantity,
-                                    total: unitPrice * quantity,
-                                    type: 'tech'
-                                });
-                            }
-                        } else { // All other tech is per day
-                            quantity = parseInt(input.value, 10);
-                            if (quantity > 0) {
-                                addQuoteItem({
-                                    description: description,
-                                    unitPrice: unitPrice,
-                                    quantity: quantity * dayCount,
-                                    total: unitPrice * quantity * dayCount,
-                                    type: 'tech'
-                                });
-                            }
-                        }
-                    });
-                }
+                // --- Calculations ---
+                let unitPrice, quantity, description;
                 
-                // Add After-Hours Surcharge (if not whole building AND not practice room)
-                if (!isWholeBuilding && !isPracticeRoom) { 
+                if (isWorkshop) {
+                    // --- Workshop Logic ---
+                    const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
+                    const workshopRates = workshopPackageRates[venue];
+                    let packageRate = workshopRates[selectedPackage];
+                    
+                    // Apply premium rate if selected
+                    if (hireType !== 'Standard Rate') {
+                        packageRate *= 0.5; // 50% for premium
+                    }
+                    
+                    unitPrice = packageRate;
+                    quantity = dayCount; // Packages are per day
+                    const packageNames = {'dry': 'Dry Hire', 'av': 'With AV', 'piano': 'With Piano', 'av-piano': 'With AV & Piano'};
+                    description = `${venue} - ${packageNames[selectedPackage]} (${days.join(', ')})`;
+                    
+                    addQuoteItem('venue', description, unitPrice, quantity, false, false);
+                    
+                } else {
+                     // --- Standard Venue Logic ---
+                    const rate = venueRates[venue][hireType];
+                    
+                    if (isWholeBuilding) {
+                        unitPrice = rate;
+                        quantity = dayCount; // Daily rate
+                        description = `${venue} - ${hireType} (${days.join(', ')})`;
+                    } else if (isPracticeRoom) {
+                        unitPrice = rate;
+                        quantity = dayCount; // Assume daily rate for simplicity, or change if hourly
+                        description = `${venue} - ${hireType} (${days.join(', ')})`;
+                        // Note: If practice rooms are hourly, we need to re-enable time fields for them
+                    } else {
+                        unitPrice = rate;
+                        quantity = duration * dayCount; // Hourly rate
+                        description = `${venue} - ${hireType} (${duration.toFixed(2)} hrs x ${dayCount} days on ${days.join(', ')})`;
+                    }
+                    addQuoteItem('venue', description, unitPrice, quantity, false, isWholeBuilding);
+                }
+
+                // Add Equipment Items (per day)
+                const equipmentInputs = document.querySelectorAll('.equipment');
+                equipmentInputs.forEach(input => {
+                    const techGroup = input.closest('.form-group');
+                    // Only add if the item is visible (not hidden by workshop logic)
+                    if (techGroup.style.display !== 'none') {
+                        let quantity = parseFloat(input.value) || 0;
+                        if (quantity > 0) {
+                            const rateKey = input.id;
+                            const unitPrice = equipmentRates[rateKey];
+                            const description = input.dataset.name;
+                            
+                            // Special handling for technician hours
+                            if (rateKey === 'technician-hours') {
+                                if (quantity > 0 && quantity < TECHNICIAN_MIN_HOURS) {
+                                    quantity = TECHNICIAN_MIN_HOURS; // Enforce minimum
+                                }
+                                // Technician hours are not per day, just total
+                                addQuoteItem('tech', description, unitPrice, quantity, true, false);
+                            } else {
+                                // All other equipment is (items * days)
+                                addQuoteItem('tech', description, unitPrice, quantity * dayCount, true, false);
+                            }
+                        }
+                    }
+                });
+                
+                // Add After-Hours Surcharge (if not whole building/workshop/practice)
+                if (!isWholeBuilding && !isWorkshop && !isPracticeRoom) {
                     const surchargeHours = calculateSurcharge(startTime, endTime, days);
                     if (surchargeHours > 0) {
                         const surchargeTotalHours = surchargeHours * dayCount;
-                        addQuoteItem({
-                            description: 'After-Hours Surcharge (per hour)',
-                            unitPrice: AFTER_HOURS_SURCHARGE,
-                            quantity: surchargeTotalHours,
-                            total: AFTER_HOURS_SURCHARGE * surchargeTotalHours,
-                            type: 'tech'
-                        });
+                        addQuoteItem('tech', 'After-Hours Surcharge', AFTER_HOURS_SURCHARGE, surchargeTotalHours, true, false);
                     }
                 }
 
                 renderQuoteTable();
-                showMessage('Venue items added to quote.', 'success');
-            });
-
-            // --- Unified Add Staff/Percussion to Quote ---
-            $('add-staff-btn').addEventListener('click', () => {
-                let itemsAdded = 0;
-                // Add pre-defined staff rows
-                $('staffing-timesheet-body').querySelectorAll('.staff-row').forEach(row => {
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    if (hours > 0) {
-                        const rate = parseFloat(row.dataset.rate);
-                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 1;
-                        const name = row.dataset.name;
-                        addQuoteItem({
-                            description: `Staff: ${name}`,
-                            unitPrice: rate,
-                            quantity: hours * quantity,
-                            total: rate * hours * quantity,
-                            type: 'staff'
-                        });
-                        itemsAdded++;
-                    }
-                });
-                // Add custom staff rows
-                $('staffing-timesheet-body').querySelectorAll('.staff-row-custom').forEach(row => {
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    if (hours > 0) {
-                        const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
-                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 1;
-                        let name = row.querySelector('.custom-role').value || row.dataset.name;
-                        addQuoteItem({
-                            description: `Staff: ${name}`,
-                            unitPrice: rate,
-                            quantity: hours * quantity,
-                            total: rate * hours * quantity,
-                            type: 'staff'
-                        });
-                        itemsAdded++;
-                    }
-                });
-                
-                if (itemsAdded > 0) {
-                    renderQuoteTable();
-                    showMessage(`${itemsAdded} staffing item(s) added to main quote.`, 'success');
-                    // Switch to main quote tab
-                    document.querySelector('.tab-button[data-tab="venue-tab"]').click();
-                } else {
-                    showMessage('No staffing hours entered.', 'error');
-                }
             });
             
-            $('add-percussion-btn').addEventListener('click', () => {
-                let itemsAdded = 0;
-                $('percussion-hire-body').querySelectorAll('.percussion-row').forEach(row => {
-                    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-                    if (quantity > 0) {
-                        const rate = parseFloat(row.dataset.rate);
-                        const days = parseFloat(row.querySelector('.item-days').value) || 1;
-                        const name = row.dataset.name;
-                        addQuoteItem({
-                            description: `Percussion: ${name}`,
-                            unitPrice: rate,
-                            quantity: quantity * days,
-                            total: rate * quantity * days,
-                            type: 'percussion'
-                        });
-                        itemsAdded++;
-                    }
-                });
-                
-                if (itemsAdded > 0) {
-                    renderQuoteTable();
-                    showMessage(`${itemsAdded} percussion item(s) added to main quote.`, 'success');
-                    // Switch to main quote tab
-                    document.querySelector('.tab-button[data-tab="venue-tab"]').click();
-                } else {
-                    showMessage('No percussion items entered.', 'error');
-                }
-            });
-
-            // --- Render Main Quote Table ---
-            function renderQuoteTable() {
-                quoteBody.innerHTML = '';
-                
-                // Group items by type
-                const venueItems = quoteItems.filter(item => item.type === 'venue' || item.type === 'tech');
-                const staffItems = quoteItems.filter(item => item.type === 'staff');
-                const percussionItems = quoteItems.filter(item => item.type === 'percussion');
-                
-                let venueSubtotal = 0;
-                let staffSubtotal = 0;
-                let percussionSubtotal = 0;
-
-                // Render Venue & Tech
-                if (venueItems.length > 0) {
-                    quoteBody.innerHTML += `<tr class="group-header print-hide"><td colspan="5">Venue & Technical Hire</td></tr>`;
-                    venueItems.forEach(item => {
-                        venueSubtotal += item.total;
-                        quoteBody.appendChild(createQuoteRow(item));
-                    });
-                }
-                
-                // Render Staff
-                if (staffItems.length > 0) {
-                    quoteBody.innerHTML += `<tr class="group-header print-hide"><td colspan="5">Staffing Costs</td></tr>`;
-                    staffItems.forEach(item => {
-                        staffSubtotal += item.total;
-                        quoteBody.appendChild(createQuoteRow(item));
-                    });
-                }
-                
-                // Render Percussion
-                if (percussionItems.length > 0) {
-                    quoteBody.innerHTML += `<tr class="group-header print-hide"><td colspan="5">Percussion Hire</td></tr>`;
-                    percussionItems.forEach(item => {
-                        percussionSubtotal += item.total;
-                        quoteBody.appendChild(createQuoteRow(item));
-                    });
-                }
-                
-                // Update totals
-                updateTotals(venueSubtotal, staffSubtotal, percussionSubtotal);
-                
-                // Add event listeners
-                addRemoveListeners();
-                if (isAdmin) {
-                    addAdminInputListeners();
-                }
-            }
-            
-            // NEW: createQuoteRow helper
-            function createQuoteRow(item) {
-                const row = document.createElement('tr');
-                
-                // CORRECTED: Admin Mode logic
-                const totalCell = (isAdmin) ? `
-                    <td class="admin-editable-total" data-id="${item.id}" data-field="total">
-                        <input type="number" value="${item.total.toFixed(2)}" min="0" step="0.01">
-                    </td>
-                ` : `
-                    <td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>
-                `;
-                
-                const unitPriceCell = `
-                    <td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>
-                `;
-                
-                 const quantityCell = `
-                    <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
-                `;
-
-                row.innerHTML = `
-                    <td>${item.description}</td>
-                    ${unitPriceCell}
-                    ${quantityCell}
-                    ${totalCell}
-                    <td class="print-hide"><button class="remove-btn" data-id="${item.id}">X</button></td>
-                `;
-                return row;
+            function addQuoteItem(group, description, unitPrice, quantity, isTech, isWholeBuilding) {
+                const total = unitPrice * quantity;
+                const quoteItem = {
+                    id: Date.now() + Math.random(), // Unique ID
+                    group,
+                    description,
+                    unitPrice,
+                    quantity,
+                    total,
+                    isTech,
+                    isWholeBuilding
+                };
+                quoteItems.push(quoteItem);
             }
 
-            // NEW: updateTotals function
-            function updateTotals(venue, staff, percussion) {
-                const combinedSubtotal = venue + staff + percussion;
-                const vat = combinedSubtotal * VAT_RATE;
-                const grandTotal = combinedSubtotal + vat;
-                
-                // Show/hide subtotal groups
-                venueSubtotalGroup.style.display = venue > 0 ? 'block' : 'none';
-                staffingSubtotalGroup.style.display = staff > 0 ? 'block' : 'none';
-                percussionSubtotalGroup.style.display = percussion > 0 ? 'block' : 'none';
-                
-                // Update text
-                venueSubtotalEl.textContent = `£${venue.toFixed(2)}`;
-                staffingSubtotalEl.textContent = `£${staff.toFixed(2)}`;
-                percussionSubtotalEl.textContent = `£${percussion.toFixed(2)}`;
-                
-                combinedSubtotalEl.textContent = `£${combinedSubtotal.toFixed(2)}`;
-                combinedVatEl.textContent = `£${vat.toFixed(2)}`;
-                venueGrandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
-            }
-
-            // --- Admin Mode Event Listeners (CORRECTED) ---
-            function addAdminInputListeners() {
-                quoteBody.querySelectorAll('.admin-editable-total input').forEach(input => {
-                    input.addEventListener('change', (e) => {
-                        const inputEl = e.target;
-                        const id = parseFloat(inputEl.closest('td').dataset.id);
-                        const field = inputEl.closest('td').dataset.field; // This will be "total"
-                        const newValue = parseFloat(inputEl.value);
-                        
-                        const item = quoteItems.find(i => i.id === id);
-                        if (!item) return;
-
-                        // Update the item
-                        item[field] = newValue; // Update the total
-                        
-                        // CORRECTED: Recalculate Unit Price
-                        if (field === 'total') {
-                            item.unitPrice = (item.quantity !== 0) ? item.total / item.quantity : 0;
-                        }
-
-                        // Recalculate all subtotals
-                        const newVenueSub = quoteItems.filter(i => i.type === 'venue' || i.type === 'tech').reduce((acc, i) => acc + i.total, 0);
-                        const newStaffSub = quoteItems.filter(i => i.type === 'staff').reduce((acc, i) => acc + i.total, 0);
-                        const newPercSub = quoteItems.filter(i => i.type === 'percussion').reduce((acc, i) => acc + i.total, 0);
-                        
-                        // Re-render the table and update totals
-                        renderQuoteTable(); // This will show the new unit price
-                        updateTotals(newVenueSub, newStaffSub, newPercSub);
-                    });
-                });
-            }
-
-            // --- Helper Functions (Calculation, Messages) ---
-            
+            // Function to parse time and calculate duration in hours
             function calculateDuration(start, end) {
                 const [startH, startM] = start.split(':').map(Number);
                 const [endH, endM] = end.split(':').map(Number);
@@ -2210,8 +1895,8 @@
                 return diffMs / (1000 * 60 * 60); // Convert milliseconds to hours
             }
             
+            // Function to calculate after-hours surcharge
             function calculateSurcharge(start, end, days) {
-                if (!start || !end) return 0;
                 const [startH, startM] = start.split(':').map(Number);
                 const [endH, endM] = end.split(':').map(Number);
                 let totalSurchargeHours = 0;
@@ -2231,28 +1916,15 @@
                         totalSurchargeHours += (bookingEnd - regularEnd);
                     }
                 });
+                // Return average surcharge hours per day
                 return totalSurchargeHours > 0 ? totalSurchargeHours / days.length : 0;
             }
             
             function showMessage(message, type = 'warning') {
                 quoteMessageBar.textContent = message;
-                if (type === 'error') {
-                    quoteMessageBar.style.backgroundColor = '#f8d7da';
-                    quoteMessageBar.style.color = '#721c24';
-                    quoteMessageBar.style.border = '1px solid #f5c6cb';
-                } else if (type === 'success') {
-                    quoteMessageBar.style.backgroundColor = '#d4edda';
-                    quoteMessageBar.style.color = '#155724';
-                    quoteMessageBar.style.border = '1px solid #c3e6cb';
-                } else if (type === 'admin') {
-                     quoteMessageBar.style.backgroundColor = '#cce5ff';
-                    quoteMessageBar.style.color = '#004085';
-                    quoteMessageBar.style.border = '1px solid #b8daff';
-                } else { // Warning
-                    quoteMessageBar.style.backgroundColor = '#fff3cd';
-                    quoteMessageBar.style.color = '#664d03';
-                    quoteMessageBar.style.border = '1px solid #ffecb5';
-                }
+                quoteMessageBar.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d1ecf1';
+                quoteMessageBar.style.color = type === 'error' ? '#721c24' : '#0c5460';
+                quoteMessageBar.style.border = type === 'error' ? '1px solid #f5c6cb' : '1px solid #bee5eb';
                 quoteMessageBar.style.display = 'block';
             }
             
@@ -2260,6 +1932,89 @@
                 quoteMessageBar.style.display = 'none';
             }
 
+            // Function to render the entire quote table
+            function renderQuoteTable() {
+                quoteBody.innerHTML = '';
+                let venueTotal = 0;
+                let techTotal = 0;
+                let staffTotal = 0;
+                let percussionTotal = 0;
+                
+                const groups = {
+                    venue: { items: [], total: 0, header: 'Venue Hire' },
+                    tech: { items: [], total: 0, header: 'Technical Hire' },
+                    staff: { items: [], total: 0, header: 'Staffing Costs' },
+                    percussion: { items: [], total: 0, header: 'Percussion Hire' }
+                };
+
+                // Group items
+                quoteItems.forEach(item => {
+                    if (groups[item.group]) {
+                        groups[item.group].items.push(item);
+                        groups[item.group].total += item.total;
+                    }
+                });
+
+                // Render each group
+                Object.values(groups).forEach(group => {
+                    if (group.items.length > 0) {
+                        // Add group header
+                        const headerRow = document.createElement('tr');
+                        headerRow.className = 'group-header-row';
+                        headerRow.innerHTML = `<td colspan="5">${group.header}</td>`;
+                        quoteBody.appendChild(headerRow);
+                        
+                        // Add group items
+                        group.items.forEach(item => {
+                            const row = document.createElement('tr');
+                            
+                            // Admin Mode: Editable Total, Auto-Updating Unit Price
+                            let totalCell, unitPriceCell;
+                            if (isAdmin) {
+                                unitPriceCell = `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
+                                totalCell = `<td style="text-align: right;"><input type="number" class="admin-editable-total" data-id="${item.id}" value="${item.total.toFixed(2)}" min="0" step="0.01"></td>`;
+                            } else {
+                                unitPriceCell = `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
+                                totalCell = `<td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>`;
+                            }
+                            
+                            row.innerHTML = `
+                                <td>${item.description}</td>
+                                ${unitPriceCell}
+                                <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
+                                ${totalCell}
+                                <td class="remove-col"><button class="remove-btn" data-id="${item.id}">X</button></td>
+                            `;
+                            quoteBody.appendChild(row);
+                        });
+                    }
+                });
+                
+                // Update Subtotals
+                venueSubtotalEl.textContent = `£${groups.venue.total.toFixed(2)}`;
+                techSubtotalEl.textContent = `£${groups.tech.total.toFixed(2)}`;
+                staffingSubtotalEl.textContent = `£${groups.staff.total.toFixed(2)}`;
+                percussionSubtotalEl.textContent = `£${groups.percussion.total.toFixed(2)}`;
+                
+                // Show/Hide subtotal rows if they have value
+                staffingSubtotalRow.style.display = (groups.staff.total > 0 && isAdmin) ? 'flex' : 'none';
+                percussionSubtotalRow.style.display = (groups.percussion.total > 0 && isAdmin) ? 'flex' : 'none';
+                
+                const currentSubtotal = groups.venue.total + groups.tech.total + groups.staff.total + groups.percussion.total;
+                const vat = currentSubtotal * VAT_RATE;
+                const grandTotal = currentSubtotal + vat;
+
+                combinedSubtotalEl.textContent = `£${currentSubtotal.toFixed(2)}`;
+                combinedVatEl.textContent = `£${vat.toFixed(2)}`;
+                combinedGrandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
+                
+                addRemoveListeners();
+                if (isAdmin) {
+                    addAdminInputListeners();
+                }
+            }
+
+            // Function to add listeners to all "remove" buttons
             function addRemoveListeners() {
                 document.querySelectorAll('.remove-btn').forEach(button => {
                     button.removeEventListener('click', handleRemoveClick);
@@ -2270,79 +2025,118 @@
             function handleRemoveClick(e) {
                 const idToRemove = parseFloat(e.target.getAttribute('data-id'));
                 quoteItems = quoteItems.filter(item => item.id !== idToRemove);
-                
-                // Recalculate all subtotals
-                const newVenueSub = quoteItems.filter(i => i.type === 'venue' || i.type === 'tech').reduce((acc, i) => acc + i.total, 0);
-                const newStaffSub = quoteItems.filter(i => i.type === 'staff').reduce((acc, i) => acc + i.total, 0);
-                const newPercSub = quoteItems.filter(i => i.type === 'percussion').reduce((acc, i) => acc + i.total, 0);
-                
                 renderQuoteTable();
-                updateTotals(newVenueSub, newStaffSub, newPercSub);
+            }
+            
+            // NEW: Function to add listeners for admin inputs
+            function addAdminInputListeners() {
+                document.querySelectorAll('.admin-editable-total').forEach(input => {
+                    input.removeEventListener('change', handleAdminTotalChange);
+                    input.addEventListener('change', handleAdminTotalChange);
+                });
+            }
+            
+            function handleAdminTotalChange(e) {
+                const idToUpdate = parseFloat(e.target.dataset.id);
+                const newTotal = parseFloat(e.target.value) || 0;
+                
+                const item = quoteItems.find(item => item.id === idToUpdate);
+                if (item) {
+                    item.total = newTotal;
+                    // Auto-update unit price
+                    if (item.quantity !== 0) {
+                        item.unitPrice = newTotal / item.quantity;
+                    }
+                }
+                renderQuoteTable(); // Re-render to update unit price and totals
             }
             
             // --- PDF & Email Logic ---
-            $('download-pdf-btn').addEventListener('click', () => {
-                const quoteContainer = $('quote-summary-container');
-                const grandTotal = venueGrandTotalEl.textContent;
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
+            const emailBtn = document.getElementById('email-btn');
+            
+            downloadPdfBtn.addEventListener('click', () => {
+                const quoteContainer = document.getElementById('quote-summary-container');
+                const notes = notesTextarea.value.trim();
+                
+                // Add a temporary notes element for the PDF
+                let notesEl = null;
+                if (notes) {
+                    notesEl = document.createElement('div');
+                    notesEl.style.padding = '20px';
+                    notesEl.style.border = '1px solid var(--border-color)';
+                    notesEl.style.borderRadius = 'var(--border-radius)';
+                    notesEl.style.marginBottom = '20px';
+                    notesEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+                    notesEl.innerText = `Quote Notes:\n\n${notes}`;
+                    quoteContainer.prepend(notesEl);
+                }
                 
                 // Add 'printing' class to hide elements
                 quoteContainer.classList.add('printing');
                 
                 html2canvas(quoteContainer).then(canvas => {
-                    // Remove 'printing' class *after* canvas is drawn
-                    quoteContainer.classList.remove('printing');
-                    
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    const pdfHeight = (canvasHeight * pdfWidth) / canvasWidth;
                     
-                    pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 10);
-                    pdf.save(`rbc-quote-${grandTotal}.pdf`);
+                    pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
+                    pdf.save(`rbc-quote-${combinedGrandTotalEl.textContent}.pdf`);
+                    
+                    // Clean up
+                    quoteContainer.classList.remove('printing');
+                    if (notesEl) {
+                        quoteContainer.removeChild(notesEl);
+                    }
                 });
             });
             
-            $('email-btn').addEventListener('click', () => {
+            emailBtn.addEventListener('click', () => {
                 const email = 'conservatoireevents@bcu.ac.uk';
                 const subject = 'New Venue Hire Quote Request';
+                const notes = notesTextarea.value.trim();
                 
                 let body = 'Hello Conservatoire Events Team,\n\nPlease see the generated quote details below:\n\n';
                 
-                // Group items by type
-                const venueItems = quoteItems.filter(item => item.type === 'venue' || item.type === 'tech');
-                const staffItems = quoteItems.filter(item => item.type === 'staff');
-                const percussionItems = quoteItems.filter(item => item.type === 'percussion');
-
-                // Helper to add item to body
-                const addItemToBody = (item) => {
-                    body += `Item: ${item.description}\n`;
-                    body += `Unit Price: £${item.unitPrice.toFixed(2)}\n`;
-                    body += `Quantity: ${item.quantity.toFixed(2)}\n`;
-                    body += `Total: £${item.total.toFixed(2)}\n`;
-                    body += '-------------------------------------\n';
-                };
+                if (notes) {
+                    body += `--- NOTES ---\n${notes}\n---------------\n\n`;
+                }
                 
-                if (venueItems.length > 0) {
-                    body += '--- VENUE & TECHNICAL HIRE ---\n';
-                    venueItems.forEach(addItemToBody);
-                }
-                if (staffItems.length > 0) {
-                    body += '\n--- STAFFING COSTS ---\n';
-                    staffItems.forEach(addItemToBody);
-                }
-                if (percussionItems.length > 0) {
-                    body += '\n--- PERCUSSION HIRE ---\n';
-                    percussionItems.forEach(addItemToBody);
-                }
+                // Group items for email body
+                const groups = {
+                    venue: { items: [], total: 0, header: '--- Venue Hire ---' },
+                    tech: { items: [], total: 0, header: '--- Technical Hire ---' },
+                    staff: { items: [], total: 0, header: '--- Staffing Costs ---' },
+                    percussion: { items: [], total: 0, header: '--- Percussion Hire ---' }
+                };
+                quoteItems.forEach(item => {
+                    if (groups[item.group]) groups[item.group].items.push(item);
+                });
+
+                Object.values(groups).forEach(group => {
+                    if (group.items.length > 0) {
+                        body += `${group.header}\n`;
+                        group.items.forEach(item => {
+                            body += `Item: ${item.description}\n`;
+                            body += `Price: £${item.unitPrice.toFixed(2)}\n`;
+                            body += `Qty/Hrs: ${item.quantity.toFixed(2)}\n`;
+                            body += `Total: £${item.total.toFixed(2)}\n\n`;
+                        });
+                    }
+                });
                 
                 // Add totals
-                if (venueItems.length > 0) body += `\nVenue & Tech Subtotal: ${venueSubtotalEl.textContent}\n`;
-                if (staffItems.length > 0) body += `Staffing Subtotal: ${staffingSubtotalEl.textContent}\n`;
-                if (percussionItems.length > 0) body += `Percussion Subtotal: ${percussionSubtotalEl.textContent}\n`;
-                
-                body += `\nCombined Subtotal: ${combinedSubtotalEl.textContent}\n`;
+                body += `\n--- TOTALS ---\n`;
+                body += `Venue Subtotal: ${venueSubtotalEl.textContent}\n`;
+                body += `Tech Subtotal: ${techSubtotalEl.textContent}\n`;
+                if (groups.staff.items.length > 0) body += `Staffing Subtotal: ${staffingSubtotalEl.textContent}\n`;
+                if (groups.percussion.items.length > 0) body += `Percussion Subtotal: ${percussionSubtotalEl.textContent}\n`;
+                body += `\nCOMBINED SUBTOTAL: ${combinedSubtotalEl.textContent}\n`;
                 body += `VAT (20%): ${combinedVatEl.textContent}\n`;
-                body += `GRAND TOTAL: ${venueGrandTotalEl.textContent}\n`;
+                body += `GRAND TOTAL: ${combinedGrandTotalEl.textContent}\n`;
                 body += `\nDisclaimer: This is a generated quote and is subject to review.\n`;
                 
                 const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -2350,46 +2144,116 @@
             });
 
 
-            // --- Staffing & Percussion Internal Calculators ---
-            $('staffing-timesheet-body').querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', () => {
-                    let subtotal = 0;
-                    $('staffing-timesheet-body').querySelectorAll('.staff-row').forEach(row => {
-                        const rate = parseFloat(row.dataset.rate);
-                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                        const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                        const cost = rate * quantity * hours;
-                        row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                        subtotal += cost;
-                    });
-                    $('staffing-timesheet-body').querySelectorAll('.staff-row-custom').forEach(row => {
-                        const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
-                        const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                        const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                        const cost = rate * quantity * hours;
-                        row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                        subtotal += cost;
-                    });
+            // --- 4. Staffing Cost Logic (Admin Only) ---
+            const addStaffBtn = document.getElementById('add-staff-to-quote-btn');
+            const staffingBody = document.getElementById('staffing-timesheet-body');
+            
+            // Auto-calculate on input
+            staffingBody.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculateStaffingSubtotals);
+            });
+
+            function calculateStaffingSubtotals() {
+                staffingBody.querySelectorAll('.staff-row').forEach(row => {
+                    const rate = parseFloat(row.dataset.rate);
+                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
                 });
+                staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
+                    const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
+                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
+                });
+            }
+            
+            addStaffBtn.addEventListener('click', () => {
+                // Add standard staff
+                staffingBody.querySelectorAll('.staff-row').forEach(row => {
+                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                    if (hours > 0 && quantity > 0) {
+                        const description = row.cells[0].textContent;
+                        const unitPrice = parseFloat(row.dataset.rate);
+                        addQuoteItem('staff', description, unitPrice, hours * quantity, true, false);
+                    }
+                });
+                // Add custom staff
+                staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
+                    const description = row.querySelector('.custom-role').value.trim();
+                    const unitPrice = parseFloat(row.querySelector('.custom-rate').value) || 0;
+                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
+                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
+                    if (description && hours > 0 && quantity > 0 && unitPrice > 0) {
+                        addQuoteItem('staff', description, unitPrice, hours * quantity, true, false);
+                    }
+                });
+                renderQuoteTable();
+                showMessage('Staffing costs added to main quote.');
+            });
+
+            // --- 5. Percussion Hire Logic (Admin Only) ---
+            const addPercussionBtn = document.getElementById('add-percussion-to-quote-btn');
+            const percussionBody = document.getElementById('percussion-timesheet-body');
+            
+            // Inflation-adjusted rates
+            const percussionRates = {
+                'Bass Drum': 41.94, 'Bell Tree': 22.37, 'Bongos': 22.37, 'Celeste': 83.85,
+                'Clash Cymbals': 27.95, 'Concert Toms (per tom)': 12.58, 'Congas (per conga)': 19.57,
+                'Crotales (per octave)': 25.16, 'Drum Kit': 83.85, 'Glockenspiel': 30.75,
+                'Hi Hats': 25.16, 'Marimba (4.3)': 67.08, 'Marimba (5 octave)': 139.76,
+                'Mark Tree': 20.97, 'Snare Drum': 25.16, 'Suspended Cymbal': 16.77,
+                'Temple Blocks (set of 5)': 25.16, 'Timbales (pair)': 44.71, 'Timpani (per timp)': 55.90,
+                'Trap Tray': 9.79, 'Tubular Bells': 53.11, 'Vibraphone': 48.92, 'Xylophone': 39.13,
+                'Tam tam': 30.75
+            };
+
+            // Populate percussion table
+            Object.entries(percussionRates).forEach(([name, rate]) => {
+                const row = document.createElement('tr');
+                row.className = 'percussion-row';
+                row.dataset.rate = rate;
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td class="rate-cell">${rate.toFixed(2)}</td>
+                    <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                    <td><input type="number" class="perc-days" value="0" min="0" step="1"></td>
+                    <td class="row-cost">£0.00</td>
+                `;
+                percussionBody.appendChild(row);
             });
             
-            $('percussion-hire-body').querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', () => {
-                    let subtotal = 0;
-                    $('percussion-hire-body').querySelectorAll('.percussion-row').forEach(row => {
-                        const rate = parseFloat(row.dataset.rate);
-                        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-                        const days = parseFloat(row.querySelector('.item-days').value) || 0;
-                        const cost = rate * quantity * days;
-                        row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                        subtotal += cost;
-                    });
+            // Auto-calculate on input
+            percussionBody.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculatePercussionSubtotals);
+            });
+
+            function calculatePercussionSubtotals() {
+                percussionBody.querySelectorAll('.percussion-row').forEach(row => {
+                    const rate = parseFloat(row.dataset.rate);
+                    const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
+                    const days = parseFloat(row.querySelector('.perc-days').value) || 0;
+                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * days).toFixed(2)}`;
                 });
+            }
+            
+            addPercussionBtn.addEventListener('click', () => {
+                percussionBody.querySelectorAll('.percussion-row').forEach(row => {
+                    const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
+                    const days = parseFloat(row.querySelector('.perc-days').value) || 0;
+                    if (days > 0 && quantity > 0) {
+                        const description = row.cells[0].textContent;
+                        const unitPrice = parseFloat(row.dataset.rate);
+                        addQuoteItem('percussion', description, unitPrice, quantity * days, true, false);
+                    }
+                });
+                renderQuoteTable();
+                showMessage('Percussion hire added to main quote.');
             });
 
 
-            // --- 7. Modal & Gallery Logic ---
-
+            // --- 6. Modal & Gallery Logic ---
             const venueDetails = {
                 'Bradshaw Hall': {
                     title: 'Bradshaw Hall',
@@ -2457,7 +2321,7 @@
                         `${baseURL}organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11174.jpg`
                     ]
                 },
-                'Workshop Space': { // Modal for "Workshops" tile
+                'Workshop Space': { // This is the modal for the single "Workshops" tile
                     title: 'Workshops / Studios',
                     capacity: 'Capacity: 30-60',
                     description: 'Eight flexible performance studios designed to the highest standards for rehearsals, workshops, and intimate performances. Each studio has a timber hardwood floor, grand piano, and B&W surround sound.',
@@ -2476,15 +2340,31 @@
                         `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11153.jpg`
                     ]
                 },
-                // NEW: Practice Rooms don't have modals, but we can add placeholders if needed
+                'Practice Room (Grand Piano)': {
+                    title: 'Practice Room (Grand)',
+                    capacity: 'N/A',
+                    description: 'Standard practice room equipped with a grand piano. Priced per room, per day.',
+                    image: `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23555.jpg`, // Placeholder
+                    link: '',
+                    gallery: []
+                },
+                'Practice Room (Upright Piano)': {
+                    title: 'Practice Room (Upright)',
+                    capacity: 'N/A',
+                    description: 'Standard practice room equipped with an upright piano. Priced per room, per day.',
+                    image: `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23556.jpg`, // Placeholder
+                    link: '',
+                    gallery: []
+                }
             };
             
+            // --- Global Gallery Image List ---
             const globalGalleryImages = [
                 ...venueDetails['Bradshaw Hall'].gallery,
                 ...venueDetails['Recital Hall'].gallery,
                 ...venueDetails['Eastside Jazz Club'].gallery,
                 ...venueDetails['The Lab'].gallery,
-                ...venueDetails['Organ Studio'].gallery,
+                ...venueDetails['The Organ Studio'].gallery,
                 ...venueDetails['Workshop Space'].gallery,
                 `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23555.jpg`,
                 `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23556.jpg`,
@@ -2495,11 +2375,11 @@
             ];
             
             // --- Lightbox Modal ---
-            const lightbox = $('lightbox-overlay');
-            const lightboxImg = $('lightbox-image');
-            const lightboxClose = $('lightbox-close');
-            const lightboxPrev = $('lightbox-prev');
-            const lightboxNext = $('lightbox-next');
+            const lightbox = document.getElementById('lightbox-overlay');
+            const lightboxImg = document.getElementById('lightbox-image');
+            const lightboxClose = document.getElementById('lightbox-close');
+            const lightboxPrev = document.getElementById('lightbox-prev');
+            const lightboxNext = document.getElementById('lightbox-next');
             
             let currentLightboxGallery = [];
             let currentLightboxIndex = 0;
@@ -2544,23 +2424,23 @@
             });
             lightboxClose.addEventListener('click', closeLightbox);
             lightboxPrev.addEventListener('click', (e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 showPrevImage();
             });
             lightboxNext.addEventListener('click', (e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 showNextImage();
             });
 
             // --- Venue Modal (Pop-up) ---
-            const modal = $('venue-modal');
-            const modalCloseBtn = $('modal-close-btn');
-            const modalTitle = $('modal-title');
-            const modalCapacity = $('modal-capacity');
-            const modalDescription = $('modal-description');
-            const modalMainImage = $('modal-main-image');
-            const modalLink = $('modal-link');
-            const modalThumbnailContainer = $('modal-thumbnail-container');
+            const venueModal = document.getElementById('venue-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalTitle = document.getElementById('modal-title');
+            const modalCapacity = document.getElementById('modal-capacity');
+            const modalDescription = document.getElementById('modal-description');
+            const modalMainImage = document.getElementById('modal-main-image');
+            const modalLink = document.getElementById('modal-link');
+            const modalThumbnailContainer = document.getElementById('modal-thumbnail-container');
             
             let currentModalGallery = [];
             
@@ -2578,12 +2458,15 @@
                         modalTitle.textContent = venueName.includes('Workshop') ? venueName : details.title;
                         modalCapacity.textContent = details.capacity;
                         modalDescription.textContent = details.description;
+                        
                         modalLink.href = details.link;
+                        modalLink.style.display = details.link ? 'inline-block' : 'none';
+                        
                         modalMainImage.src = details.image;
                         modalMainImage.alt = details.title;
                         
                         modalThumbnailContainer.innerHTML = '';
-                        currentModalGallery = [details.image]; // Start with main image
+                        currentModalGallery = [details.image];
                         
                         if (details.gallery && details.gallery.length > 0) {
                             details.gallery.forEach(imgUrl => {
@@ -2593,10 +2476,11 @@
                             });
                         }
                         
+                        // Create thumbnails
                         currentModalGallery.forEach((imgUrl, index) => {
                             const thumbDiv = document.createElement('div');
                             thumbDiv.className = 'thumbnail';
-                            if (imgUrl === details.image) thumbDiv.classList.add('active');
+                            if (index === 0) thumbDiv.classList.add('active');
                             
                             const thumbImg = document.createElement('img');
                             thumbImg.src = imgUrl;
@@ -2612,33 +2496,35 @@
                             modalThumbnailContainer.appendChild(thumbDiv);
                         });
                         
-                        modal.style.display = 'flex';
+                        venueModal.style.display = 'flex';
                     }
                 });
             });
 
             function closeModal() {
-                modal.style.display = 'none';
+                venueModal.style.display = 'none';
             }
 
             modalCloseBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
+            venueModal.addEventListener('click', (e) => {
+                if (e.target === venueModal) closeModal();
             });
             
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeModal();
                     closeLightbox();
+                    closePasswordModal();
                 }
+                
                 if (lightbox.classList.contains('show')) {
                     if (e.key === 'ArrowLeft') showPrevImage();
-                    if (e.key === 'ArrowRight') showNextImage();
+                    else if (e.key === 'ArrowRight') showNextImage();
                 }
             });
             
             // --- Populate Global Gallery ---
-            const globalGalleryScroll = $('global-gallery-scroll');
+            const globalGalleryScroll = document.getElementById('global-gallery-scroll');
             const uniqueImageUrls = [...new Set(globalGalleryImages)];
             
             uniqueImageUrls.forEach(imgUrl => {
