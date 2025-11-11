@@ -134,7 +134,7 @@
         }
 
         .tab-content {
-            display: none; /* Hide tabs by default */
+            display: none; /* Hidden by default */
             padding-top: 30px;
         }
 
@@ -512,11 +512,11 @@
         }
         
         /* NEW: Admin mode editable fields */
-        .admin-editable {
+        .admin-editable-total { /* Only total is editable */
             padding: 0 !important;
             border-width: 0 !important;
         }
-        .admin-editable input {
+        .admin-editable-total input {
             width: 100%;
             height: 100%;
             border: 2px dashed var(--primary-color);
@@ -525,13 +525,6 @@
             font-weight: bold;
             text-align: right;
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f6ff;
-        }
-        
-        /* Admin mode for totals */
-        .admin-editable-total {
-            border: 2px dashed var(--primary-color);
-            padding: 5px;
             background-color: #f0f6ff;
         }
         
@@ -546,16 +539,12 @@
         }
         
         /* Remove borders from admin inputs when printing */
-        .printing .admin-editable input,
-        .printing .admin-editable-total {
+        .printing .admin-editable-total input {
             border: none;
             background-color: transparent;
             padding: 12px;
             font-weight: 700;
-            color: var(--primary-color);
-        }
-        .printing .admin-editable-total {
-             padding: 5px 0;
+            color: var(--dark-grey);
         }
         /* End Admin Mode styles */
 
@@ -2063,30 +2052,22 @@
                     currentSubtotal += item.total;
                     const row = document.createElement('tr');
                     
-                    // Admin Mode: Make Total editable
+                    // CORRECTED: Only Total is editable
                     const totalCell = (isAdmin) ? `
-                        <td class="admin-editable" data-id="${item.id}" data-field="total">
+                        <td class="admin-editable-total" data-id="${item.id}">
                             <input type="number" value="${item.total.toFixed(2)}" min="0" step="0.01">
                         </td>
                     ` : `
                         <td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>
                     `;
                     
-                    // Admin Mode: Make Unit Price editable
-                    const unitPriceCell = (isAdmin) ? `
-                        <td class="admin-editable" data-id="${item.id}" data-field="unitPrice">
-                            <input type="number" value="${item.unitPrice.toFixed(2)}" min="0" step="0.01">
-                        </td>
-                    ` : `
+                    // CORRECTED: Unit Price is NOT editable
+                    const unitPriceCell = `
                         <td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>
                     `;
                     
-                    // Admin Mode: Make Quantity editable
-                     const quantityCell = (isAdmin) ? `
-                        <td class="admin-editable" data-id="${item.id}" data-field="quantity">
-                            <input type="number" value="${item.quantity.toFixed(2)}" min="0" step="0.01">
-                        </td>
-                    ` : `
+                    // CORRECTED: Quantity is NOT editable
+                     const quantityCell = `
                         <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
                     `;
 
@@ -2119,35 +2100,24 @@
                 venueGrandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
             }
 
-            // --- Admin Mode Event Listeners ---
+            // --- Admin Mode Event Listeners (CORRECTED) ---
             function addAdminInputListeners() {
-                quoteBody.querySelectorAll('.admin-editable input').forEach(input => {
+                quoteBody.querySelectorAll('.admin-editable-total input').forEach(input => {
                     input.addEventListener('change', (e) => {
                         const inputEl = e.target;
                         const id = parseFloat(inputEl.closest('td').dataset.id);
-                        const field = inputEl.closest('td').dataset.field;
-                        const newValue = parseFloat(inputEl.value);
+                        const newTotal = parseFloat(inputEl.value);
                         
                         const item = quoteItems.find(i => i.id === id);
                         if (!item) return;
 
-                        // Update the item
-                        item[field] = newValue;
+                        // Update the item's total
+                        item.total = newTotal;
                         
-                        // Recalculate based on which field was changed
-                        if (field === 'total') {
-                            // Total was changed, auto-update Unit Price
-                            item.unitPrice = (item.quantity !== 0) ? item.total / item.quantity : 0;
-                        } else {
-                            // Unit Price or Quantity was changed, auto-update Total
-                            item.total = item.unitPrice * item.quantity;
-                        }
-
-                        // Recalculate the entire subtotal
+                        // Recalculate the entire subtotal from the quoteItems array
                         const newSubtotal = quoteItems.reduce((acc, i) => acc + i.total, 0);
                         
-                        // Re-render the table and update totals
-                        renderQuoteTable();
+                        // Update the main totals display
                         updateTotals(newSubtotal);
                     });
                 });
