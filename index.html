@@ -57,15 +57,14 @@
 
         /* --- 2. Header & Layout --- */
         header {
-            /* background-color: var(--primary-color); */
-            /* Use a background image for the header */
             background-image: linear-gradient(rgba(0, 74, 153, 0.8), rgba(0, 59, 122, 0.9)), url('https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg');
             background-size: cover;
             background-position: center;
             color: var(--white);
-            padding: 40px 0;
+            padding: 40px 20px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         header h1 {
@@ -79,6 +78,33 @@
             font-weight: 300;
             opacity: 0.9;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        /* NEW: Admin Login Button */
+        #admin-login-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: var(--dark-grey);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        #admin-login-button:hover {
+            background: #b98f00;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        #admin-logout-button {
+            display: none; /* Hidden by default */
+            background: var(--danger-color);
+            color: var(--white);
         }
 
         /* This is the main content wrapper */
@@ -419,12 +445,25 @@
             display: none; /* Hidden by default */
             padding: 15px 20px;
             margin-bottom: 20px;
-            background-color: #fff3cd;
-            color: #664d03;
-            border: 1px solid #ffecb5;
+            background-color: #d1e7dd; /* Green success */
+            color: #0f5132;
+            border: 1px solid #badbcc;
             border-radius: var(--border-radius);
             font-weight: 500;
         }
+        
+        #quote-message-bar.error {
+             background-color: #f8d7da;
+             color: #721c24;
+             border: 1px solid #f5c6cb;
+        }
+        
+        #quote-message-bar.warning {
+             background-color: #fff3cd;
+             color: #664d03;
+             border: 1px solid #ffecb5;
+        }
+
 
         /* Makes the table horizontally scrollable on small screens */
         .table-wrapper {
@@ -463,7 +502,7 @@
         .staffing-table td:nth-child(2), /* Rate */
         .staffing-table td:nth-child(5), /* Cost */
         .percussion-table td:nth-child(2), /* Rate */
-        .percussion-table td:nth-child(5) { /* Cost */
+        .percussion-table td:nth-child(5) { /* Cost - Adjusted for new structure */
             text-align: right;
             font-weight: 600;
         }
@@ -525,6 +564,26 @@
             text-align: center;
         }
         
+        /* NEW: Admin Mode Editable Cells */
+        .quote-table .editable {
+            background-color: #fef9e7;
+            padding: 0;
+        }
+        .quote-table .editable input {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--primary-color);
+            padding: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            text-align: right;
+             -moz-appearance: textfield;
+        }
+        .quote-table .editable input::-webkit-inner-spin-button {
+             -webkit-appearance: none;
+            margin: 0;
+        }
+        
         .remove-btn {
             background: var(--danger-color);
             color: white;
@@ -574,6 +633,13 @@
             max-width: 300px;
             margin-bottom: 15px;
         }
+        
+        .password-prompt-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+        }
+
 
         /* --- 8. Totals & Footer --- */
         .totals-section {
@@ -591,26 +657,14 @@
             margin-bottom: 15px;
         }
         
-        #venue-grand-total,
-        #staffing-grand-total,
-        #percussion-grand-total { /* NEW: Percussion total */
+        #venue-grand-total {
             font-size: 2rem;
             font-weight: 700;
             color: var(--primary-color);
             margin-top: 10px;
         }
         
-        /* NEW: Staffing & Percussion totals styling */
-        #staff-subtotal,
-        #staff-vat,
-        #perc-subtotal,
-        #perc-vat {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--dark-grey);
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
+        /* REMOVED: Separate totals sections */
         
         .disclaimer {
             font-size: 0.9rem;
@@ -906,6 +960,19 @@
             #lightbox-next {
                 right: 5px;
             }
+            #admin-login-button {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+                top: 10px;
+                right: 10px;
+            }
+            .tabs {
+                justify-content: center;
+            }
+            .tab-button {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
         }
 
 
@@ -916,6 +983,8 @@
     <header>
         <h1>Royal Birmingham Conservatoire</h1>
         <p>Multi-Venue Quote Calculator</p>
+        <!-- NEW: Admin Login Button -->
+        <button id="admin-login-button">Admin Login</button>
     </header>
 
     <main class="container">
@@ -924,7 +993,7 @@
         <nav class="tabs">
             <button class="tab-button active" data-tab="venue-tab">Venue Quote</button>
             <button class="tab-button" data-tab="staffing-tab">Staffing Costs</button>
-            <button class="tab-button" data-tab="percussion-tab">Percussion Hire</button> <!-- NEW TAB -->
+            <button class="tab-button" data-tab="percussion-tab">Percussion Hire</button> 
         </nav>
 
         <!-- Tab Content: Venue Quote -->
@@ -1194,6 +1263,7 @@
                 <br>
                 <button type="button" id="staff-login-btn" class="btn btn-primary">Login</button>
                 <p id="staffing-password-error">Incorrect password. Please try again.</p>
+                <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p>
             </div>
 
             <!-- Staffing Calculator (wrapper is hidden by default) -->
@@ -1210,7 +1280,7 @@
                                 <th>Staff Role</th>
                                 <th>Hourly Rate (£)</th>
                                 <th>Quantity</th>
-                                <th>Total Hours</th>
+                                <th>Total Hours (per staff)</th>
                                 <th>Cost (£)</th>
                             </tr>
                         </thead>
@@ -1271,21 +1341,12 @@
                 </div>
 
                 <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="calculate-staff-btn" class="btn btn-primary">Calculate Totals</button>
+                    <!-- CHANGED: Button text and ID -->
+                    <button type="button" id="add-staff-to-quote-btn" class="btn btn-primary">Add Staff to Main Quote</button>
                 </div>
                 
-                <!-- NEW: Staffing Summary Section -->
-                <section id="staffing-summary-container">
-                    <h2>Staffing Timesheet Summary</h2>
-                    <div class="totals-section">
-                        Subtotal
-                        <div id="staff-subtotal">£0.00</div>
-                        VAT (20%)
-                        <div id="staff-vat">£0.00</div>
-                        <strong>Staffing Total (inc. VAT)</strong>
-                        <div id="staffing-grand-total">£0.00</div>
-                    </div>
-                </section>
+                <!-- REMOVED: Separate staffing summary -->
+                
             </div>
         </section>
         
@@ -1299,6 +1360,7 @@
                 <br>
                 <button type="button" id="perc-login-btn" class="btn btn-primary">Login</button>
                 <p id="percussion-password-error">Incorrect password. Please try again.</p>
+                <p class="password-prompt-info">Note: This uses the same password as Admin Mode.</p>
             </div>
 
             <!-- Percussion Calculator (wrapper is hidden by default) -->
@@ -1493,20 +1555,12 @@
                 </div>
 
                 <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="calculate-perc-btn" class="btn btn-primary">Calculate Totals</button>
+                    <!-- CHANGED: Button text and ID -->
+                    <button type="button" id="add-perc-to-quote-btn" class="btn btn-primary">Add Percussion to Main Quote</button>
                 </div>
                 
-                <section id="percussion-summary-container">
-                    <h2>Percussion Hire Summary</h2>
-                    <div class="totals-section">
-                        Subtotal
-                        <div id="perc-subtotal">£0.00</div>
-                        VAT (20%)
-                        <div id="perc-vat">£0.00</div>
-                        <strong>Percussion Total (inc. VAT)</strong>
-                        <div id="percussion-grand-total">£0.00</div>
-                    </div>
-                </section>
+                <!-- REMOVED: Separate percussion summary -->
+                
             </div>
         </section>
 
@@ -1566,8 +1620,7 @@
             // --- 1. Tab Switching Logic ---
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
-            let isStaffingUnlocked = false; 
-            let isPercussionUnlocked = false; // NEW: Percussion lock
+            let isAdmin = false; // NEW: Admin Mode state
             const correctPassword = "bcu-events-2025"; 
 
             tabButtons.forEach(button => {
@@ -1575,33 +1628,26 @@
                     const targetTab = button.getAttribute('data-tab');
 
                     // Password Check Logic for Staffing
-                    if (targetTab === 'staffing-tab' && !isStaffingUnlocked) {
-                        // Deactivate all
+                    if (targetTab === 'staffing-tab' && !isAdmin) {
                         tabButtons.forEach(btn => btn.classList.remove('active'));
                         tabContents.forEach(content => content.classList.remove('active'));
-                        // Activate clicked button and its content
                         button.classList.add('active');
                         document.getElementById(targetTab).classList.add('active');
-                        // Ensure prompt is visible and calculator is hidden
                         document.getElementById('staffing-password-prompt').style.display = 'block';
                         document.getElementById('staffing-calculator-wrapper').style.display = 'none';
-                        return; // Stop here
+                        return; 
                     }
                     
-                    // NEW: Password Check Logic for Percussion
-                    if (targetTab === 'percussion-tab' && !isPercussionUnlocked) {
-                        // Deactivate all
+                    // Password Check Logic for Percussion
+                    if (targetTab === 'percussion-tab' && !isAdmin) {
                         tabButtons.forEach(btn => btn.classList.remove('active'));
                         tabContents.forEach(content => content.classList.remove('active'));
-                        // Activate clicked button and its content
                         button.classList.add('active');
                         document.getElementById(targetTab).classList.add('active');
-                        // Ensure prompt is visible and calculator is hidden
                         document.getElementById('percussion-password-prompt').style.display = 'block';
                         document.getElementById('percussion-calculator-wrapper').style.display = 'none';
-                        return; // Stop here
+                        return; 
                     }
-
 
                     // Deactivate all tabs and buttons
                     tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -1612,51 +1658,108 @@
                     document.getElementById(targetTab).classList.add('active');
                 });
             });
+            
+            // --- NEW: Admin Login Logic ---
+            const adminLoginBtn = document.getElementById('admin-login-button');
+            
+            function toggleAdminMode(loggedIn) {
+                isAdmin = loggedIn;
+                const adminButton = document.getElementById('admin-login-button') || document.getElementById('admin-logout-button');
+                
+                if (isAdmin) {
+                    adminButton.textContent = 'Logout';
+                    adminButton.id = 'admin-logout-button'; // Change ID to change style
+                    adminButton.style.display = 'block';
+                    
+                    // Unlock protected tabs
+                    document.getElementById('staffing-password-prompt').style.display = 'none';
+                    document.getElementById('staffing-calculator-wrapper').style.display = 'block';
+                    document.getElementById('percussion-password-prompt').style.display = 'none';
+                    document.getElementById('percussion-calculator-wrapper').style.display = 'block';
+                    
+                } else {
+                    adminButton.textContent = 'Admin Login';
+                    adminButton.id = 'admin-login-button'; // Change ID back
+                    
+                    // Re-lock tabs if not on them
+                    const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+                    if (activeTab !== 'staffing-tab') {
+                        document.getElementById('staffing-password-prompt').style.display = 'block';
+                        document.getElementById('staffing-calculator-wrapper').style.display = 'none';
+                    }
+                     if (activeTab !== 'percussion-tab') {
+                        document.getElementById('percussion-password-prompt').style.display = 'block';
+                        document.getElementById('percussion-calculator-wrapper').style.display = 'none';
+                    }
+                }
+                // Re-render the quote table to add/remove editable fields
+                renderQuoteTable();
+            }
 
-            // Password Button Listeners (Staffing)
+            adminLoginBtn.addEventListener('click', () => {
+                if (isAdmin) {
+                    toggleAdminMode(false); // Logout
+                } else {
+                    // Prompt for password
+                    const password = prompt('Enter Admin Password:');
+                    if (password === correctPassword) {
+                        toggleAdminMode(true); // Login
+                    } else if (password) {
+                        alert('Incorrect password.');
+                    }
+                }
+            });
+            
+            // Re-grab button on subsequent clicks
+            document.querySelector('header').addEventListener('click', (e) => {
+                if(e.target.id === 'admin-login-button' && !isAdmin) {
+                     const password = prompt('Enter Admin Password:');
+                    if (password === correctPassword) {
+                        toggleAdminMode(true); // Login
+                    } else if (password) {
+                        alert('Incorrect password.');
+                    }
+                } else if (e.target.id === 'admin-logout-button' && isAdmin) {
+                     toggleAdminMode(false); // Logout
+                }
+            });
+
+            // Password Button Listeners (Staffing & Percussion)
+            // These now just check the admin password
             const staffLoginBtn = document.getElementById('staff-login-btn');
             const passwordInput = document.getElementById('staff-password-input');
             const passwordErrorEl = document.getElementById('staffing-password-error');
             
             function attemptStaffLogin() {
                 if (passwordInput.value === correctPassword) {
-                    isStaffingUnlocked = true;
-                    document.getElementById('staffing-password-prompt').style.display = 'none';
-                    document.getElementById('staffing-calculator-wrapper').style.display = 'block';
+                    isAdmin = true; // Log in as admin
+                    toggleAdminMode(true);
                     passwordErrorEl.style.display = 'none';
                 } else {
                     passwordErrorEl.style.display = 'block';
                 }
             }
-
             staffLoginBtn.addEventListener('click', attemptStaffLogin);
             passwordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    attemptStaffLogin();
-                }
+                if (e.key === 'Enter') attemptStaffLogin();
             });
             
-            // NEW: Password Button Listeners (Percussion)
             const percLoginBtn = document.getElementById('perc-login-btn');
             const percPasswordInput = document.getElementById('perc-password-input');
             const percPasswordErrorEl = document.getElementById('percussion-password-error');
             
             function attemptPercussionLogin() {
                 if (percPasswordInput.value === correctPassword) {
-                    isPercussionUnlocked = true;
-                    document.getElementById('percussion-password-prompt').style.display = 'none';
-                    document.getElementById('percussion-calculator-wrapper').style.display = 'block';
+                    isAdmin = true; // Log in as admin
+                    toggleAdminMode(true);
                     percPasswordErrorEl.style.display = 'none';
                 } else {
                     percPasswordErrorEl.style.display = 'block';
                 }
             }
-
             percLoginBtn.addEventListener('click', attemptPercussionLogin);
             percPasswordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    attemptPercussionLogin();
-                }
+                if (e.key === 'Enter') attemptPercussionLogin();
             });
 
 
@@ -1665,8 +1768,8 @@
             const VAT_RATE = 0.20; // 20%
             const MIN_HOURS = 4;
             const AFTER_HOURS_SURCHARGE = 20;
-            const TECHNICIAN_RATE = 35; // NEW: Technician hourly rate
-            const TECHNICIAN_MIN_HOURS = 4; // NEW: Technician minimum hours
+            const TECHNICIAN_RATE = 35; 
+            const TECHNICIAN_MIN_HOURS = 4; 
             
             // Store all quote items in an array
             let quoteItems = [];
@@ -1919,11 +2022,11 @@
                 if (isWholeBuilding && quoteItems.length > 0 && !hasWholeBuilding) {
                     // Trying to add Whole Building to existing items
                     quoteItems = []; // Clear existing items
-                    showMessage('Quote cleared to add Whole Building Hire.');
+                    showMessage('Quote cleared to add Whole Building Hire.', 'warning');
                 } else if (!isWholeBuilding && hasWholeBuilding) {
                     // Trying to add regular item to Whole Building
                     quoteItems = []; // Clear Whole Building item
-                    showMessage('Quote cleared to add individual items.');
+                    showMessage('Quote cleared to add individual items.', 'warning');
                 } else {
                     hideMessage();
                 }
@@ -2059,11 +2162,9 @@
                 return totalSurchargeHours > 0 ? totalSurchargeHours / days.length : 0;
             }
             
-            function showMessage(message, type = 'warning') {
+            function showMessage(message, type = 'success') {
                 quoteMessageBar.textContent = message;
-                quoteMessageBar.style.backgroundColor = type === 'error' ? '#f8d7da' : '#fff3cd';
-                quoteMessageBar.style.color = type === 'error' ? '#721c24' : '#664d03';
-                quoteMessageBar.style.border = type === 'error' ? '1px solid #f5c6cb' : '1px solid #ffecb5';
+                quoteMessageBar.className = type; // 'success', 'warning', 'error'
                 quoteMessageBar.style.display = 'block';
             }
             
@@ -2079,10 +2180,20 @@
                 quoteItems.forEach(item => {
                     currentSubtotal += item.total;
                     const row = document.createElement('tr');
+                    
+                    // NEW: Admin Mode Check
+                    const priceCell = isAdmin ? 
+                        `<td class="editable"><input type="number" class="admin-edit" data-id="${item.id}" data-field="unitPrice" value="${item.unitPrice.toFixed(2)}"></td>` : 
+                        `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
+                        
+                    const quantityCell = isAdmin ?
+                        `<td class="editable"><input type="number" class="admin-edit" data-id="${item.id}" data-field="quantity" value="${item.quantity.toFixed(2)}"></td>` :
+                        `<td style="text-align: right;">${item.quantity.toFixed(2)}</td>`;
+                    
                     row.innerHTML = `
                         <td>${item.description}</td>
-                        <td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>
-                        <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
+                        ${priceCell}
+                        ${quantityCell}
                         <td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>
                         <td><button class="remove-btn" data-id="${item.id}">X</button></td>
                     `;
@@ -2097,6 +2208,42 @@
                 venueGrandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
                 
                 addRemoveListeners();
+                
+                // NEW: Add listeners for admin edits
+                if (isAdmin) {
+                    addAdminEditListeners();
+                }
+            }
+            
+            // NEW: Add listeners for admin input fields
+            function addAdminEditListeners() {
+                document.querySelectorAll('.admin-edit').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const idToEdit = parseFloat(e.target.dataset.id);
+                        const field = e.target.dataset.field;
+                        const newValue = parseFloat(e.target.value) || 0;
+                        
+                        // Find item in array and update it
+                        const item = quoteItems.find(i => i.id === idToEdit);
+                        if (item) {
+                            item[field] = newValue;
+                            // Recalculate total for that item
+                            item.total = item.unitPrice * item.quantity;
+                        }
+                        
+                        // Re-render the table to update totals
+                        renderQuoteTable();
+                        
+                        // HACK: Re-focus the edited cell
+                        // This is needed because renderQuoteTable() rebuilds the DOM
+                        const newElement = document.querySelector(`.admin-edit[data-id="${idToEdit}"][data-field="${field}"]`);
+                        if (newElement) {
+                            newElement.focus();
+                            // Move cursor to the end
+                            newElement.selectionStart = newElement.selectionEnd = newElement.value.length;
+                        }
+                    });
+                });
             }
 
             // Function to add listeners to all "remove" buttons
@@ -2164,94 +2311,103 @@
             });
 
 
-            // --- 4. Staffing Cost Logic (REBUILT as Timesheet) ---
-
-            // DOM elements
-            const calculateStaffBtn = document.getElementById('calculate-staff-btn');
+            // --- 4. Staffing Cost Logic (UNIFIED) ---
+            const addStaffBtn = document.getElementById('add-staff-to-quote-btn');
             const staffingBody = document.getElementById('staffing-timesheet-body');
-            const staffSubtotalEl = document.getElementById('staff-subtotal');
-            const staffVatEl = document.getElementById('staff-vat');
-            const staffingGrandTotalEl = document.getElementById('staffing-grand-total');
 
-            // Event Listener
-            calculateStaffBtn.addEventListener('click', calculateStaffingTotals);
-
-            // Add listeners to all inputs to re-calculate on change
-            staffingBody.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', calculateStaffingTotals);
-            });
-
-            // Render function for staffing table
-            function calculateStaffingTotals() {
-                let subtotal = 0;
-
-                // Calculate pre-defined rows
+            addStaffBtn.addEventListener('click', () => {
+                let itemsAdded = 0;
+                // Add pre-defined rows
                 staffingBody.querySelectorAll('.staff-row').forEach(row => {
                     const rate = parseFloat(row.dataset.rate);
                     const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
                     const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    const cost = rate * quantity * hours;
-                    row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                    subtotal += cost;
+                    
+                    if (quantity > 0 && hours > 0) {
+                        const description = `STAFF: ${row.cells[0].textContent} (x${quantity})`;
+                        const totalHours = hours * quantity;
+                        addQuoteItem(description, rate, totalHours, true, false);
+                        itemsAdded++;
+                        
+                        // Clear inputs
+                        row.querySelector('.staff-quantity').value = 1;
+                        row.querySelector('.staff-hours').value = 0;
+                    }
                 });
                 
-                // Calculate custom rows
+                // Add custom rows
                 staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
+                    const role = row.querySelector('.custom-role').value;
                     const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
                     const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
                     const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    const cost = rate * quantity * hours;
-                    row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                    subtotal += cost;
+                    
+                    if (role && rate > 0 && quantity > 0 && hours > 0) {
+                        const description = `STAFF: ${role} (x${quantity})`;
+                        const totalHours = hours * quantity;
+                        addQuoteItem(description, rate, totalHours, true, false);
+                        itemsAdded++;
+                        
+                        // Clear inputs
+                        row.querySelector('.custom-role').value = '';
+                        row.querySelector('.custom-rate').value = 0;
+                        row.querySelector('.staff-quantity').value = 1;
+                        row.querySelector('.staff-hours').value = 0;
+                    }
                 });
-
-                const vat = subtotal * VAT_RATE;
-                const total = subtotal + vat;
                 
-                // Update staffing totals
-                staffSubtotalEl.textContent = `£${subtotal.toFixed(2)}`;
-                staffVatEl.textContent = `£${vat.toFixed(2)}`;
-                staffingGrandTotalEl.textContent = `£${total.toFixed(2)}`;
-            }
-            
-            // --- 5. NEW: Percussion Hire Logic ---
-            const calculatePercBtn = document.getElementById('calculate-perc-btn');
-            const percussionBody = document.getElementById('percussion-hire-body');
-            const percSubtotalEl = document.getElementById('perc-subtotal');
-            const percVatEl = document.getElementById('perc-vat');
-            const percGrandTotalEl = document.getElementById('percussion-grand-total');
-            
-            calculatePercBtn.addEventListener('click', calculatePercussionTotals);
-            
-            percussionBody.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', calculatePercussionTotals);
+                if (itemsAdded > 0) {
+                    renderQuoteTable();
+                    showMessage(`${itemsAdded} staffing item(s) added to the main quote.`);
+                    // Switch back to the main quote tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.querySelector('.tab-button[data-tab="venue-tab"]').classList.add('active');
+                    document.getElementById('venue-tab').classList.add('active');
+                } else {
+                    alert('No staffing hours entered.');
+                }
             });
             
-            function calculatePercussionTotals() {
-                let subtotal = 0;
-                
+            // --- 5. Percussion Hire Logic (UNIFIED) ---
+            const addPercBtn = document.getElementById('add-perc-to-quote-btn');
+            const percussionBody = document.getElementById('percussion-hire-body');
+            
+            addPercBtn.addEventListener('click', () => {
+                let itemsAdded = 0;
                 percussionBody.querySelectorAll('.perc-row').forEach(row => {
-                    const rate = parseFloat(row.dataset.rate);
                     const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
                     const days = parseFloat(row.querySelector('.perc-days').value) || 0;
-                    const cost = rate * quantity * days;
-                    row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
-                    subtotal += cost;
+                    
+                    if (quantity > 0 && days > 0) {
+                        const rate = parseFloat(row.dataset.rate);
+                        const description = `PERCUSSION: ${row.cells[0].textContent}`;
+                        const totalQuantity = quantity * days; // Total item-days
+                        
+                        addQuoteItem(description, rate, totalQuantity, true, false);
+                        itemsAdded++;
+                        
+                        // Clear input
+                        row.querySelector('.perc-quantity').value = 0;
+                        row.querySelector('.perc-days').value = 1;
+                    }
                 });
                 
-                const vat = subtotal * VAT_RATE;
-                const total = subtotal + vat;
-                
-                percSubtotalEl.textContent = `£${subtotal.toFixed(2)}`;
-                percVatEl.textContent = `£${vat.toFixed(2)}`;
-                percGrandTotalEl.textContent = `£${total.toFixed(2)}`;
-            }
-            
-            // Initial calculation
-            calculatePercussionTotals();
+                if (itemsAdded > 0) {
+                    renderQuoteTable();
+                    showMessage(`${itemsAdded} percussion item(s) added to the main quote.`);
+                    // Switch back to the main quote tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.querySelector('.tab-button[data-tab="venue-tab"]').classList.add('active');
+                    document.getElementById('venue-tab').classList.add('active');
+                } else {
+                    alert('No percussion items selected.');
+                }
+            });
 
 
-            // --- 6. NEW: Modal & Gallery Logic ---
+            // --- 6. Modal & Gallery Logic ---
 
             // --- All Venue Details and Image Galleries ---
             const venueDetails = {
