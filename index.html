@@ -94,6 +94,7 @@
         /* --- 3. Tab Navigation --- */
         .tabs {
             display: flex;
+            flex-wrap: wrap; /* Allow tabs to wrap on small screens */
             border-bottom: 2px solid var(--border-color);
         }
 
@@ -108,6 +109,7 @@
             opacity: 0.7;
             position: relative;
             top: 2px; /* Aligns with the bottom border */
+            border-bottom: 3px solid transparent; /* Placeholder for active state */
         }
 
         .tab-button.active {
@@ -404,6 +406,7 @@
         /* --- 7. Quote Summary Table --- */
         #quote-summary-container h2,
         #staffing-summary-container h2,
+        #percussion-summary-container h2, /* NEW: Percussion title */
         #global-gallery-container h2 { /* Style for new gallery title */
             color: var(--primary-color);
             border-bottom: 2px solid var(--border-color);
@@ -437,33 +440,41 @@
             min-width: 800px;
         }
         
-        /* NEW: Staffing timesheet table */
-        .staffing-table {
+        /* NEW: Staffing & Percussion timesheet table */
+        .staffing-table,
+        .percussion-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 1rem;
         }
         .staffing-table th,
-        .staffing-table td {
+        .staffing-table td,
+        .percussion-table th,
+        .percussion-table td {
             border: 1px solid var(--border-color);
             padding: 12px;
             text-align: left;
         }
-        .staffing-table th {
+        .staffing-table th,
+        .percussion-table th {
             background-color: #f9f9f9;
         }
         .staffing-table td:nth-child(2), /* Rate */
-        .staffing-table td:nth-child(5) { /* Cost */
+        .staffing-table td:nth-child(5), /* Cost */
+        .percussion-table td:nth-child(2), /* Rate */
+        .percussion-table td:nth-child(5) { /* Cost */
             text-align: right;
             font-weight: 600;
         }
-        .staffing-table .row-cost {
+        .staffing-table .row-cost,
+        .percussion-table .row-cost {
             font-family: monospace, sans-serif;
             font-size: 1.1rem;
             color: var(--primary-color);
         }
-        .staffing-table input {
+        .staffing-table input,
+        .percussion-table input {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border-color);
@@ -473,7 +484,8 @@
             -moz-appearance: textfield;
         }
         
-        .staffing-table input[type="number"] {
+        .staffing-table input[type="number"],
+        .percussion-table input[type="number"] {
             text-align: right;
         }
         
@@ -482,7 +494,9 @@
         }
         
         .staffing-table input::-webkit-inner-spin-button,
-        .staffing-table input::-webkit-outer-spin-button {
+        .staffing-table input::-webkit-outer-spin-button,
+        .percussion-table input::-webkit-inner-spin-button,
+        .percussion-table input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
@@ -525,27 +539,32 @@
         }
         
         /* Styles for Password Protection */
-        #staffing-calculator-wrapper {
+        #staffing-calculator-wrapper,
+        #percussion-calculator-wrapper { /* NEW: Percussion wrapper */
             display: none; /* Hidden by default */
         }
-        #staffing-password-prompt {
+        #staffing-password-prompt,
+        #percussion-password-prompt { /* NEW: Percussion prompt */
             text-align: center;
             padding: 40px;
             border: 2px dashed var(--border-color);
             border-radius: var(--border-radius);
             background-color: #fdfdfd;
         }
-        #staffing-password-prompt p {
+        #staffing-password-prompt p,
+        #percussion-password-prompt p {
             font-size: 1.1rem;
             margin-bottom: 20px;
         }
-        #staffing-password-error {
+        #staffing-password-error,
+        #percussion-password-error {
             color: var(--danger-color);
             font-weight: 600;
             display: none; /* Hidden by default */
             margin-top: 15px;
         }
-        #staffing-password-prompt input[type="password"] {
+        #staffing-password-prompt input[type="password"],
+        #percussion-password-prompt input[type="password"] {
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -573,16 +592,19 @@
         }
         
         #venue-grand-total,
-        #staffing-grand-total { /* staffing-grand-total is now for the new timesheet total */
+        #staffing-grand-total,
+        #percussion-grand-total { /* NEW: Percussion total */
             font-size: 2rem;
             font-weight: 700;
             color: var(--primary-color);
             margin-top: 10px;
         }
         
-        /* NEW: Staffing totals styling */
+        /* NEW: Staffing & Percussion totals styling */
         #staff-subtotal,
-        #staff-vat {
+        #staff-vat,
+        #perc-subtotal,
+        #perc-vat {
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--dark-grey);
@@ -902,6 +924,7 @@
         <nav class="tabs">
             <button class="tab-button active" data-tab="venue-tab">Venue Quote</button>
             <button class="tab-button" data-tab="staffing-tab">Staffing Costs</button>
+            <button class="tab-button" data-tab="percussion-tab">Percussion Hire</button> <!-- NEW TAB -->
         </nav>
 
         <!-- Tab Content: Venue Quote -->
@@ -1265,6 +1288,227 @@
                 </section>
             </div>
         </section>
+        
+        <!-- NEW: Tab Content: Percussion Hire -->
+        <section id="percussion-tab" class="tab-content">
+            
+            <!-- Password Prompt Section -->
+            <div id="percussion-password-prompt">
+                <p>This section is for authorized staff only. Please enter the password.</p>
+                <input type="password" id="perc-password-input" placeholder="Password...">
+                <br>
+                <button type="button" id="perc-login-btn" class="btn btn-primary">Login</button>
+                <p id="percussion-password-error">Incorrect password. Please try again.</p>
+            </div>
+
+            <!-- Percussion Calculator (wrapper is hidden by default) -->
+            <div id="percussion-calculator-wrapper">
+                <div class="form-section">
+                    <h3>Percussion Hire Charges 2025/26</h3>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="percussion-table">
+                        <thead>
+                            <tr>
+                                <th>Instrument</th>
+                                <th>Hire Cost / Day (£)</th>
+                                <th>Quantity</th>
+                                <th>Days</th>
+                                <th>Cost (£)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="percussion-hire-body">
+                            <!-- Rates are 23/24 * 1.1 (10% inflation) * 1.1 (10% inflation) = 1.21 -->
+                            <tr class="perc-row" data-rate="41.93"> <!-- 34.65 * 1.21 -->
+                                <td>Bass Drum</td>
+                                <td class="rate-cell">41.93</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="22.36"> <!-- 18.48 * 1.21 -->
+                                <td>Bell Tree</td>
+                                <td class="rate-cell">22.36</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="22.36"> <!-- 18.48 * 1.21 -->
+                                <td>Bongos</td>
+                                <td class="rate-cell">22.36</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="83.85"> <!-- 69.30 * 1.21 -->
+                                <td>Celeste</td>
+                                <td class="rate-cell">83.85</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="27.95"> <!-- 23.10 * 1.21 -->
+                                <td>Clash Cymbals</td>
+                                <td class="rate-cell">27.95</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="12.58"> <!-- 10.40 * 1.21 -->
+                                <td>Concert Toms (per tom)</td>
+                                <td class="rate-cell">12.58</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="19.57"> <!-- 16.17 * 1.21 -->
+                                <td>Congas (per conga)</td>
+                                <td class="rate-cell">19.57</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="25.16"> <!-- 20.79 * 1.21 -->
+                                <td>Crotales (per octave)</td>
+                                <td class="rate-cell">25.16</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="83.85"> <!-- 69.30 * 1.21 -->
+                                <td>Drum Kit</td>
+                                <td class="rate-cell">83.85</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="30.75"> <!-- 25.41 * 1.21 -->
+                                <td>Glockenspiel</td>
+                                <td class="rate-cell">30.75</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="25.16"> <!-- 20.79 * 1.21 -->
+                                <td>Hi Hats</td>
+                                <td class="rate-cell">25.16</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="67.08"> <!-- 55.44 * 1.21 -->
+                                <td>Marimba (4.3)</td>
+                                <td class="rate-cell">67.08</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="139.76"> <!-- 115.50 * 1.21 -->
+                                <td>Marimba (5 octave) (by negotiation)</td>
+                                <td class="rate-cell">139.76</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="20.97"> <!-- 17.33 * 1.21 -->
+                                <td>Mark Tree</td>
+                                <td class="rate-cell">20.97</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="25.16"> <!-- 20.79 * 1.21 -->
+                                <td>Snare Drum</td>
+                                <td class="rate-cell">25.16</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="16.77"> <!-- 13.86 * 1.21 -->
+                                <td>Suspended Cymbal</td>
+                                <td class="rate-cell">16.77</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="30.75"> <!-- 25.41 * 1.21 -->
+                                <td>Tam tam</td>
+                                <td class="rate-cell">30.75</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="25.16"> <!-- 20.79 * 1.21 -->
+                                <td>Temple Blocks (set of 5)</td>
+                                <td class="rate-cell">25.16</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="44.72"> <!-- 36.96 * 1.21 -->
+                                <td>Timbales (pair)</td>
+                                <td class="rate-cell">44.72</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="55.90"> <!-- 46.20 * 1.21 -->
+                                <td>Timpani (per timp)</td>
+                                <td class="rate-cell">55.90</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="9.79"> <!-- 8.09 * 1.21 -->
+                                <td>Trap Tray</td>
+                                <td class="rate-cell">9.79</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="53.11"> <!-- 43.89 * 1.21 -->
+                                <td>Tubular Bells</td>
+                                <td class="rate-cell">53.11</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="48.92"> <!-- 40.43 * 1.21 -->
+                                <td>Vibraphone</td>
+                                <td class="rate-cell">48.92</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                            <tr class="perc-row" data-rate="39.13"> <!-- 32.34 * 1.21 -->
+                                <td>Xylophone</td>
+                                <td class="rate-cell">39.13</td>
+                                <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
+                                <td><input type="number" class="perc-days" value="1" min="1" step="1"></td>
+                                <td class="row-cost">£0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
+                    <button type="button" id="calculate-perc-btn" class="btn btn-primary">Calculate Totals</button>
+                </div>
+                
+                <section id="percussion-summary-container">
+                    <h2>Percussion Hire Summary</h2>
+                    <div class="totals-section">
+                        Subtotal
+                        <div id="perc-subtotal">£0.00</div>
+                        VAT (20%)
+                        <div id="perc-vat">£0.00</div>
+                        <strong>Percussion Total (inc. VAT)</strong>
+                        <div id="percussion-grand-total">£0.00</div>
+                    </div>
+                </section>
+            </div>
+        </section>
 
         <!-- NEW: Global Gallery Section -->
         <section id="global-gallery-container">
@@ -1322,14 +1566,15 @@
             // --- 1. Tab Switching Logic ---
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
-            let isStaffingUnlocked = false; // NEW: Password lock state
-            const correctPassword = "bcu-events-2025"; // NEW: Password
+            let isStaffingUnlocked = false; 
+            let isPercussionUnlocked = false; // NEW: Percussion lock
+            const correctPassword = "bcu-events-2025"; 
 
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetTab = button.getAttribute('data-tab');
 
-                    // Password Check Logic
+                    // Password Check Logic for Staffing
                     if (targetTab === 'staffing-tab' && !isStaffingUnlocked) {
                         // Deactivate all
                         tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -1342,6 +1587,21 @@
                         document.getElementById('staffing-calculator-wrapper').style.display = 'none';
                         return; // Stop here
                     }
+                    
+                    // NEW: Password Check Logic for Percussion
+                    if (targetTab === 'percussion-tab' && !isPercussionUnlocked) {
+                        // Deactivate all
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        // Activate clicked button and its content
+                        button.classList.add('active');
+                        document.getElementById(targetTab).classList.add('active');
+                        // Ensure prompt is visible and calculator is hidden
+                        document.getElementById('percussion-password-prompt').style.display = 'block';
+                        document.getElementById('percussion-calculator-wrapper').style.display = 'none';
+                        return; // Stop here
+                    }
+
 
                     // Deactivate all tabs and buttons
                     tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -1353,15 +1613,14 @@
                 });
             });
 
-            // Password Button Listeners
+            // Password Button Listeners (Staffing)
             const staffLoginBtn = document.getElementById('staff-login-btn');
             const passwordInput = document.getElementById('staff-password-input');
             const passwordErrorEl = document.getElementById('staffing-password-error');
             
-            function attemptLogin() {
+            function attemptStaffLogin() {
                 if (passwordInput.value === correctPassword) {
                     isStaffingUnlocked = true;
-                    // Hide prompt, show calculator
                     document.getElementById('staffing-password-prompt').style.display = 'none';
                     document.getElementById('staffing-calculator-wrapper').style.display = 'block';
                     passwordErrorEl.style.display = 'none';
@@ -1370,13 +1629,36 @@
                 }
             }
 
-            staffLoginBtn.addEventListener('click', attemptLogin);
-            // Allow pressing Enter to login
+            staffLoginBtn.addEventListener('click', attemptStaffLogin);
             passwordInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    attemptLogin();
+                    attemptStaffLogin();
                 }
             });
+            
+            // NEW: Password Button Listeners (Percussion)
+            const percLoginBtn = document.getElementById('perc-login-btn');
+            const percPasswordInput = document.getElementById('perc-password-input');
+            const percPasswordErrorEl = document.getElementById('percussion-password-error');
+            
+            function attemptPercussionLogin() {
+                if (percPasswordInput.value === correctPassword) {
+                    isPercussionUnlocked = true;
+                    document.getElementById('percussion-password-prompt').style.display = 'none';
+                    document.getElementById('percussion-calculator-wrapper').style.display = 'block';
+                    percPasswordErrorEl.style.display = 'none';
+                } else {
+                    percPasswordErrorEl.style.display = 'block';
+                }
+            }
+
+            percLoginBtn.addEventListener('click', attemptPercussionLogin);
+            percPasswordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    attemptPercussionLogin();
+                }
+            });
+
 
             // --- 2. Shared Constants ---
             const { jsPDF } = window.jspdf;
@@ -1931,9 +2213,45 @@
                 staffVatEl.textContent = `£${vat.toFixed(2)}`;
                 staffingGrandTotalEl.textContent = `£${total.toFixed(2)}`;
             }
+            
+            // --- 5. NEW: Percussion Hire Logic ---
+            const calculatePercBtn = document.getElementById('calculate-perc-btn');
+            const percussionBody = document.getElementById('percussion-hire-body');
+            const percSubtotalEl = document.getElementById('perc-subtotal');
+            const percVatEl = document.getElementById('perc-vat');
+            const percGrandTotalEl = document.getElementById('percussion-grand-total');
+            
+            calculatePercBtn.addEventListener('click', calculatePercussionTotals);
+            
+            percussionBody.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculatePercussionTotals);
+            });
+            
+            function calculatePercussionTotals() {
+                let subtotal = 0;
+                
+                percussionBody.querySelectorAll('.perc-row').forEach(row => {
+                    const rate = parseFloat(row.dataset.rate);
+                    const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
+                    const days = parseFloat(row.querySelector('.perc-days').value) || 0;
+                    const cost = rate * quantity * days;
+                    row.querySelector('.row-cost').textContent = `£${cost.toFixed(2)}`;
+                    subtotal += cost;
+                });
+                
+                const vat = subtotal * VAT_RATE;
+                const total = subtotal + vat;
+                
+                percSubtotalEl.textContent = `£${subtotal.toFixed(2)}`;
+                percVatEl.textContent = `£${vat.toFixed(2)}`;
+                percGrandTotalEl.textContent = `£${total.toFixed(2)}`;
+            }
+            
+            // Initial calculation
+            calculatePercussionTotals();
 
 
-            // --- 5. NEW: Modal & Gallery Logic ---
+            // --- 6. NEW: Modal & Gallery Logic ---
 
             // --- All Venue Details and Image Galleries ---
             const venueDetails = {
