@@ -272,248 +272,487 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const { jsPDF } = window.jspdf;
-            const VAT_RATE = 0.20; 
-            const MIN_HOURS = 4;
-            const AFTER_HOURS_SURCHARGE = 20;
-            const TECHNICIAN_RATE = 35;
-            const TECHNICIAN_MIN_HOURS = 4;
-            let quoteItems = [];
-            const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
+      document.addEventListener('DOMContentLoaded', () => {
+    // --- 1. CONFIGURATION ---
+    // CHANGE THIS: Set to 'false' for Public version, 'true' for Admin version
+    const isAdmin = false; 
 
-            const venueRates = {
-                'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 125 },
-                'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 100 },
-                'The Lab': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 },
-                'Eastside Jazz Club': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 },
-                'The Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 75 },
-                'Workshop (Large, up to 60)': { 'Standard Rate': 60, 'Recording / Premium Workshop': 30 },
-                'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 25 },
-                'Practice Room (Grand Piano)': { 'Standard Rate': 30, 'Recording / Premium Workshop': 30 },
-                'Practice Room (Upright Piano)': { 'Standard Rate': 25, 'Recording / Premium Workshop': 25 },
-                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }
-            };
-            
-            const workshopPackageRates = {
-                'Workshop (Large, up to 60)': { 'dry': 60, 'av': 100, 'piano': 100, 'av-piano': 150 },
-                'Workshop (Small, up to 40)': { 'dry': 50, 'av': 90, 'piano': 90, 'av-piano': 135 }
-            };
+    const { jsPDF } = window.jspdf;
+    const VAT_RATE = 0.20;
+    const MIN_HOURS = 4;
+    const AFTER_HOURS_SURCHARGE = 20;
+    const TECHNICIAN_RATE = 35;
+    const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
+    let quoteItems = [];
 
-            const equipmentRates = { 'pa': 100, 'projector': 250, 'mic-wired': 20, 'mic-wireless': 40, 'monitor': 15, 'laptop': 50, 'piano': 250, 'audio-rec': 150, 'video-rec': 250, 'technician-hours': TECHNICIAN_RATE };
+    // --- 2. TABS LOGIC ---
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-            // DOM Elements
-            const addQuoteBtn = document.getElementById('add-quote-btn');
-            const quoteBody = document.getElementById('quote-summary-body');
-            const venueSelect = document.getElementById('venue');
-            const hireTypeSelect = document.getElementById('hire-type');
-            
-            // Logic
-            venueSelect.addEventListener('change', updateFormDisplay);
-            hireTypeSelect.addEventListener('change', updateFormDisplay);
-            document.querySelectorAll('input[name="workshop-package"]').forEach(radio => radio.addEventListener('change', updateFormDisplay));
+    // Admin/Public Toggle
+    if (isAdmin) {
+        const staffBtn = document.getElementById('staffing-tab-button');
+        const percBtn = document.getElementById('percussion-tab-button');
+        if(staffBtn) staffBtn.style.display = 'block';
+        if(percBtn) percBtn.style.display = 'block';
+        if(document.querySelector('header p')) document.querySelector('header p').textContent += " (Admin Mode)";
+    } else {
+        const staffBtn = document.getElementById('staffing-tab-button');
+        const percBtn = document.getElementById('percussion-tab-button');
+        if(staffBtn) staffBtn.style.display = 'none';
+        if(percBtn) percBtn.style.display = 'none';
+    }
 
-            function updateFormDisplay() {
-                const venue = venueSelect.value;
-                const hireType = hireTypeSelect.value;
-                const isWorkshop = venue.includes('Workshop');
-                const isWholeBuilding = venue === 'Whole Building Hire';
-                const isPracticeRoom = venue.includes('Practice Room');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(button.getAttribute('data-tab')).classList.add('active');
+        });
+    });
 
-                document.getElementById('start-time-group').style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
-                document.getElementById('end-time-group').style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
-                document.getElementById('workshop-package-group').style.display = isWorkshop ? 'block' : 'none';
+    // --- 3. VENUE DATA & GALLERIES ---
+    const venueDetails = {
+        'Bradshaw Hall': {
+            title: 'Bradshaw Hall',
+            capacity: '440+',
+            description: 'A premier concert hall acoustically modelled to optimize the experience for performers and audiences.',
+            img: 'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/bradshaw-hall',
+            gallery: [
+                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg',
+                'bradshaw/rb_RBC-Music---Jazz_30933.jpg',
+                'bradshaw/rb_RBC-Music_30995.jpg',
+                'bradshaw/rb_RBC-Music_30998.jpg',
+                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11160.jpg',
+                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11166.jpg',
+                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11169.jpg',
+                'bradshaw/rb_Royal-Birmingham-Conservatoire_11095.jpg'
+            ]
+        },
+        'Recital Hall': {
+            title: 'Recital Hall',
+            capacity: '146-200',
+            description: 'An intimate, flexible space with a floor-level stage, variable acoustics, and retractable seating.',
+            img: 'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/recital-hall',
+            gallery: [
+                'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg',
+                'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11142.jpg',
+                'recital/rb_Royal-Birmingham-Conservatoire_11107.jpg',
+                'recital/rb_Royal-Birmingham-Conservatoire_11108.jpg'
+            ]
+        },
+        'Eastside Jazz Club': {
+            title: 'Eastside Jazz Club',
+            capacity: '60-100',
+            description: "Birmingham's only dedicated Jazz venue, designed for a quintessential, cosy club atmosphere.",
+            img: 'jazz/rb_RBC-Music---Jazz_30928.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club',
+            gallery: [
+                'jazz/rb_RBC-Music---Jazz_30928.jpg',
+                'jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11138.jpg',
+                'jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11139.jpg',
+                'jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11140.jpg'
+            ]
+        },
+        'The Lab': {
+            title: 'The Lab',
+            capacity: '100',
+            description: 'A cutting-edge, completely flexible black-box studio for art performances, theatre, and experimental music.',
+            img: 'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-lab',
+            gallery: [
+                'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg',
+                'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11123.jpg'
+            ]
+        },
+        'The Organ Studio': {
+            title: 'The Organ Studio',
+            capacity: '80',
+            description: 'A light and airy venue with a Eule Pipe organ, suited to chamber music and organ recitals.',
+            img: 'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-organ-studio',
+            gallery: [
+                'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg',
+                'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11173.jpg',
+                'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11174.jpg'
+            ]
+        },
+        'Workshop Space': {
+            title: 'Workshops / Studios',
+            capacity: '30-60',
+            description: 'Eight flexible performance studios designed to the highest standards for rehearsals, workshops, and intimate performances.',
+            img: 'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg',
+            link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/performance-studios',
+            gallery: [
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11154.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11155.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11156.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11157.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire_11106.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11150.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11151.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11152.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11153.jpg'
+            ]
+        }
+    };
+
+    // --- 4. MODAL & LIGHTBOX LOGIC (Fixed Navigation) ---
+    const modal = document.getElementById('venue-modal');
+    const lightbox = document.getElementById('lightbox-overlay');
+    const lightboxImg = document.getElementById('lightbox-image');
+    
+    // State variables for gallery navigation
+    let activeGalleryImages = []; // Array of relative paths ['path/img1.jpg', 'path/img2.jpg']
+    let activeImageIndex = 0;
+    
+    // --- Helper Functions for Navigation ---
+    function openLightbox(index, imagesArray) {
+        activeImageIndex = index;
+        activeGalleryImages = imagesArray;
+        updateLightboxImage();
+        lightbox.style.display = 'flex';
+    }
+
+    function updateLightboxImage() {
+        if(activeGalleryImages.length > 0) {
+            lightboxImg.src = baseURL + activeGalleryImages[activeImageIndex];
+        }
+    }
+
+    function nextImage() {
+        if(activeGalleryImages.length === 0) return;
+        activeImageIndex = (activeImageIndex + 1) % activeGalleryImages.length;
+        updateLightboxImage();
+    }
+
+    function prevImage() {
+        if(activeGalleryImages.length === 0) return;
+        activeImageIndex = (activeImageIndex - 1 + activeGalleryImages.length) % activeGalleryImages.length;
+        updateLightboxImage();
+    }
+
+    // --- Event Listeners for Navigation ---
+    // Clicks on arrows
+    document.getElementById('lightbox-next').addEventListener('click', (e) => {
+        e.stopPropagation();
+        nextImage();
+    });
+    document.getElementById('lightbox-prev').addEventListener('click', (e) => {
+        e.stopPropagation();
+        prevImage();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if(lightbox.style.display === 'flex') {
+            if(e.key === 'ArrowRight') nextImage();
+            if(e.key === 'ArrowLeft') prevImage();
+            if(e.key === 'Escape') lightbox.style.display = 'none';
+        }
+        if(modal.style.display === 'flex' && e.key === 'Escape') {
+            modal.style.display = 'none';
+        }
+    });
+
+    // --- Modal Logic ---
+    // Helper to track which image is currently shown in the modal so we open lightbox to that specific image
+    let currentModalGallery = []; 
+    let currentModalIndex = 0;
+
+    document.querySelectorAll('.venue-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const venueName = card.dataset.venue;
+            const key = venueName.includes('Workshop') ? 'Workshop Space' : venueName;
+            const d = venueDetails[key];
+
+            if(d) {
+                document.getElementById('modal-title').textContent = d.title;
+                document.getElementById('modal-capacity').textContent = 'Capacity: ' + d.capacity;
+                document.getElementById('modal-description').textContent = d.description;
+                document.getElementById('modal-link').href = d.link;
                 
-                // Hide tech section for workshops initially (shown selectively below)
-                const techSection = document.getElementById('technical-equipment-section');
-                const techGroups = document.querySelectorAll('.form-group[id^="tech-group-"]');
+                // Set initial Main Image
+                document.getElementById('modal-main-image').src = baseURL + d.img;
                 
-                techSection.style.display = isWorkshop ? 'none' : 'block';
-                techGroups.forEach(g => g.style.display = isWorkshop ? 'none' : 'block');
-
-                if (isWorkshop) {
-                    const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
-                    const workshopRates = workshopPackageRates[venue];
-                    const multiplier = (hireType === 'Standard Rate' ? 1 : 0.5);
-                    
-                    document.getElementById('price-dry').textContent = `£${(workshopRates.dry * multiplier).toFixed(2)}`;
-                    document.getElementById('price-av').textContent = `£${(workshopRates.av * multiplier).toFixed(2)}`;
-                    document.getElementById('price-piano').textContent = `£${(workshopRates.piano * multiplier).toFixed(2)}`;
-                    document.getElementById('price-av-piano').textContent = `£${(workshopRates['av-piano'] * multiplier).toFixed(2)}`;
-
-                    const showAV = selectedPackage === 'dry' || selectedPackage === 'piano';
-                    const showPiano = selectedPackage === 'dry' || selectedPackage === 'av';
-                    
-                    techSection.style.display = 'block';
-                    document.getElementById('tech-group-pa').style.display = showAV ? 'block' : 'none';
-                    document.getElementById('tech-group-projector').style.display = showAV ? 'block' : 'none';
-                    document.getElementById('tech-group-piano').style.display = showPiano ? 'block' : 'none';
-                    // Always show these for workshops
-                    ['mic-wired', 'mic-wireless', 'monitor', 'laptop', 'audio-rec', 'video-rec', 'technician'].forEach(id => {
-                        document.getElementById(`tech-group-${id}`).style.display = 'block';
+                // Initialize Modal State
+                currentModalGallery = d.gallery || [d.img];
+                currentModalIndex = 0; 
+                // Ensure the main image is the first one in the tracked gallery if possible
+                // (Usually d.img is inside d.gallery[0], but if not, logic holds)
+                
+                const container = document.getElementById('modal-thumbnail-container');
+                container.innerHTML = ''; 
+                
+                if (d.gallery) {
+                    d.gallery.forEach((img, index) => {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'thumbnail';
+                        if(index === 0) thumb.classList.add('active');
+                        
+                        const i = document.createElement('img');
+                        i.src = baseURL + img;
+                        thumb.appendChild(i);
+                        
+                        thumb.onclick = () => {
+                            // Update Main Image
+                            document.getElementById('modal-main-image').src = baseURL + img;
+                            // Update State
+                            currentModalIndex = index;
+                            // Update Active Class
+                            container.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                            thumb.classList.add('active');
+                        };
+                        container.appendChild(thumb);
                     });
                 }
+                modal.style.display = 'flex';
             }
-            updateFormDisplay();
+        });
+    });
 
-            document.getElementById('clear-quote-btn').addEventListener('click', () => { quoteItems = []; renderQuoteTable(); });
+    // Clicking the Main Image in Modal opens Lightbox
+    document.getElementById('modal-main-image').addEventListener('click', () => {
+        openLightbox(currentModalIndex, currentModalGallery);
+    });
 
-            addQuoteBtn.addEventListener('click', () => {
-                const venue = venueSelect.value;
-                const hireType = hireTypeSelect.value;
-                const days = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(d => d.value);
-                const dayCount = days.length;
-                if (dayCount === 0) return alert('Select at least one day.');
+    // --- Global Gallery Logic ---
+    const globalGalleryScroll = document.getElementById('global-gallery-scroll');
+    if(globalGalleryScroll) {
+        let allImages = [];
+        // Flatten all galleries into one big list
+        Object.values(venueDetails).forEach(v => {
+            if(v.gallery) allImages = allImages.concat(v.gallery);
+        });
+        // Remove duplicates
+        allImages = [...new Set(allImages)];
 
-                const isWorkshop = venue.includes('Workshop');
-                const isWhole = venue === 'Whole Building Hire';
-                
-                let unitPrice, quantity, desc;
-                
-                if (isWorkshop) {
-                    const pkg = document.querySelector('input[name="workshop-package"]:checked').value;
-                    let rate = workshopPackageRates[venue][pkg];
-                    if (hireType !== 'Standard Rate') rate *= 0.5;
-                    unitPrice = rate; quantity = dayCount; desc = `${venue} - ${pkg} (${days.join(', ')})`;
-                    addQuoteItem('venue', desc, unitPrice, quantity);
-                } else if (isWhole || venue.includes('Practice')) {
-                    unitPrice = venueRates[venue][hireType]; quantity = dayCount; desc = `${venue} (${days.join(', ')})`;
-                    addQuoteItem('venue', desc, unitPrice, quantity);
-                } else {
-                    const start = document.getElementById('start-time').value;
-                    const end = document.getElementById('end-time').value;
-                    const duration = calculateDuration(start, end);
-                    if (duration < MIN_HOURS) return alert(`Minimum ${MIN_HOURS} hours.`);
-                    unitPrice = venueRates[venue][hireType]; quantity = duration * dayCount;
-                    desc = `${venue} (${duration.toFixed(2)}h x ${dayCount} days)`;
-                    addQuoteItem('venue', desc, unitPrice, quantity);
-                    
-                    const surcharge = calculateSurcharge(start, end, days);
-                    if (surcharge > 0) addQuoteItem('tech', 'After-Hours Surcharge', AFTER_HOURS_SURCHARGE, surcharge * dayCount);
-                }
+        allImages.forEach((img, index) => {
+            const div = document.createElement('div');
+            div.className = 'global-thumbnail';
+            const i = document.createElement('img');
+            i.src = baseURL + img;
+            div.appendChild(i);
+            
+            div.onclick = () => {
+                // Pass the global index and the full global list
+                openLightbox(index, allImages);
+            };
+            globalGalleryScroll.appendChild(div);
+        });
+    }
 
-                document.querySelectorAll('.equipment').forEach(input => {
-                    if (input.closest('.form-group').style.display !== 'none' && input.value > 0) {
-                        let qty = parseFloat(input.value);
-                        if (input.id === 'technician-hours' && qty < 4) qty = 4;
-                        const finalQty = input.id === 'technician-hours' ? qty : qty * dayCount;
-                        addQuoteItem('tech', input.dataset.name, equipmentRates[input.id], finalQty);
-                    }
+    // Close Modals
+    document.getElementById('modal-close-btn').addEventListener('click', () => modal.style.display = 'none');
+    document.getElementById('lightbox-close').addEventListener('click', () => lightbox.style.display = 'none');
+    window.onclick = e => {
+        if(e.target == modal) modal.style.display = 'none';
+        if(e.target == lightbox) lightbox.style.display = 'none';
+    };
+
+
+    // --- 5. CALCULATOR LOGIC ---
+    const venueRates = { 'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 125 }, 'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 100 }, 'The Lab': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 }, 'Eastside Jazz Club': { 'Standard Rate': 175, 'Recording / Premium Workshop': 87.50 }, 'The Organ Studio': { 'Standard Rate': 150, 'Recording / Premium Workshop': 75 }, 'Workshop (Large, up to 60)': { 'Standard Rate': 60, 'Recording / Premium Workshop': 30 }, 'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 25 }, 'Practice Room (Grand Piano)': { 'Standard Rate': 30, 'Recording / Premium Workshop': 30 }, 'Practice Room (Upright Piano)': { 'Standard Rate': 25, 'Recording / Premium Workshop': 25 }, 'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 } };
+    const workshopPackageRates = { 'Workshop (Large, up to 60)': { 'dry': 60, 'av': 100, 'piano': 100, 'av-piano': 150 }, 'Workshop (Small, up to 40)': { 'dry': 50, 'av': 90, 'piano': 90, 'av-piano': 135 } };
+    const equipmentRates = { 'pa': 100, 'projector': 250, 'mic-wired': 20, 'mic-wireless': 40, 'monitor': 15, 'laptop': 50, 'piano': 250, 'audio-rec': 150, 'video-rec': 250, 'technician-hours': 35 };
+
+    const venueSelect = document.getElementById('venue');
+    const hireTypeSelect = document.getElementById('hire-type');
+
+    function updateFormDisplay() {
+        const venue = venueSelect.value;
+        const isWorkshop = venue.includes('Workshop');
+        const isWhole = venue === 'Whole Building Hire';
+        const isPractice = venue.includes('Practice');
+        
+        document.getElementById('start-time-group').style.display = (isWhole||isWorkshop||isPractice) ? 'none' : 'flex';
+        document.getElementById('end-time-group').style.display = (isWhole||isWorkshop||isPractice) ? 'none' : 'flex';
+        document.getElementById('workshop-package-group').style.display = isWorkshop ? 'block' : 'none';
+        
+        const techSection = document.getElementById('technical-equipment-section');
+        const techGroups = document.querySelectorAll('.form-group[id^="tech-group-"]');
+        techSection.style.display = isWorkshop ? 'none' : 'block';
+        techGroups.forEach(g => g.style.display = isWorkshop ? 'none' : 'block');
+
+        if(isWorkshop) {
+            const pkg = document.querySelector('input[name="workshop-package"]:checked').value;
+            const mult = hireTypeSelect.value === 'Standard Rate' ? 1 : 0.5;
+            const rates = workshopPackageRates[venue];
+            document.getElementById('price-dry').textContent = `£${(rates.dry*mult).toFixed(2)}`;
+            document.getElementById('price-av').textContent = `£${(rates.av*mult).toFixed(2)}`;
+            document.getElementById('price-piano').textContent = `£${(rates.piano*mult).toFixed(2)}`;
+            document.getElementById('price-av-piano').textContent = `£${(rates['av-piano']*mult).toFixed(2)}`;
+            
+            const showAV = pkg==='dry'||pkg==='piano';
+            const showPiano = pkg==='dry'||pkg==='av';
+            document.getElementById('technical-equipment-section').style.display = 'block';
+            document.getElementById('tech-group-pa').style.display = showAV?'block':'none';
+            document.getElementById('tech-group-projector').style.display = showAV?'block':'none';
+            document.getElementById('tech-group-piano').style.display = showPiano?'block':'none';
+            ['mic-wired','mic-wireless','monitor','laptop','audio-rec','video-rec','technician'].forEach(id => {
+                document.getElementById(`tech-group-${id}`).style.display = 'block';
+            });
+        }
+    }
+
+    venueSelect.addEventListener('change', updateFormDisplay);
+    hireTypeSelect.addEventListener('change', updateFormDisplay);
+    document.querySelectorAll('input[name="workshop-package"]').forEach(r => r.addEventListener('change', updateFormDisplay));
+    updateFormDisplay();
+
+    // Add Quote Logic
+    document.getElementById('add-quote-btn').addEventListener('click', () => {
+        const venue = venueSelect.value;
+        const hireType = hireTypeSelect.value;
+        const days = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(d=>d.value);
+        if(days.length===0) return alert("Please select at least one day.");
+
+        let unit, qty, desc;
+        if(venue.includes('Workshop')) {
+            const pkg = document.querySelector('input[name="workshop-package"]:checked').value;
+            unit = workshopPackageRates[venue][pkg] * (hireType==='Standard Rate'?1:0.5);
+            qty = days.length; desc = `${venue} - ${pkg} (${days.join(', ')})`;
+            addQuoteItem('venue', desc, unit, qty);
+        } else if(venue==='Whole Building Hire'||venue.includes('Practice')) {
+            unit = venueRates[venue][hireType]; qty = days.length; desc = `${venue} (${days.join(', ')})`;
+            addQuoteItem('venue', desc, unit, qty);
+        } else {
+            const s=document.getElementById('start-time').value, e=document.getElementById('end-time').value;
+            const [sh,sm] = s.split(':').map(Number); const [eh,em] = e.split(':').map(Number);
+            let end = new Date(0,0,0,eh,em); if(end < new Date(0,0,0,sh,sm)) end.setDate(end.getDate()+1);
+            const duration = (end - new Date(0,0,0,sh,sm)) / 36e5;
+            if(duration < MIN_HOURS) return alert(`Minimum ${MIN_HOURS} hours.`);
+            
+            unit = venueRates[venue][hireType]; qty = duration * days.length; 
+            desc = `${venue} (${duration.toFixed(2)}h x ${days.length} days)`;
+            addQuoteItem('venue', desc, unit, qty);
+            
+            // Surcharge
+            let surcharge = 0;
+            days.forEach(d => {
+                const regEnd = (d==='Sat'||d==='Sun')?19:23;
+                let tS=sh+sm/60, tE=eh+em/60; if(tE<tS) tE+=24;
+                if(tS<8) surcharge += (8-tS);
+                if(tE>regEnd) surcharge += (tE-regEnd);
+            });
+            if(surcharge>0) addQuoteItem('tech', 'After-Hours Surcharge', AFTER_HOURS_SURCHARGE, (surcharge/days.length)*days.length);
+        }
+
+        document.querySelectorAll('.equipment').forEach(i => {
+            if(i.value>0 && i.closest('.form-group').style.display!=='none') {
+                addQuoteItem('tech', i.dataset.name, equipmentRates[i.id], i.id==='technician-hours'? parseFloat(i.value) : parseFloat(i.value)*days.length);
+            }
+        });
+        renderQuoteTable();
+    });
+
+    document.getElementById('clear-quote-btn').addEventListener('click', () => { quoteItems=[]; renderQuoteTable(); });
+
+    function addQuoteItem(group, desc, unit, qty) { quoteItems.push({ id: Date.now()+Math.random(), group, description: desc, unitPrice: unit, quantity: qty, total: unit*qty }); }
+
+    function renderQuoteTable() {
+        const body = document.getElementById('quote-summary-body');
+        body.innerHTML = '';
+        let totals = {venue:0, tech:0, staff:0, percussion:0};
+        
+        quoteItems.forEach(item => {
+            totals[item.group] += item.total;
+            const row = document.createElement('tr');
+            
+            const totalDisplay = isAdmin 
+                ? `<input type="number" class="admin-editable-total" data-id="${item.id}" value="${item.total.toFixed(2)}" style="width:80px; text-align:right;">`
+                : `<strong>${item.total.toFixed(2)}</strong>`;
+            
+            row.innerHTML = `<td>${item.description}</td><td style="text-align:right">${item.unitPrice.toFixed(2)}</td><td style="text-align:right">${item.quantity.toFixed(2)}</td><td style="text-align:right">${totalDisplay}</td><td class="remove-col"><button class="remove-btn" data-id="${item.id}">X</button></td>`;
+            body.appendChild(row);
+        });
+        
+        document.getElementById('venue-subtotal').textContent = `£${totals.venue.toFixed(2)}`;
+        document.getElementById('tech-subtotal').textContent = `£${totals.tech.toFixed(2)}`;
+        
+        if(document.getElementById('staffing-subtotal')) document.getElementById('staffing-subtotal').textContent = `£${totals.staff.toFixed(2)}`;
+        if(document.getElementById('percussion-subtotal')) document.getElementById('percussion-subtotal').textContent = `£${totals.percussion.toFixed(2)}`;
+        
+        const grand = Object.values(totals).reduce((a,b)=>a+b,0);
+        document.getElementById('combined-subtotal').textContent = `£${grand.toFixed(2)}`;
+        document.getElementById('combined-vat').textContent = `£${(grand*VAT_RATE).toFixed(2)}`;
+        document.getElementById('combined-grand-total').textContent = `£${(grand*1.2).toFixed(2)}`;
+        
+        document.querySelectorAll('.remove-btn').forEach(b => b.addEventListener('click', e => { quoteItems=quoteItems.filter(i=>i.id!=e.target.dataset.id); renderQuoteTable(); }));
+        
+        if(isAdmin) {
+            document.querySelectorAll('.admin-editable-total').forEach(i => i.addEventListener('change', e => {
+                const item = quoteItems.find(x => x.id == e.target.dataset.id);
+                if(item) { item.total = parseFloat(e.target.value); item.unitPrice = item.total/item.quantity; }
+                renderQuoteTable();
+            }));
+        }
+    }
+
+    // --- 6. ADMIN-ONLY FEATURES ---
+    if (isAdmin) {
+        const staffBody = document.getElementById('staffing-timesheet-body');
+        if(staffBody) {
+            staffBody.addEventListener('input', () => {
+                staffBody.querySelectorAll('tr').forEach(r => {
+                    const rate = parseFloat(r.dataset.rate || r.querySelector('.custom-rate').value || 0);
+                    const qty = parseFloat(r.querySelector('.staff-quantity').value || 0);
+                    const hrs = parseFloat(r.querySelector('.staff-hours').value || 0);
+                    r.querySelector('.row-cost').textContent = `£${(rate*qty*hrs).toFixed(2)}`;
+                });
+            });
+            document.getElementById('add-staff-to-quote-btn').addEventListener('click', () => {
+                staffBody.querySelectorAll('tr').forEach(r => {
+                    const desc = r.cells[0].textContent || r.querySelector('.custom-role').value;
+                    const rate = parseFloat(r.dataset.rate || r.querySelector('.custom-rate').value || 0);
+                    const qty = parseFloat(r.querySelector('.staff-quantity').value || 0);
+                    const hrs = parseFloat(r.querySelector('.staff-hours').value || 0);
+                    if(hrs>0 && qty>0 && desc) addQuoteItem('staff', desc, rate, qty*hrs);
                 });
                 renderQuoteTable();
             });
+        }
 
-            function addQuoteItem(group, description, unitPrice, quantity) {
-                quoteItems.push({ id: Date.now() + Math.random(), group, description, unitPrice, quantity, total: unitPrice * quantity });
-            }
-
-            function renderQuoteTable() {
-                quoteBody.innerHTML = '';
-                let vTotal = 0, tTotal = 0;
-                
-                quoteItems.forEach(item => {
-                    if(item.group === 'venue') vTotal += item.total;
-                    if(item.group === 'tech') tTotal += item.total;
-                    
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${item.description}</td><td style="text-align:right">${item.unitPrice.toFixed(2)}</td><td style="text-align:right">${item.quantity.toFixed(2)}</td><td style="text-align:right"><strong>${item.total.toFixed(2)}</strong></td><td class="remove-col"><button class="remove-btn" data-id="${item.id}">X</button></td>`;
-                    quoteBody.appendChild(row);
-                });
-
-                document.getElementById('venue-subtotal').textContent = `£${vTotal.toFixed(2)}`;
-                document.getElementById('tech-subtotal').textContent = `£${tTotal.toFixed(2)}`;
-                const sub = vTotal + tTotal;
-                document.getElementById('combined-subtotal').textContent = `£${sub.toFixed(2)}`;
-                document.getElementById('combined-vat').textContent = `£${(sub * VAT_RATE).toFixed(2)}`;
-                document.getElementById('combined-grand-total').textContent = `£${(sub * 1.2).toFixed(2)}`;
-
-                document.querySelectorAll('.remove-btn').forEach(btn => btn.addEventListener('click', e => {
-                    quoteItems = quoteItems.filter(i => i.id !== parseFloat(e.target.dataset.id));
-                    renderQuoteTable();
-                }));
-            }
-
-            // Helpers
-            function calculateDuration(s, e) {
-                const [sh, sm] = s.split(':').map(Number); const [eh, em] = e.split(':').map(Number);
-                let end = new Date(0,0,0,eh,em); if(end < new Date(0,0,0,sh,sm)) end.setDate(end.getDate()+1);
-                return (end - new Date(0,0,0,sh,sm)) / 36e5;
-            }
-            function calculateSurcharge(s, e, days) {
-                const [sh, sm] = s.split(':').map(Number); const [eh, em] = e.split(':').map(Number);
-                let total = 0;
-                days.forEach(d => {
-                    const regEnd = (d==='Sat'||d==='Sun') ? 19 : 23;
-                    const start = sh+sm/60; let end = eh+em/60; if(end<start) end+=24;
-                    if(start < 8) total += (8-start);
-                    if(end > regEnd) total += (end-regEnd);
-                });
-                return total > 0 ? total/days.length : 0;
-            }
-
-            // PDF & Email
-            document.getElementById('download-pdf-btn').addEventListener('click', () => {
-                const el = document.getElementById('quote-summary-container');
-                el.classList.add('printing');
-                html2canvas(el).then(canvas => {
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, (canvas.height*190)/canvas.width);
-                    pdf.save('quote.pdf');
-                    el.classList.remove('printing');
+        const percBody = document.getElementById('percussion-timesheet-body');
+        if(percBody) {
+            const percRates = {'Bass Drum': 41.94, 'Bell Tree': 22.37, 'Bongos': 22.37, 'Celeste': 83.85, 'Clash Cymbals': 27.95, 'Concert Toms': 12.58, 'Congas': 19.57, 'Crotales': 25.16, 'Drum Kit': 83.85, 'Glockenspiel': 30.75, 'Hi Hats': 25.16, 'Marimba (4.3)': 67.08, 'Marimba (5.0)': 139.76, 'Mark Tree': 20.97, 'Snare Drum': 25.16, 'Suspended Cymbal': 16.77, 'Temple Blocks': 25.16, 'Timbales': 44.71, 'Timpani': 55.90, 'Trap Tray': 9.79, 'Tubular Bells': 53.11, 'Vibraphone': 48.92, 'Xylophone': 39.13, 'Tam tam': 30.75 };
+            Object.entries(percRates).forEach(([n,r]) => {
+                const row = document.createElement('tr'); row.className='perc-row'; row.dataset.rate=r;
+                row.innerHTML = `<td>${n}</td><td>${r}</td><td><input type="number" class="pq" value="0"></td><td><input type="number" class="pd" value="0"></td><td class="pc">£0.00</td>`;
+                percBody.appendChild(row);
+            });
+            percBody.addEventListener('input', () => {
+                percBody.querySelectorAll('tr').forEach(r => {
+                    const c = parseFloat(r.dataset.rate) * parseFloat(r.querySelector('.pq').value) * parseFloat(r.querySelector('.pd').value);
+                    r.querySelector('.pc').textContent = `£${(c||0).toFixed(2)}`;
                 });
             });
-
-            // Modal & Gallery Logic
-            const venueDetails = {
-                'Bradshaw Hall': { title: 'Bradshaw Hall', capacity: '440+', desc: 'Premier concert hall.', img: 'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/bradshaw-hall' },
-                'Recital Hall': { title: 'Recital Hall', capacity: '146-200', desc: 'Intimate flexible space.', img: 'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/recital-hall' },
-                'Eastside Jazz Club': { title: 'Eastside Jazz Club', capacity: '60-100', desc: 'Dedicated Jazz venue.', img: 'jazz/rb_RBC-Music---Jazz_30928.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club' },
-                'The Lab': { title: 'The Lab', capacity: '100', desc: 'Black-box studio.', img: 'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-lab' },
-                'The Organ Studio': { title: 'The Organ Studio', capacity: '80', desc: 'Pipe organ venue.', img: 'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-organ-studio' },
-                'Workshop Space': { title: 'Workshops', capacity: '30-60', desc: 'Flexible studios.', img: 'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/performance-studios' }
-            };
-
-            const modal = document.getElementById('venue-modal');
-            const lightbox = document.getElementById('lightbox-overlay');
-            const lightboxImg = document.getElementById('lightbox-image');
-
-            document.querySelectorAll('.venue-card').forEach(card => card.addEventListener('click', () => {
-                const d = venueDetails[card.dataset.venue];
-                if(d) {
-                    document.getElementById('modal-title').textContent = d.title;
-                    document.getElementById('modal-main-image').src = baseURL + d.img;
-                    document.getElementById('modal-capacity').textContent = 'Capacity: ' + d.capacity;
-                    document.getElementById('modal-description').textContent = d.desc;
-                    document.getElementById('modal-link').href = d.link;
-                    modal.style.display = 'flex';
-                }
-            }));
-
-            document.getElementById('modal-close-btn').addEventListener('click', () => modal.style.display = 'none');
-            window.onclick = e => { if(e.target == modal) modal.style.display = 'none'; if(e.target == lightbox) lightbox.style.display = 'none'; };
-            document.getElementById('lightbox-close').addEventListener('click', () => lightbox.style.display = 'none');
-            document.getElementById('modal-main-image').addEventListener('click', e => {
-                lightboxImg.src = e.target.src;
-                lightbox.style.display = 'flex';
+            document.getElementById('add-percussion-to-quote-btn').addEventListener('click', () => {
+                percBody.querySelectorAll('tr').forEach(r => {
+                    const qty = r.querySelector('.pq').value, days = r.querySelector('.pd').value;
+                    if(qty>0 && days>0) addQuoteItem('percussion', r.cells[0].textContent, r.dataset.rate, qty*days);
+                });
+                renderQuoteTable();
             });
-            
-            // Populate Global Gallery
-            const galleryImages = [
-                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg',
-                'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg',
-                'jazz/rb_RBC-Music---Jazz_30928.jpg',
-                'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg',
-                'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg',
-                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg'
-            ];
-            galleryImages.forEach(img => {
-                const div = document.createElement('div'); div.className = 'global-thumbnail';
-                const i = document.createElement('img'); i.src = baseURL + img;
-                div.appendChild(i);
-                div.onclick = () => { lightboxImg.src = i.src; lightbox.style.display = 'flex'; };
-                document.getElementById('global-gallery-scroll').appendChild(div);
-            });
+        }
+    }
+
+    document.getElementById('download-pdf-btn').addEventListener('click', () => {
+        const el = document.getElementById('quote-summary-container');
+        el.classList.add('printing');
+        html2canvas(el).then(canvas => {
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, (canvas.height*190)/canvas.width);
+            pdf.save('quote.pdf');
+            el.classList.remove('printing');
         });
+    });
+});
     </script>
 </body>
 </html>
+
