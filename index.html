@@ -3,31 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Royal Birmingham Conservatoire — Multi-Venue Quote</title>
-    <!-- 
-      This imports the 'Poppins' font from Google Fonts. 
-      It's a clean, modern, professional sans-serif font.
-    -->
+    <title>Royal Birmingham Conservatoire — Venue Quote</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- 
-      These add PDF generation capabilities.
-      jsPDF is the core library.
-      html2canvas takes a "screenshot" of a part of your page.
-    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- 
-      CSS is now inside the <style> tag instead of a separate file.
-    -->
     <style>
-        /* --- 1. Global & Reset Styles --- */
+        /* --- Global & Reset Styles --- */
         :root {
-            --primary-color: #004a99; /* A professional, corporate blue */
-            --secondary-color: #d4a300; /* An accent gold, common for conservatoires */
+            --primary-color: #004a99;
+            --secondary-color: #d4a300;
             --light-grey: #f4f7f6;
             --dark-grey: #333333;
             --border-color: #e0e0e0;
@@ -38,26 +25,12 @@
             --border-radius: 8px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--light-grey); color: var(--dark-grey); line-height: 1.6; }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--light-grey);
-            color: var(--dark-grey);
-            line-height: 1.6;
-        }
-
-        /* --- 2. Header & Layout --- */
+        /* --- Header --- */
         header {
-            /* Use a background image for the header */
             background-image: linear-gradient(rgba(0, 74, 153, 0.8), rgba(0, 59, 122, 0.9)), url('https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg');
             background-size: cover;
             background-position: center;
@@ -65,951 +38,83 @@
             padding: 40px 20px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
+        header h1 { font-weight: 700; font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        header p { font-size: 1.2rem; font-weight: 300; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        header h1 {
-            font-weight: 700;
-            font-size: 2.8rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
+        .container { max-width: 1400px; margin: 30px auto; padding: 30px; background-color: var(--white); border-radius: var(--border-radius); box-shadow: var(--shadow); }
 
-        header p {
-            font-size: 1.2rem;
-            font-weight: 300;
-            opacity: 0.9;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        
-        /* NEW: Admin Login Button */
-        #admin-login-button, #admin-logout-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--secondary-color);
-            color: var(--dark-grey);
-            border: none;
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-        #admin-login-button:hover, #admin-logout-button:hover {
-            background-color: #b38b00;
-        }
-        #admin-logout-button {
-            display: none; /* Hidden by default */
-            background: var(--danger-color);
-            color: var(--white);
-        }
-        #admin-logout-button:hover {
-            background: var(--danger-hover);
-        }
+        /* --- Gallery --- */
+        .venue-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .venue-card { border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.2s ease; cursor: pointer; display: flex; flex-direction: column; }
+        .venue-card:hover { transform: translateY(-5px); }
+        .venue-card img { width: 100%; height: 220px; object-fit: cover; display: block; }
+        .venue-card-content { padding: 20px; background-color: #fafafa; border-top: 1px solid var(--border-color); flex-grow: 1; display: flex; flex-direction: column; }
+        .venue-card-content h3 { font-size: 1.3rem; font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
+        .venue-card-content .capacity { font-size: 0.9rem; font-weight: 600; color: var(--dark-grey); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .venue-card-content p { font-size: 0.95rem; color: #555; flex-grow: 1; }
 
+        /* --- Form --- */
+        .calculator-form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding-bottom: 30px; margin-bottom: 30px; border-bottom: 2px solid var(--border-color); }
+        .form-section { grid-column: 1 / -1; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        .form-section h3 { color: var(--primary-color); font-size: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group-full { grid-column: 1 / -1; }
+        .form-group label { font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background-color: var(--white); }
+        .day-selection { display: flex; flex-wrap: wrap; gap: 15px; padding: 10px; background-color: #fcfcfc; border: 1px solid var(--border-color); border-radius: 6px; }
+        .day-selection div { display: flex; align-items: center; }
+        .day-selection label { margin-left: 8px; cursor: pointer; }
+        
+        #workshop-package-group { display: none; background-color: #fcfcfc; border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; }
+        .package-option { display: flex; align-items: center; margin-bottom: 15px; }
+        .package-option .price { margin-left: auto; font-weight: 700; color: var(--primary-color); }
 
-        /* This is the main content wrapper */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 30px;
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
+        .button-group { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .btn { padding: 14px 28px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 600; text-transform: uppercase; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-secondary { background-color: #6c757d; color: var(--white); }
+        .btn-danger { background-color: var(--danger-color); color: var(--white); margin-left: auto; }
 
-        /* --- 3. Tab Navigation --- */
-        .tabs {
-            display: flex;
-            flex-wrap: wrap; /* Allow tabs to wrap on small screens */
-            border-bottom: 2px solid var(--border-color);
-        }
+        /* --- Summary Table --- */
+        #quote-summary-container h2, #global-gallery-container h2 { color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+        #quote-message-bar { display: none; padding: 15px; margin-bottom: 20px; background-color: #fff3cd; color: #664d03; border-radius: var(--border-radius); }
+        .table-wrapper { overflow-x: auto; }
+        .quote-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; min-width: 800px; }
+        .quote-table th, .quote-table td { border: 1px solid var(--border-color); padding: 14px; text-align: left; }
+        .quote-table th { background-color: #f9f9f9; }
+        .group-header-row { background-color: var(--primary-color) !important; color: var(--white); font-weight: 700; }
+        .remove-btn { background: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        .pdf-hide, .printing .remove-col { display: none; }
 
-        .tab-button {
-            padding: 15px 30px;
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--dark-grey);
-            opacity: 0.7;
-            position: relative;
-            top: 2px; /* Aligns with the bottom border */
-        }
+        /* --- Totals --- */
+        .totals-section { text-align: right; font-size: 1.2rem; margin-bottom: 20px; padding: 20px; background-color: #fcfcfc; border: 1px solid var(--border-color); border-radius: var(--border-radius); }
+        .totals-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .totals-row.subtotal { border-top: 1px dashed var(--border-color); margin-top: 10px; padding-top: 10px; font-weight: 600; }
+        .totals-row.grand-total { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); border-top: 2px solid var(--dark-grey); margin-top: 10px; padding-top: 10px; }
+        .disclaimer { font-size: 0.9rem; color: #666; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; }
 
-        .tab-button.active {
-            opacity: 1;
-            border-bottom: 3px solid var(--primary-color);
-        }
-        
-        /* NEW: Hide admin tabs by default */
-        #staffing-tab-button, #percussion-tab-button {
-            display: none;
-        }
-        
-        /* Class to show admin items */
-        .admin-visible {
-            display: block !important;
-        }
-        .admin-visible-inline {
-            display: inline-block !important;
-        }
+        /* --- Modals & Lightbox --- */
+        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background-color: var(--white); border-radius: var(--border-radius); max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { font-size: 2.5rem; cursor: pointer; }
+        .modal-body { padding: 30px; overflow-y: auto; }
+        .modal-gallery .main-image-container { height: 400px; background-color: #eee; border-radius: var(--border-radius); overflow: hidden; }
+        .modal-gallery img { width: 100%; height: 100%; object-fit: cover; }
+        .thumbnail-container { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-top: 10px; }
+        .thumbnail, .global-thumbnail { width: 60px; height: 60px; border-radius: 6px; overflow: hidden; display: inline-block; margin-right: 10px; cursor: pointer; border: 2px solid transparent; }
+        .global-thumbnail { width: 120px; height: 80px; border: 2px solid var(--border-color); }
+        .thumbnail.active { border-color: var(--primary-color); }
 
-        .tab-content {
-            display: none; /* Hide tabs by default */
-            padding-top: 30px;
-        }
+        #lightbox-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        #lightbox-overlay.show { display: flex; }
+        #lightbox-image { max-width: 90%; max-height: 90%; border-radius: 4px; }
+        .lightbox-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; color: rgba(255,255,255,0.7); cursor: pointer; padding: 20px; }
+        #lightbox-prev { left: 20px; } #lightbox-next { right: 20px; }
+        #lightbox-close { position: absolute; top: 20px; right: 40px; color: white; font-size: 3rem; cursor: pointer; }
 
-        .tab-content.active {
-            display: block; /* Show active tab */
-        }
-
-        /* --- 4. Venue Gallery --- */
-        .venue-gallery {
-            display: grid;
-            /* Creates a responsive grid that fits as many 300px+ cards as possible */
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-
-        .venue-card {
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            overflow: hidden; /* Clips the image to the card's rounded corners */
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer; /* Show it's clickable */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .venue-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .venue-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover; /* Ensures images fill the space without stretching */
-            display: block;
-        }
-
-        /* Styles for venue card content */
-        .venue-card-content {
-            padding: 20px;
-            background-color: #fafafa;
-            border-top: 1px solid var(--border-color);
-            flex-grow: 1; /* Makes all cards the same height */
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .venue-card-content h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .venue-card-content .capacity {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--dark-grey);
-            margin-bottom: 10px;
-            display: block;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .venue-card-content p {
-            font-size: 0.95rem;
-            color: #555;
-            flex-grow: 1;
-        }
-
-        /* --- 5. Form Styling --- */
-        .calculator-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Two-column layout for the form */
-            gap: 24px;
-            padding-bottom: 30px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .form-section {
-            grid-column: 1 / -1; /* Make section titles span both columns */
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .form-section h3 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Form group that spans the full width */
-        .form-group-full {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #555;
-        }
-
-        .form-group input[type="time"],
-        .form-group input[type="number"],
-        .form-group input[type="text"],
-        .form-group textarea,
-        .form-group select {
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--white); /* Fix for iOS styling */
-            -webkit-appearance: none; 
-            -moz-appearance: none;
-            appearance: none;
-        }
-        
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .form-group input[type="number"] {
-             -moz-appearance: textfield; /* Firefox */
-        }
-        
-        .form-group input[type="number"]::-webkit-inner-spin-button,
-        .form-group input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .form-group input[type="time"]:focus,
-        .form-group input[type="number"]:focus,
-        .form-group input[type="text"]:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
-        }
-
-        /* Day Selection Checkboxes */
-        .day-selection {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 10px;
-            background-color: #fcfcfc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        .day-selection div {
-            display: flex;
-            align-items: center;
-        }
-
-        .day-selection label {
-            font-weight: 400;
-            margin: 0 0 0 8px;
-            text-transform: none;
-            color: var(--dark-grey);
-            cursor: pointer;
-        }
-
-        .day-selection input[type="checkbox"] {
-            width: 1.3em;
-            height: 1.3em;
-            cursor: pointer;
-        }
-        
-        /* Workshop Package Selection */
-        #workshop-package-group {
-            display: none; /* Hide by default */
-            background-color: #fcfcfc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 20px;
-        }
-        
-        .package-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .package-option:last-child {
-            margin-bottom: 0;
-        }
-        
-        .package-option input[type="radio"] {
-            width: 1.3em;
-            height: 1.3em;
-            margin-right: 12px;
-            cursor: pointer;
-        }
-        
-        .package-option label {
-            margin: 0;
-            font-weight: 600;
-            color: var(--dark-grey);
-            cursor: pointer;
-        }
-        
-        .package-option .price {
-            margin-left: auto;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary-color);
-        }
-
-
-        /* --- 6. Button Styling --- */
-        .button-group {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background-color: #003b7a;
-            box-shadow: 0 4px 10px rgba(0, 74, 153, 0.2);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: var(--white);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-        
-        /* New button for clearing quote */
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: var(--white);
-            margin-left: auto; /* Pushes it to the right */
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--danger-hover);
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
-        }
-
-
-        /* --- 7. Quote Summary Table --- */
-        #quote-summary-container h2,
-        #staffing-summary-container h2,
-        #percussion-summary-container h2,
-        #global-gallery-container h2 { /* Style for new gallery title */
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        /* NEW: Message bar for conflicts */
-        #quote-message-bar {
-            display: none; /* Hidden by default */
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            background-color: #fff3cd;
-            color: #664d03;
-            border: 1px solid #ffecb5;
-            border-radius: var(--border-radius);
-            font-weight: 500;
-        }
-        /* Class for PDF cleanup */
-        .pdf-hide {
-            display: none !important;
-        }
-
-        /* Makes the table horizontally scrollable on small screens */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        .quote-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 1rem;
-            table-layout: auto; 
-            min-width: 800px;
-        }
-        
-        /* NEW: Staffing & Percussion timesheet table */
-        .timesheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 1rem;
-        }
-        .timesheet-table th,
-        .timesheet-table td {
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            text-align: left;
-        }
-        .timesheet-table th {
-            background-color: #f9f9f9;
-        }
-        .timesheet-table td:nth-child(2), /* Rate */
-        .timesheet-table td:last-child { /* Cost */
-            text-align: right;
-            font-weight: 600;
-        }
-        .timesheet-table .row-cost {
-            font-family: monospace, sans-serif;
-            font-size: 1.1rem;
-            color: var(--primary-color);
-        }
-        .timesheet-table input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            -moz-appearance: textfield;
-        }
-        .timesheet-table input[type="number"] {
-            text-align: right;
-        }
-        .timesheet-table input[type="text"] {
-            text-align: left;
-        }
-        .timesheet-table input::-webkit-inner-spin-button,
-        .timesheet-table input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-
-        .quote-table th,
-        .quote-table td {
-            border: 1px solid var(--border-color);
-            padding: 14px;
-            text-align: left;
-            white-space: nowrap;
-        }
-        
-        .quote-table th:first-child,
-        .quote-table td:first-child {
-            white-space: normal; /* Allow item name to wrap */
-            width: 50%;
-        }
-
-        .quote-table th {
-            background-color: #f9f9f9;
-            font-weight: 600;
-        }
-
-        .quote-table td:last-child {
-            text-align: center;
-        }
-        
-        /* NEW: Group header row */
-        .group-header-row {
-            background-color: var(--primary-color) !important;
-            color: var(--white);
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        .group-header-row td {
-            border: none;
-        }
-        
-        /* NEW: Admin mode editable fields */
-        .admin-editable-total {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            border: 1px dashed var(--primary-color);
-            border-radius: 6px;
-            text-align: right;
-            font-weight: 700;
-            color: var(--primary-color);
-            -moz-appearance: textfield;
-        }
-        
-        /* PDF Cleanup for Admin mode */
-        .printing .admin-editable-total {
-            border: none;
-            padding: 0;
-            width: auto;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-        
-        /* PDF Cleanup for Remove column */
-        .printing .remove-col {
-            display: none;
-        }
-        
-        
-        .remove-btn {
-            background: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .remove-btn:hover {
-            background: var(--danger-hover);
-        }
-        
-        /* Styles for Password Protection */
-        #staffing-password-prompt, #percussion-password-prompt {
-            text-align: center;
-            padding: 40px;
-            border: 2px dashed var(--border-color);
-            border-radius: var(--border-radius);
-            background-color: #fdfdfd;
-        }
-        #staffing-password-prompt p, #percussion-password-prompt p {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-        #staffing-password-error {
-            color: var(--danger-color);
-            font-weight: 600;
-            display: none; /* Hidden by default */
-            margin-top: 15px;
-        }
-        #staffing-password-prompt input[type="password"] {
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            width: 100%;
-            max-width: 300px;
-            margin-bottom: 15px;
-        }
-
-        /* --- 8. Totals & Footer --- */
-        .totals-section {
-            text-align: right;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #fcfcfc;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-        }
-        
-        .totals-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-        .totals-row.subtotal {
-            font-weight: 600;
-            color: var(--dark-grey);
-            border-top: 1px dashed var(--border-color);
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-        .totals-row.grand-total {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            border-top: 2px solid var(--dark-grey);
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-        
-        .totals-label {
-            font-weight: 500;
-            text-align: left;
-        }
-        .totals-value {
-            font-weight: 700;
-            text-align: right;
-            font-family: monospace, sans-serif;
-            font-size: 1.3rem;
-        }
-        .totals-row.grand-total .totals-value {
-            font-size: 1.8rem;
-        }
-        
-        
-        .disclaimer {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 20px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-        }
-        
-        /* --- 9. NEW: Global Gallery Container --- */
-        #global-gallery-container {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid var(--border-color);
-        }
-
-        /* --- 10. NEW: Venue Modal Styles --- */
-        .modal-overlay {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        /* NEW: Password Modal */
-        #admin-password-modal {
-            z-index: 1001; /* Above main overlay */
-        }
-
-        .modal-content {
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 900px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* For containing the scrolling content */
-        }
-        
-        /* NEW: Password Modal content */
-        .password-modal-content {
-            max-width: 400px;
-            max-height: auto;
-            padding: 30px;
-            text-align: center;
-        }
-        .password-modal-content h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-        .password-modal-content p {
-            margin-bottom: 20px;
-        }
-        #admin-password-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            margin-bottom: 20px;
-        }
-        #admin-password-error {
-            color: var(--danger-color);
-            font-weight: 600;
-            display: none; /* Hidden by default */
-            margin-bottom: 15px;
-        }
-
-        
-        .modal-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h2 {
-            color: var(--primary-color);
-            font-size: 2rem;
-        }
-
-        .modal-close {
-            color: #aaa;
-            font-size: 2.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .modal-close:hover,
-        .modal-close:focus {
-            color: var(--dark-grey);
-        }
-        
-        .modal-body {
-            padding: 30px;
-            overflow-y: auto; /* Allow content to scroll */
-        }
-        
-        /* NEW: Gallery Styles */
-        .modal-gallery {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .modal-gallery .main-image-container {
-            width: 100%;
-            height: 400px;
-            background-color: #eee;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        .modal-gallery .main-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            cursor: zoom-in; /* NEW: Add magnify cursor */
-        }
-        
-        /* Thumbnail Gallery Fix & Global Gallery Style */
-        .thumbnail-container {
-            width: 100%;
-            overflow-x: auto; /* Allow horizontal scrolling */
-            white-space: nowrap; /* Keep thumbnails in one line */
-            padding-bottom: 10px; /* Space for scrollbar */
-        }
-
-        .thumbnail {
-            width: 60px;
-            height: 60px;
-            border-radius: 6px;
-            overflow: hidden;
-            display: inline-block; /* Changed from 'flex' */
-            margin-right: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-        
-        /* NEW: Style for global gallery thumbnails */
-        .global-thumbnail {
-            width: 120px;
-            height: 80px;
-            border-radius: 6px;
-            overflow: hidden;
-            display: inline-block;
-            margin-right: 10px;
-            cursor: zoom-in;
-            border: 2px solid var(--border-color);
-            transition: border-color 0.2s;
-        }
-        
-        .global-thumbnail:hover {
-             border-color: var(--primary-color);
-        }
-        
-        .global-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .thumbnail.active,
-        .thumbnail:hover {
-            border-color: var(--primary-color);
-        }
-        
-        /* Modal Info Section */
-        .modal-details .capacity {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--dark-grey);
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-        }
-        
-        .modal-details p {
-            font-size: 1rem;
-            line-height: 1.7;
-            margin-bottom: 25px;
-        }
-        
-        .modal-details .btn {
-            padding: 12px 24px;
-            font-size: 0.9rem;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        /* --- 11. NEW: Lightbox Modal Styles --- */
-        #lightbox-overlay {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 2000; /* Higher than the other modal */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            cursor: pointer; /* Changed from zoom-out */
-            padding: 20px;
-            align-items: center;
-            justify-content: center;
-            /* NEW: Animation */
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        #lightbox-overlay.show {
-            display: flex;
-            opacity: 1;
-        }
-        
-        #lightbox-close {
-            position: absolute;
-            top: 20px;
-            right: 40px;
-            color: var(--white);
-            font-size: 3rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 2002;
-        }
-        
-        #lightbox-image {
-            display: block;
-            max-width: 90%;
-            max-height: 90%;
-            margin: auto;
-            border-radius: 4px;
-            cursor: default; /* Clicks on image shouldn't close it */
-            /* NEW: Animation */
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        #lightbox-overlay.show #lightbox-image {
-            transform: scale(1);
-        }
-        
-        /* NEW: Lightbox Arrows */
-        .lightbox-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 3rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 2001;
-            padding: 10px 20px;
-            user-select: none; /* Prevent text selection */
-            transition: color 0.2s ease;
-        }
-        
-        .lightbox-arrow:hover {
-            color: rgba(255, 255, 255, 1);
-        }
-        
-        #lightbox-prev {
-            left: 20px;
-        }
-        
-        #lightbox-next {
-            right: 20px;
-        }
-
-
-        /* Responsive adjustments */
-        @media (max-width: 900px) {
-            .modal-gallery .main-image-container {
-                height: 300px; /* Smaller main image on mobile */
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .calculator-form {
-                grid-template-columns: 1fr; /* Stack form inputs on small screens */
-            }
-            .form-section {
-                grid-column: 1 / 1;
-            }
-            .form-group-full {
-                grid-column: 1 / 1;
-            }
-            .button-group {
-                grid-column: 1 / 1;
-            }
-            .btn-danger {
-                margin-left: 0; /* Stack on small screens */
-            }
-            header h1 {
-                font-size: 2rem;
-            }
-            .modal-header h2 {
-                font-size: 1.5rem;
-            }
-            /* NEW: Adjust lightbox arrows for mobile */
-            .lightbox-arrow {
-                font-size: 2rem;
-                padding: 10px;
-            }
-            #lightbox-prev {
-                left: 5px;
-            }
-            #lightbox-next {
-                right: 5px;
-            }
-        }
-
-
+        @media (max-width: 768px) { .calculator-form { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -1017,580 +122,166 @@
     <header>
         <h1>Royal Birmingham Conservatoire</h1>
         <p>Multi-Venue Quote Calculator</p>
-        <button id="admin-login-button">Admin Login</button>
-        <button id="admin-logout-button">Logout</button>
     </header>
 
     <main class="container">
         
-        <!-- Tab Navigation -->
-        <nav class="tabs">
-            <button class="tab-button active" data-tab="venue-tab">Venue Quote</button>
-            <button class="tab-button" id="staffing-tab-button" data-tab="staffing-tab">Staffing Costs</button>
-            <button class="tab-button" id="percussion-tab-button" data-tab="percussion-tab">Percussion Hire</button>
-        </nav>
+        <div class="venue-gallery">
+            <div class="venue-card" data-venue="Bradshaw Hall">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg" alt="Bradshaw Hall">
+                <div class="venue-card-content"><h3>Bradshaw Hall</h3><span class="capacity">Capacity: 440+</span><p>A premier concert hall acoustically modelled...</p></div>
+            </div>
+            <div class="venue-card" data-venue="Recital Hall">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg" alt="Recital Hall">
+                <div class="venue-card-content"><h3>Recital Hall</h3><span class="capacity">Capacity: 146-200</span><p>An intimate, flexible space with variable acoustics...</p></div>
+            </div>
+            <div class="venue-card" data-venue="Eastside Jazz Club">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/jazz/rb_RBC-Music---Jazz_30928.jpg" alt="Eastside Jazz Club">
+                <div class="venue-card-content"><h3>Eastside Jazz Club</h3><span class="capacity">Capacity: 60-100</span><p>Birmingham's only dedicated Jazz venue...</p></div>
+            </div>
+            <div class="venue-card" data-venue="The Lab">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg" alt="The Lab">
+                <div class="venue-card-content"><h3>The Lab</h3><span class="capacity">Capacity: 100</span><p>A cutting-edge, completely flexible black-box studio...</p></div>
+            </div>
+            <div class="venue-card" data-venue="The Organ Studio">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg" alt="Organ Studio">
+                <div class="venue-card-content"><h3>The Organ Studio</h3><span class="capacity">Capacity: 80</span><p>A light and airy venue with a Eule Pipe organ...</p></div>
+            </div>
+            <div class="venue-card" data-venue="Workshop Space">
+                <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg" alt="Workshops">
+                <div class="venue-card-content"><h3>Workshops / Studios</h3><span class="capacity">Capacity: 30-60</span><p>Flexible studios for rehearsals and workshops...</p></div>
+            </div>
+        </div>
 
-        <!-- Tab Content: Venue Quote -->
-        <section id="venue-tab" class="tab-content active">
-
-            <!-- Venue Gallery (UPDATED: data-venue links to JS object) -->
-            <div class="venue-gallery">
-                <div class="venue-card" data-venue="Bradshaw Hall">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg" alt="Bradshaw Hall">
-                    <div class="venue-card-content">
-                        <h3>Bradshaw Hall</h3>
-                        <span class="capacity">Capacity: 440+</span>
-                        <p>A premier concert hall acoustically modelled to optimize the experience...</p>
-                    </div>
-                </div>
-                <div class="venue-card" data-venue="Recital Hall">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg" alt="Recital Hall">
-                    <div class="venue-card-content">
-                        <h3>Recital Hall</h3>
-                        <span class="capacity">Capacity: 146-200</span>
-                        <p>An intimate, flexible space with a floor-level stage, variable acoustics...</p>
-                    </div>
-                </div>
-                <div class="venue-card" data-venue="Eastside Jazz Club">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/jazz/rb_RBC-Music---Jazz_30928.jpg" alt="Eastside Jazz Club">
-                    <div class="venue-card-content">
-                        <h3>Eastside Jazz Club</h3>
-                        <span class="capacity">Capacity: 60-100</span>
-                        <p>Birmingham's only dedicated Jazz venue, designed for a quintessential...</p>
-                    </div>
-                </div>
-                <div class="venue-card" data-venue="The Lab">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg" alt="The Lab">
-                    <div class="venue-card-content">
-                        <h3>The Lab</h3>
-                        <span class="capacity">Capacity: 100</span>
-                        <p>A cutting-edge, completely flexible black-box studio for art, theatre...</p>
-                    </div>
-                </div>
-                <div class="venue-card" data-venue="The Organ Studio">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg" alt="Organ Studio">
-                    <div class="venue-card-content">
-                        <h3>The Organ Studio</h3>
-                        <span class="capacity">Capacity: 80</span>
-                        <p>A light and airy venue with a Eule Pipe organ, suited to chamber music...</p>
-                    </div>
-                </div>
-                <!-- Consolidated Workshop Tile -->
-                <div class="venue-card" data-venue="Workshop Space">
-                    <img src="https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg" alt="Workshops / Performance Studios">
-                    <div class="venue-card-content">
-                        <h3>Workshops / Studios</h3>
-                        <span class="capacity">Capacity: 30-60</span>
-                        <p>Eight flexible studios designed for rehearsals, workshops, and intimate...</p>
-                    </div>
+        <form id="quote-form" class="calculator-form">
+            <div class="form-section"><h3>Booking Details</h3></div>
+            <div class="form-group">
+                <label for="venue">Venue / Space</label>
+                <select id="venue" name="venue">
+                    <option value="Bradshaw Hall">Bradshaw Hall</option>
+                    <option value="Recital Hall">Recital Hall</option>
+                    <option value="The Lab">The Lab</option>
+                    <option value="Eastside Jazz Club">Eastside Jazz Club</option>
+                    <option value="The Organ Studio">The Organ Studio</option>
+                    <option value="Workshop (Large, up to 60)">Workshop (Large, up to 60)</option>
+                    <option value="Workshop (Small, up to 40)">Workshop (Small, up to 40)</option>
+                    <option value="Practice Room (Grand Piano)">Practice Room (Grand Piano)</option>
+                    <option value="Practice Room (Upright Piano)">Practice Room (Upright Piano)</option>
+                    <option value="Whole Building Hire">Whole Building Hire</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="hire-type">Hire Type</label>
+                <select id="hire-type" name="hire-type">
+                    <option value="Standard Rate">Standard Rate (includes FOH staff)</option>
+                    <option value="Recording / Premium Workshop">Recording / Premium Workshop (dry hire)</option>
+                </select>
+            </div>
+            <div class="form-group" id="start-time-group"><label for="start-time">Booking Start Time</label><input type="time" id="start-time" name="start-time" value="09:00" step="1800"></div>
+            <div class="form-group" id="end-time-group"><label for="end-time">Booking End Time</label><input type="time" id="end-time" name="end-time" value="17:00" step="1800"></div>
+            
+            <div class="form-group form-group-full">
+                <label>Event Day(s)</label>
+                <div class="day-selection">
+                    <div><input type="checkbox" id="mon" name="day" value="Mon" checked><label for="mon">Mon</label></div>
+                    <div><input type="checkbox" id="tue" name="day" value="Tue"><label for="tue">Tue</label></div>
+                    <div><input type="checkbox" id="wed" name="day" value="Wed"><label for="wed">Wed</label></div>
+                    <div><input type="checkbox" id="thu" name="day" value="Thu"><label for="thu">Thu</label></div>
+                    <div><input type="checkbox" id="fri" name="day" value="Fri"><label for="fri">Fri</label></div>
+                    <div><input type="checkbox" id="sat" name="day" value="Sat"><label for="sat">Sat</label></div>
+                    <div><input type="checkbox" id="sun" name="day" value="Sun"><label for="sun">Sun</label></div>
                 </div>
             </div>
-
-            <!-- Calculator Form -->
-            <form id="quote-form" class="calculator-form">
-                
-                <div class="form-section">
-                    <h3>Booking Details</h3>
-                </div>
-
-                <div class="form-group">
-                    <label for="venue">Venue / Space</label>
-                    <select id="venue" name="venue">
-                        <option value="Bradshaw Hall">Bradshaw Hall</option>
-                        <option value="Recital Hall">Recital Hall</option>
-                        <option value="The Lab">The Lab</option>
-                        <option value="Eastside Jazz Club">Eastside Jazz Club</option>
-                        <option value="The Organ Studio">The Organ Studio</option>
-                        <option value="Workshop (Large, up to 60)">Workshop (Large, up to 60)</option>
-                        <option value="Workshop (Small, up to 40)">Workshop (Small, up to 40)</option>
-                        <option value="Practice Room (Grand Piano)">Practice Room (Grand Piano)</option>
-                        <option value="Practice Room (Upright Piano)">Practice Room (Upright Piano)</option>
-                        <option value="Whole Building Hire">Whole Building Hire</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="hire-type">Hire Type</label>
-                    <select id="hire-type" name="hire-type">
-                        <option value="Standard Rate">Standard Rate (includes FOH staff)</option>
-                        <option value="Recording / Premium Workshop">Recording / Premium Workshop (dry hire)</option>
-                    </select>
-                </div>
-
-                <!-- Time inputs, will be hidden for Whole Building Hire -->
-                <div class="form-group" id="start-time-group">
-                    <label for="start-time">Booking Start Time</label>
-                    <input type="time" id="start-time" name="start-time" value="09:00" step="1800">
-                </div>
-
-                <div class="form-group" id="end-time-group">
-                    <label for="end-time">Booking End Time</label>
-                    <input type="time" id="end-time" name="end-time" value="17:00" step="1800">
-                </div>
-                
-                <div class="form-group form-group-full">
-                    <label>Event Day(s)</label>
-                    <div class="day-selection">
-                        <div><input type="checkbox" id="mon" name="day" value="Mon" checked><label for="mon">Mon</label></div>
-                        <div><input type="checkbox" id="tue" name="day" value="Tue"><label for="tue">Tue</label></div>
-                        <div><input type="checkbox" id="wed" name="day" value="Wed"><label for="wed">Wed</label></div>
-                        <div><input type="checkbox" id="thu" name="day" value="Thu"><label for="thu">Thu</label></div>
-                        <div><input type="checkbox" id="fri" name="day" value="Fri"><label for="fri">Fri</label></div>
-                        <div><input type="checkbox" id="sat" name="day" value="Sat"><label for="sat">Sat</label></div>
-                        <div><input type="checkbox" id="sun" name="day" value="Sun"><label for="sun">Sun</label></div>
-                    </div>
-                </div>
-                
-                <!-- NEW: Workshop Package Selector -->
-                <div class="form-group form-group-full" id="workshop-package-group">
-                    <label>Workshop Package</label>
-                    <div class="package-option">
-                        <input type="radio" id="pkg-dry" name="workshop-package" value="dry" checked>
-                        <label for="pkg-dry">Dry Hire</label>
-                        <span class="price" id="price-dry">£0.00</span>
-                    </div>
-                    <div class="package-option">
-                        <input type="radio" id="pkg-av" name="workshop-package" value="av">
-                        <label for="pkg-av">With AV</label>
-                        <span class="price" id="price-av">£0.00</span>
-                    </div>
-                    <div class="package-option">
-                        <input type="radio" id="pkg-piano" name="workshop-package" value="piano">
-                        <label for="pkg-piano">With Piano</label>
-                        <span class="price" id="price-piano">£0.00</span>
-                    </div>
-                    <div class="package-option">
-                        <input type="radio" id="pkg-av-piano" name="workshop-package" value="av-piano">
-                        <label for="pkg-av-piano">With AV & Piano</label>
-                        <span class="price" id="price-av-piano">£0.00</span>
-                    </div>
-                </div>
-
-                <!-- Main Technical Equipment Section -->
-                <div class="form-section" id="technical-equipment-section">
-                    <h3>Technical / Equipment (per day)</h3>
-                </div>
-
-                <div class="form-group" id="tech-group-pa">
-                    <label for="pa">PA (per day)</label>
-                    <select id="pa" name="pa" class="equipment" data-name="PA (per day)">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-projector">
-                    <label for="projector">Projector (per day)</label>
-                    <select id="projector" name="projector" class="equipment" data-name="Projector (per day)">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-mic-wired">
-                    <label for="mic-wired">Microphone (wired)</label>
-                    <select id="mic-wired" name="mic-wired" class="equipment" data-name="Microphone (wired)">
-                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-mic-wireless">
-                    <label for="mic-wireless">Microphone (wireless)</label>
-                    <select id="mic-wireless" name="mic-wireless" class="equipment" data-name="Microphone (wireless)">
-                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-monitor">
-                    <label for="monitor">Monitor</label>
-                    <select id="monitor" name="monitor" class="equipment" data-name="Monitor">
-                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-laptop">
-                    <label for="laptop">Laptop</label>
-                    <select id="laptop" name="laptop" class="equipment" data-name="Laptop">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-piano">
-                    <label for="piano">Grand Piano</label>
-                    <select id="piano" name="piano" class="equipment" data-name="Grand Piano">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-audio-rec">
-                    <label for="audio-rec">Overhead Audio Recording</label>
-                    <select id="audio-rec" name="audio-rec" class="equipment" data-name="Overhead Audio Recording">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tech-group-video-rec">
-                    <label for="video-rec">Static Video Recording</label>
-                    <select id="video-rec" name="video-rec" class="equipment" data-name="Static Video Recording">
-                        <option value="0">0</option><option value="1">1</option>
-                    </select>
-                </div>
-                <!-- NEW: Technician Hours -->
-                <div class="form-group" id="tech-group-technician">
-                    <label for="technician-hours">Technician Hours (4hr min)</label>
-                    <input type="number" id="technician-hours" name="technician-hours" class="equipment" data-name="Technician" value="0" min="0" step="1">
-                </div>
-                
-                <!-- NEW: Quote Notes -->
-                <div class="form-group form-group-full" id="notes-group">
-                    <label for="quote-notes">Quote Notes (will appear on PDF/Email)</label>
-                    <textarea id="quote-notes" placeholder="e.g., Client Name, Event Ref, specific requirements..."></textarea>
-                </div>
-
-
-                <!-- Action Buttons -->
-                <div class="button-group">
-                    <button type="button" id="add-quote-btn" class="btn btn-primary">Add to Quote</button>
-                    <button type="button" id="download-pdf-btn" class="btn btn-secondary">Download PDF</button>
-                    <button type="button" id="email-btn" class="btn btn-secondary">Email Quote</button>
-                    <button type="button" id="clear-quote-btn" class="btn btn-danger">Clear Quote</button>
-                </div>
-            </form>
-
-            <!-- Quote Summary Section -->
-            <section id="quote-summary-container">
-                <h2>Venue Quote Summary</h2>
-                
-                <!-- NEW: Message bar -->
-                <div id="quote-message-bar"></div>
-
-                <div class="table-wrapper">
-                    <table class="quote-table">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <!-- NEW: Headers updated -->
-                                <th style="text-align: right;">Price per Unit/per Hour (£)</th>
-                                <th style="text-align: right;">Quantity/Hours</th>
-                                <th style="text-align: right;">Total (£)</th>
-                                <th class="remove-col">Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody id="quote-summary-body">
-                            <!-- Rows will be added here by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- NEW: Updated Totals Section -->
-                <div class="totals-section">
-                    <div class="totals-row">
-                        <span class="totals-label">Venue Hire Subtotal</span>
-                        <span class="totals-value" id="venue-subtotal">£0.00</span>
-                    </div>
-                    <div class="totals-row">
-                        <span class="totals-label">Technical Hire Subtotal</span>
-                        <span class="totals-value" id="tech-subtotal">£0.00</span>
-                    </div>
-                    <div class="totals-row admin-visible" id="staffing-subtotal-row">
-                        <span class="totals-label">Staffing Subtotal</span>
-                        <span class="totals-value" id="staffing-subtotal">£0.00</span>
-                    </div>
-                    <div class="totals-row admin-visible" id="percussion-subtotal-row">
-                        <span class="totals-label">Percussion Subtotal</span>
-                        <span class="totals-value" id="percussion-subtotal">£0.00</span>
-                    </div>
-                    <div class="totals-row subtotal">
-                        <span class="totals-label">COMBINED SUBTOTAL (Ex. VAT)</span>
-                        <span class="totals-value" id="combined-subtotal">£0.00</span>
-                    </div>
-                    <div class="totals-row">
-                        <span class="totals-label">VAT (20%)</span>
-                        <span class="totals-value" id="combined-vat">£0.00</span>
-                    </div>
-                    <div class="totals-row grand-total">
-                        <span class="totals-label">GRAND TOTAL (Inc. VAT)</span>
-                        <span class="totals-value" id="combined-grand-total">£0.00</span>
-                    </div>
-                </div>
-
-                <div class="disclaimer">
-                    <p><strong>Note:</strong> All prices + VAT. Minimum 4-hour booking applies (except Whole Building Hire).
-                    <br>Regular hours: Mon–Fri 08:00–23:00, Sat–Sun 08:00–19:00.
-                    <br>After-hours surcharge: £20/hour + VAT applies outside these hours.
-                    <br>Technician hours will be quoted separately based on the technical requirements of the event.
-                    <br>For booking & detailed technical quotes contact: <strong>conservatoireevents@bcu.ac.uk</strong>
-                    <br>**Disclaimer:** Quote is for reference purposes only. All costs are subject to review.
-                    </p>
-                </div>
-            </section>
-        </section>
-
-        <!-- Tab Content: Staffing Costs (Admin Only) -->
-        <section id="staffing-tab" class="tab-content">
-            <div id="staffing-calculator-wrapper">
-                <div class="form-section">
-                    <h3>Staffing Timesheet</h3>
-                </div>
-
-                <div class="table-wrapper">
-                    <table class="timesheet-table">
-                        <thead>
-                            <tr>
-                                <th>Staff Role</th>
-                                <th>Hourly Rate (£)</th>
-                                <th>Quantity</th>
-                                <th>Total Hours</th>
-                                <th>Cost (£)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="staffing-timesheet-body">
-                            <!-- Pre-defined rows -->
-                            <tr class="staff-row" data-rate="32">
-                                <td>Duty Managers</td>
-                                <td class="rate-cell">32.00</td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <tr class="staff-row" data-rate="22">
-                                <td>Stewards</td>
-                                <td class="rate-cell">22.00</td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <tr class="staff-row" data-rate="35">
-                                <td>Technicians</td>
-                                <td class="rate-cell">35.00</td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <tr class="staff-row" data-rate="20">
-                                <td>Porters</td>
-                                <td class="rate-cell">20.00</td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <tr class="staff-row" data-rate="20">
-                                <td>Security</td>
-                                <td class="rate-cell">20.00</td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <!-- Custom Rows -->
-                            <tr class="staff-row-custom">
-                                <td><input type="text" class="custom-role" placeholder="Custom Role 1"></td>
-                                <td><input type="number" class="custom-rate" value="0" min="0" step="0.50"></td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                            <tr class="staff-row-custom">
-                                <td><input type="text" class="custom-role" placeholder="Custom Role 2"></td>
-                                <td><input type="number" class="custom-rate" value="0" min="0" step="0.50"></td>
-                                <td><input type="number" class="staff-quantity" value="1" min="0" step="1"></td>
-                                <td><input type="number" class="staff-hours" value="0" min="0" step="0.5"></td>
-                                <td class="row-cost">£0.00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="add-staff-to-quote-btn" class="btn btn-primary">Add Staff to Main Quote</button>
-                </div>
+            
+            <div class="form-group form-group-full" id="workshop-package-group">
+                <label>Workshop Package</label>
+                <div class="package-option"><input type="radio" id="pkg-dry" name="workshop-package" value="dry" checked><label for="pkg-dry">Dry Hire</label><span class="price" id="price-dry">£0.00</span></div>
+                <div class="package-option"><input type="radio" id="pkg-av" name="workshop-package" value="av"><label for="pkg-av">With AV</label><span class="price" id="price-av">£0.00</span></div>
+                <div class="package-option"><input type="radio" id="pkg-piano" name="workshop-package" value="piano"><label for="pkg-piano">With Piano</label><span class="price" id="price-piano">£0.00</span></div>
+                <div class="package-option"><input type="radio" id="pkg-av-piano" name="workshop-package" value="av-piano"><label for="pkg-av-piano">With AV & Piano</label><span class="price" id="price-av-piano">£0.00</span></div>
             </div>
-        </section>
-        
-        <!-- Tab Content: Percussion Hire (Admin Only) -->
-        <section id="percussion-tab" class="tab-content">
-             <div id="percussion-calculator-wrapper">
-                <div class="form-section">
-                    <h3>Percussion Hire</h3>
-                </div>
 
-                <div class="table-wrapper">
-                    <table class="timesheet-table">
-                        <thead>
-                            <tr>
-                                <th>Instrument</th>
-                                <th>Hire Rate (£)</th>
-                                <th>Quantity</th>
-                                <th>Days</th>
-                                <th>Cost (£)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="percussion-timesheet-body">
-                            <!-- Percussion items will be auto-populated here -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="form-section" id="technical-equipment-section"><h3>Technical / Equipment (per day)</h3></div>
 
-                <div class="button-group" style="grid-column: 1 / -1; justify-content: flex-end;">
-                    <button type="button" id="add-percussion-to-quote-btn" class="btn btn-primary">Add Percussion to Main Quote</button>
-                </div>
+            <div class="form-group" id="tech-group-pa"><label for="pa">PA (per day)</label><select id="pa" class="equipment" data-name="PA (per day)"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-projector"><label for="projector">Projector (per day)</label><select id="projector" class="equipment" data-name="Projector (per day)"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-mic-wired"><label for="mic-wired">Microphone (wired)</label><select id="mic-wired" class="equipment" data-name="Microphone (wired)"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+            <div class="form-group" id="tech-group-mic-wireless"><label for="mic-wireless">Microphone (wireless)</label><select id="mic-wireless" class="equipment" data-name="Microphone (wireless)"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+            <div class="form-group" id="tech-group-monitor"><label for="monitor">Monitor</label><select id="monitor" class="equipment" data-name="Monitor"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+            <div class="form-group" id="tech-group-laptop"><label for="laptop">Laptop</label><select id="laptop" class="equipment" data-name="Laptop"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-piano"><label for="piano">Grand Piano</label><select id="piano" class="equipment" data-name="Grand Piano"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-audio-rec"><label for="audio-rec">Overhead Audio Recording</label><select id="audio-rec" class="equipment" data-name="Overhead Audio Recording"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-video-rec"><label for="video-rec">Static Video Recording</label><select id="video-rec" class="equipment" data-name="Static Video Recording"><option value="0">0</option><option value="1">1</option></select></div>
+            <div class="form-group" id="tech-group-technician"><label for="technician-hours">Technician Hours (4hr min)</label><input type="number" id="technician-hours" class="equipment" data-name="Technician" value="0" min="0"></div>
+            
+            <div class="form-group form-group-full" id="notes-group"><label for="quote-notes">Quote Notes</label><textarea id="quote-notes" placeholder="e.g., Client Name, Event Ref..."></textarea></div>
+
+            <div class="button-group">
+                <button type="button" id="add-quote-btn" class="btn btn-primary">Add to Quote</button>
+                <button type="button" id="download-pdf-btn" class="btn btn-secondary">Download PDF</button>
+                <button type="button" id="email-btn" class="btn btn-secondary">Email Quote</button>
+                <button type="button" id="clear-quote-btn" class="btn btn-danger">Clear Quote</button>
+            </div>
+        </form>
+
+        <section id="quote-summary-container">
+            <h2>Venue Quote Summary</h2>
+            <div id="quote-message-bar"></div>
+
+            <div class="table-wrapper">
+                <table class="quote-table">
+                    <thead><tr><th>Item</th><th style="text-align: right;">Price per Unit/Hour</th><th style="text-align: right;">Quantity/Hours</th><th style="text-align: right;">Total (£)</th><th class="remove-col">Remove</th></tr></thead>
+                    <tbody id="quote-summary-body"></tbody>
+                </table>
+            </div>
+
+            <div class="totals-section">
+                <div class="totals-row"><span class="totals-label">Venue Hire Subtotal</span><span class="totals-value" id="venue-subtotal">£0.00</span></div>
+                <div class="totals-row"><span class="totals-label">Technical Hire Subtotal</span><span class="totals-value" id="tech-subtotal">£0.00</span></div>
+                <div class="totals-row subtotal"><span class="totals-label">COMBINED SUBTOTAL (Ex. VAT)</span><span class="totals-value" id="combined-subtotal">£0.00</span></div>
+                <div class="totals-row"><span class="totals-label">VAT (20%)</span><span class="totals-value" id="combined-vat">£0.00</span></div>
+                <div class="totals-row grand-total"><span class="totals-label">GRAND TOTAL (Inc. VAT)</span><span class="totals-value" id="combined-grand-total">£0.00</span></div>
+            </div>
+
+            <div class="disclaimer">
+                <p><strong>Note:</strong> All prices + VAT. Minimum 4-hour booking applies. For booking & detailed technical quotes contact: <strong>conservatoireevents@bcu.ac.uk</strong></p>
             </div>
         </section>
 
-        <!-- NEW: Global Gallery Section -->
         <section id="global-gallery-container">
             <h2>Venue Gallery</h2>
-            <div class="thumbnail-container" id="global-gallery-scroll">
-                <!-- Global thumbnails will be injected here by JS -->
-            </div>
+            <div class="thumbnail-container" id="global-gallery-scroll"></div>
         </section>
-
     </main>
 
-    <!-- NEW: Modal HTML structure -->
     <div id="venue-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-title">Venue Title</h2>
-                <span class="modal-close" id="modal-close-btn">&times;</span>
-            </div>
+            <div class="modal-header"><h2 id="modal-title">Venue</h2><span class="modal-close" id="modal-close-btn">&times;</span></div>
             <div class="modal-body">
                 <div class="modal-gallery">
-                    <div class="main-image-container">
-                        <img id="modal-main-image" src="" alt="Main venue image">
-                    </div>
-                    <div class="thumbnail-container" id="modal-thumbnail-container">
-                        <!-- Thumbnails will be injected here by JS -->
-                    </div>
+                    <div class="main-image-container"><img id="modal-main-image" src="" alt="Main"></div>
+                    <div class="thumbnail-container" id="modal-thumbnail-container"></div>
                 </div>
-                
-                <div class="modal-details">
-                    <span id="modal-capacity" class="capacity">Capacity: 0</span>
-                    <p id="modal-description">Description will load here.</p>
-                    <a id="modal-link" href="#" target="_blank" class="btn btn-primary" style="background-color: var(--secondary-color);">More Information</a>
-                </div>
+                <div class="modal-details"><span id="modal-capacity" class="capacity"></span><p id="modal-description"></p><a id="modal-link" href="#" target="_blank" class="btn btn-primary">More Information</a></div>
             </div>
         </div>
     </div>
     
-    <!-- NEW: Admin Password Modal -->
-    <div id="admin-password-modal" class="modal-overlay">
-        <div class="modal-content password-modal-content">
-            <h2>Admin Login</h2>
-            <p>Please enter the admin password to unlock staffing, percussion, and cost overrides.</p>
-            <input type="password" id="admin-password-input" placeholder="Password...">
-            <p id="admin-password-error">Incorrect password. Please try again.</p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button type="button" id="admin-login-submit" class="btn btn-primary">Login</button>
-                <button type="button" id="admin-login-cancel" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- NEW: Lightbox Modal HTML -->
     <div id="lightbox-overlay">
-        <span id="lightbox-close">&times;</span>
-        <!-- NEW: Lightbox Arrows -->
-        <span class="lightbox-arrow" id="lightbox-prev">&lt;</span>
-        <img id="lightbox-image" src="" alt="Magnified View">
-        <span class="lightbox-arrow" id="lightbox-next">&gt;</span>
+        <span id="lightbox-close">&times;</span><span class="lightbox-arrow" id="lightbox-prev">&lt;</span><img id="lightbox-image" src="" alt="Magnified View"><span class="lightbox-arrow" id="lightbox-next">&gt;</span>
     </div>
 
-
-    <!-- 
-      All JavaScript is now inside this <script> tag.
-    -->
     <script>
-        // Wait for the page to be fully loaded before running scripts
         document.addEventListener('DOMContentLoaded', () => {
-
-            // --- 1. Admin & Tab Switching Logic ---
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const correctPassword = "bcu-events-2025";
-            let isAdmin = false;
-            
-            const adminLoginBtn = document.getElementById('admin-login-button');
-            const adminLogoutBtn = document.getElementById('admin-logout-button');
-            const adminPasswordModal = document.getElementById('admin-password-modal');
-            const adminPasswordInput = document.getElementById('admin-password-input');
-            const adminPasswordError = document.getElementById('admin-password-error');
-            const adminLoginSubmit = document.getElementById('admin-login-submit');
-            const adminLoginCancel = document.getElementById('admin-login-cancel');
-            
-            const staffingTabButton = document.getElementById('staffing-tab-button');
-            const percussionTabButton = document.getElementById('percussion-tab-button');
-
-            function toggleAdminMode(state) {
-                isAdmin = state;
-                adminLoginBtn.style.display = state ? 'none' : 'block';
-                adminLogoutBtn.style.display = state ? 'block' : 'none';
-                
-                // Show/Hide Admin Tabs
-                staffingTabButton.style.display = state ? 'block' : 'none';
-                percussionTabButton.style.display = state ? 'block' : 'none';
-                
-                // Hide admin tabs if they are active and user logs out
-                if (!state && (staffingTabButton.classList.contains('active') || percussionTabButton.classList.contains('active'))) {
-                    // Switch back to the first tab
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    tabButtons[0].classList.add('active');
-                    tabContents[0].classList.add('active');
-                }
-                
-                // Re-render the quote table to show/hide admin features
-                renderQuoteTable();
-            }
-            
-            function showPasswordModal() {
-                adminPasswordModal.style.display = 'flex';
-                adminPasswordInput.value = '';
-                adminPasswordError.style.display = 'none';
-                adminPasswordInput.focus();
-            }
-            
-            function closePasswordModal() {
-                adminPasswordModal.style.display = 'none';
-            }
-            
-            function attemptAdminLogin() {
-                if (adminPasswordInput.value === correctPassword) {
-                    toggleAdminMode(true);
-                    closePasswordModal();
-                } else {
-                    adminPasswordError.style.display = 'block';
-                }
-            }
-            
-            adminLoginBtn.addEventListener('click', showPasswordModal);
-            adminLogoutBtn.addEventListener('click', () => toggleAdminMode(false));
-            adminLoginCancel.addEventListener('click', closePasswordModal);
-            adminLoginSubmit.addEventListener('click', attemptAdminLogin);
-            adminPasswordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') attemptAdminLogin();
-            });
-
-            // Tab Switching
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.getAttribute('data-tab');
-                    
-                    // Deactivate all
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    // Activate clicked
-                    button.classList.add('active');
-                    document.getElementById(targetTab).classList.add('active');
-                });
-            });
-
-
-            // --- 2. Shared Constants ---
             const { jsPDF } = window.jspdf;
-            const VAT_RATE = 0.20; // 20%
+            const VAT_RATE = 0.20; 
             const MIN_HOURS = 4;
             const AFTER_HOURS_SURCHARGE = 20;
             const TECHNICIAN_RATE = 35;
             const TECHNICIAN_MIN_HOURS = 4;
-            
-            // Store all quote items in an array
             let quoteItems = [];
-            
-            // --- Base URL for all GitHub images ---
             const baseURL = 'https://github.com/evquote/Hire-Charge-Calculator/raw/main/images/';
 
-            // --- 3. Venue Quote Logic ---
-
-            // Define rates
             const venueRates = {
                 'Bradshaw Hall': { 'Standard Rate': 250, 'Recording / Premium Workshop': 125 },
                 'Recital Hall': { 'Standard Rate': 200, 'Recording / Premium Workshop': 100 },
@@ -1601,950 +292,228 @@
                 'Workshop (Small, up to 40)': { 'Standard Rate': 50, 'Recording / Premium Workshop': 25 },
                 'Practice Room (Grand Piano)': { 'Standard Rate': 30, 'Recording / Premium Workshop': 30 },
                 'Practice Room (Upright Piano)': { 'Standard Rate': 25, 'Recording / Premium Workshop': 25 },
-                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }, // Flat daily rates
+                'Whole Building Hire': { 'Standard Rate': 5000, 'Recording / Premium Workshop': 2500 }
             };
             
-            // Workshop Package Rates (Page 23 of PDF)
             const workshopPackageRates = {
-                'Workshop (Large, up to 60)': {
-                    'dry': 60,
-                    'av': 100,
-                    'piano': 100,
-                    'av-piano': 150
-                },
-                'Workshop (Small, up to 40)': {
-                    'dry': 50,
-                    'av': 90,
-                    'piano': 90,
-                    'av-piano': 135
-                }
+                'Workshop (Large, up to 60)': { 'dry': 60, 'av': 100, 'piano': 100, 'av-piano': 150 },
+                'Workshop (Small, up to 40)': { 'dry': 50, 'av': 90, 'piano': 90, 'av-piano': 135 }
             };
 
-            const equipmentRates = {
-                'pa': 100.00,
-                'projector': 250.00,
-                'mic-wired': 20.00,
-                'mic-wireless': 40.00,
-                'monitor': 15.00,
-                'laptop': 50.00,
-                'piano': 250.00, // This is for main venues, not workshops
-                'audio-rec': 150.00,
-                'video-rec': 250.00, 
-                'technician-hours': TECHNICIAN_RATE
-            };
+            const equipmentRates = { 'pa': 100, 'projector': 250, 'mic-wired': 20, 'mic-wireless': 40, 'monitor': 15, 'laptop': 50, 'piano': 250, 'audio-rec': 150, 'video-rec': 250, 'technician-hours': TECHNICIAN_RATE };
 
-            // DOM element references
+            // DOM Elements
             const addQuoteBtn = document.getElementById('add-quote-btn');
             const quoteBody = document.getElementById('quote-summary-body');
-            const venueSubtotalEl = document.getElementById('venue-subtotal');
-            const techSubtotalEl = document.getElementById('tech-subtotal');
-            const staffingSubtotalEl = document.getElementById('staffing-subtotal');
-            const percussionSubtotalEl = document.getElementById('percussion-subtotal');
-            const staffingSubtotalRow = document.getElementById('staffing-subtotal-row');
-            const percussionSubtotalRow = document.getElementById('percussion-subtotal-row');
-            const combinedSubtotalEl = document.getElementById('combined-subtotal');
-            const combinedVatEl = document.getElementById('combined-vat');
-            const combinedGrandTotalEl = document.getElementById('combined-grand-total');
-            
             const venueSelect = document.getElementById('venue');
             const hireTypeSelect = document.getElementById('hire-type');
-            const startTimeGroup = document.getElementById('start-time-group');
-            const endTimeGroup = document.getElementById('end-time-group');
-            const quoteMessageBar = document.getElementById('quote-message-bar');
-            const clearQuoteBtn = document.getElementById('clear-quote-btn');
-            const notesTextarea = document.getElementById('quote-notes');
             
-            // Workshop & Tech Groups
-            const workshopPackageGroup = document.getElementById('workshop-package-group');
-            const techSection = document.getElementById('technical-equipment-section');
-            const techGroups = {
-                pa: document.getElementById('tech-group-pa'),
-                projector: document.getElementById('tech-group-projector'),
-                piano: document.getElementById('tech-group-piano'),
-                'mic-wired': document.getElementById('tech-group-mic-wired'),
-                'mic-wireless': document.getElementById('tech-group-mic-wireless'),
-                monitor: document.getElementById('tech-group-monitor'),
-                laptop: document.getElementById('tech-group-laptop'),
-                'audio-rec': document.getElementById('tech-group-audio-rec'),
-                'video-rec': document.getElementById('tech-group-video-rec'),
-                technician: document.getElementById('tech-group-technician')
-            };
-
-            // --- Form Listeners ---
-            
-            // Handle "Whole Building Hire" & "Workshop" show/hide logic
+            // Logic
             venueSelect.addEventListener('change', updateFormDisplay);
             hireTypeSelect.addEventListener('change', updateFormDisplay);
-            document.querySelectorAll('input[name="workshop-package"]').forEach(radio => {
-                radio.addEventListener('change', updateFormDisplay);
-            });
+            document.querySelectorAll('input[name="workshop-package"]').forEach(radio => radio.addEventListener('change', updateFormDisplay));
 
             function updateFormDisplay() {
                 const venue = venueSelect.value;
                 const hireType = hireTypeSelect.value;
-                const isWholeBuilding = venue === 'Whole Building Hire';
                 const isWorkshop = venue.includes('Workshop');
+                const isWholeBuilding = venue === 'Whole Building Hire';
                 const isPracticeRoom = venue.includes('Practice Room');
 
-                // Toggle time groups
-                startTimeGroup.style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
-                endTimeGroup.style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
-
-                // Toggle workshop packages
-                workshopPackageGroup.style.display = isWorkshop ? 'block' : 'none';
+                document.getElementById('start-time-group').style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
+                document.getElementById('end-time-group').style.display = (isWholeBuilding || isWorkshop || isPracticeRoom) ? 'none' : 'flex';
+                document.getElementById('workshop-package-group').style.display = isWorkshop ? 'block' : 'none';
                 
-                // Toggle entire tech section
+                // Hide tech section for workshops initially (shown selectively below)
+                const techSection = document.getElementById('technical-equipment-section');
+                const techGroups = document.querySelectorAll('.form-group[id^="tech-group-"]');
+                
                 techSection.style.display = isWorkshop ? 'none' : 'block';
-                Object.values(techGroups).forEach(group => {
-                    group.style.display = isWorkshop ? 'none' : 'block';
-                });
+                techGroups.forEach(g => g.style.display = isWorkshop ? 'none' : 'block');
 
                 if (isWorkshop) {
-                    // Show/Hide tech section based on package
                     const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
                     const workshopRates = workshopPackageRates[venue];
+                    const multiplier = (hireType === 'Standard Rate' ? 1 : 0.5);
                     
-                    // Update package prices
-                    document.getElementById('price-dry').textContent = `£${(workshopRates.dry * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
-                    document.getElementById('price-av').textContent = `£${(workshopRates.av * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
-                    document.getElementById('price-piano').textContent = `£${(workshopRates.piano * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
-                    document.getElementById('price-av-piano').textContent = `£${(workshopRates['av-piano'] * (hireType === 'Standard Rate' ? 1 : 0.5)).toFixed(2)}`;
+                    document.getElementById('price-dry').textContent = `£${(workshopRates.dry * multiplier).toFixed(2)}`;
+                    document.getElementById('price-av').textContent = `£${(workshopRates.av * multiplier).toFixed(2)}`;
+                    document.getElementById('price-piano').textContent = `£${(workshopRates.piano * multiplier).toFixed(2)}`;
+                    document.getElementById('price-av-piano').textContent = `£${(workshopRates['av-piano'] * multiplier).toFixed(2)}`;
 
-                    // Toggle individual tech items based on package
                     const showAV = selectedPackage === 'dry' || selectedPackage === 'piano';
                     const showPiano = selectedPackage === 'dry' || selectedPackage === 'av';
                     
                     techSection.style.display = 'block';
-                    techGroups.pa.style.display = showAV ? 'block' : 'none';
-                    techGroups.projector.style.display = showAV ? 'block' : 'none';
-                    techGroups.piano.style.display = showPiano ? 'block' : 'none';
-                    
-                    // Always show these
-                    techGroups['mic-wired'].style.display = 'block';
-                    techGroups['mic-wireless'].style.display = 'block';
-                    techGroups.monitor.style.display = 'block';
-                    techGroups.laptop.style.display = 'block';
-                    techGroups['audio-rec'].style.display = 'block';
-                    techGroups['video-rec'].style.display = 'block';
-                    techGroups.technician.style.display = 'block';
+                    document.getElementById('tech-group-pa').style.display = showAV ? 'block' : 'none';
+                    document.getElementById('tech-group-projector').style.display = showAV ? 'block' : 'none';
+                    document.getElementById('tech-group-piano').style.display = showPiano ? 'block' : 'none';
+                    // Always show these for workshops
+                    ['mic-wired', 'mic-wireless', 'monitor', 'laptop', 'audio-rec', 'video-rec', 'technician'].forEach(id => {
+                        document.getElementById(`tech-group-${id}`).style.display = 'block';
+                    });
                 }
             }
-            
-            // Initial call to set form state
             updateFormDisplay();
-            
-            // Handle "Clear Quote"
-            clearQuoteBtn.addEventListener('click', () => {
-                quoteItems = [];
-                renderQuoteTable();
-                hideMessage();
-            });
 
-            // Main function to add an item to the quote
+            document.getElementById('clear-quote-btn').addEventListener('click', () => { quoteItems = []; renderQuoteTable(); });
+
             addQuoteBtn.addEventListener('click', () => {
                 const venue = venueSelect.value;
                 const hireType = hireTypeSelect.value;
-                const startTime = document.getElementById('start-time').value;
-                const endTime = document.getElementById('end-time').value;
-                
-                const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked'));
-                const days = selectedDays.map(day => day.value);
+                const days = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(d => d.value);
                 const dayCount = days.length;
+                if (dayCount === 0) return alert('Select at least one day.');
 
-                const isWholeBuilding = (venue === 'Whole Building Hire');
                 const isWorkshop = venue.includes('Workshop');
-                const isPracticeRoom = venue.includes('Practice Room');
-
-                // --- Validation ---
-                if (dayCount === 0) {
-                    showMessage('Please select at least one event day.', 'error');
-                    return;
-                }
+                const isWhole = venue === 'Whole Building Hire';
                 
-                let duration = 1; // Default
-                if (!isWholeBuilding && !isWorkshop && !isPracticeRoom) {
-                    if (!startTime || !endTime) {
-                        showMessage('Please select a start and end time.', 'error');
-                        return; 
-                    }
-                    duration = calculateDuration(startTime, endTime);
-                    if (duration < MIN_HOURS) {
-                        showMessage(`Minimum booking is ${MIN_HOURS} hours. Your selection is ${duration.toFixed(2)} hours.`, 'error');
-                        return;
-                    }
-                }
-                
-                // --- Conflict Handling ---
-                const hasWholeBuilding = quoteItems.some(item => item.group === 'venue' && item.isWholeBuilding);
-                if (isWholeBuilding && quoteItems.length > 0 && !hasWholeBuilding) {
-                    quoteItems = quoteItems.filter(item => item.group !== 'venue' && item.group !== 'tech');
-                    showMessage('Venue & Tech items cleared to add Whole Building Hire.');
-                } else if (!isWholeBuilding && hasWholeBuilding) {
-                    quoteItems = quoteItems.filter(item => item.group !== 'venue' && item.group !== 'tech');
-                    showMessage('Quote cleared to add individual items.');
-                } else {
-                    hideMessage();
-                }
-
-                // --- Calculations ---
-                let unitPrice, quantity, description;
+                let unitPrice, quantity, desc;
                 
                 if (isWorkshop) {
-                    // --- Workshop Logic ---
-                    const selectedPackage = document.querySelector('input[name="workshop-package"]:checked').value;
-                    const workshopRates = workshopPackageRates[venue];
-                    let packageRate = workshopRates[selectedPackage];
-                    
-                    // Apply premium rate if selected
-                    if (hireType !== 'Standard Rate') {
-                        packageRate *= 0.5; // 50% for premium
-                    }
-                    
-                    unitPrice = packageRate;
-                    quantity = dayCount; // Packages are per day
-                    const packageNames = {'dry': 'Dry Hire', 'av': 'With AV', 'piano': 'With Piano', 'av-piano': 'With AV & Piano'};
-                    description = `${venue} - ${packageNames[selectedPackage]} (${days.join(', ')})`;
-                    
-                    addQuoteItem('venue', description, unitPrice, quantity, false, false);
-                    
+                    const pkg = document.querySelector('input[name="workshop-package"]:checked').value;
+                    let rate = workshopPackageRates[venue][pkg];
+                    if (hireType !== 'Standard Rate') rate *= 0.5;
+                    unitPrice = rate; quantity = dayCount; desc = `${venue} - ${pkg} (${days.join(', ')})`;
+                    addQuoteItem('venue', desc, unitPrice, quantity);
+                } else if (isWhole || venue.includes('Practice')) {
+                    unitPrice = venueRates[venue][hireType]; quantity = dayCount; desc = `${venue} (${days.join(', ')})`;
+                    addQuoteItem('venue', desc, unitPrice, quantity);
                 } else {
-                     // --- Standard Venue Logic ---
-                    const rate = venueRates[venue][hireType];
+                    const start = document.getElementById('start-time').value;
+                    const end = document.getElementById('end-time').value;
+                    const duration = calculateDuration(start, end);
+                    if (duration < MIN_HOURS) return alert(`Minimum ${MIN_HOURS} hours.`);
+                    unitPrice = venueRates[venue][hireType]; quantity = duration * dayCount;
+                    desc = `${venue} (${duration.toFixed(2)}h x ${dayCount} days)`;
+                    addQuoteItem('venue', desc, unitPrice, quantity);
                     
-                    if (isWholeBuilding) {
-                        unitPrice = rate;
-                        quantity = dayCount; // Daily rate
-                        description = `${venue} - ${hireType} (${days.join(', ')})`;
-                    } else if (isPracticeRoom) {
-                        unitPrice = rate;
-                        quantity = dayCount; // Assume daily rate for simplicity, or change if hourly
-                        description = `${venue} - ${hireType} (${days.join(', ')})`;
-                        // Note: If practice rooms are hourly, we need to re-enable time fields for them
-                    } else {
-                        unitPrice = rate;
-                        quantity = duration * dayCount; // Hourly rate
-                        description = `${venue} - ${hireType} (${duration.toFixed(2)} hrs x ${dayCount} days on ${days.join(', ')})`;
-                    }
-                    addQuoteItem('venue', description, unitPrice, quantity, false, isWholeBuilding);
+                    const surcharge = calculateSurcharge(start, end, days);
+                    if (surcharge > 0) addQuoteItem('tech', 'After-Hours Surcharge', AFTER_HOURS_SURCHARGE, surcharge * dayCount);
                 }
 
-                // Add Equipment Items (per day)
-                const equipmentInputs = document.querySelectorAll('.equipment');
-                equipmentInputs.forEach(input => {
-                    const techGroup = input.closest('.form-group');
-                    // Only add if the item is visible (not hidden by workshop logic)
-                    if (techGroup.style.display !== 'none') {
-                        let quantity = parseFloat(input.value) || 0;
-                        if (quantity > 0) {
-                            const rateKey = input.id;
-                            const unitPrice = equipmentRates[rateKey];
-                            const description = input.dataset.name;
-                            
-                            // Special handling for technician hours
-                            if (rateKey === 'technician-hours') {
-                                if (quantity > 0 && quantity < TECHNICIAN_MIN_HOURS) {
-                                    quantity = TECHNICIAN_MIN_HOURS; // Enforce minimum
-                                }
-                                // Technician hours are not per day, just total
-                                addQuoteItem('tech', description, unitPrice, quantity, true, false);
-                            } else {
-                                // All other equipment is (items * days)
-                                addQuoteItem('tech', description, unitPrice, quantity * dayCount, true, false);
-                            }
-                        }
+                document.querySelectorAll('.equipment').forEach(input => {
+                    if (input.closest('.form-group').style.display !== 'none' && input.value > 0) {
+                        let qty = parseFloat(input.value);
+                        if (input.id === 'technician-hours' && qty < 4) qty = 4;
+                        const finalQty = input.id === 'technician-hours' ? qty : qty * dayCount;
+                        addQuoteItem('tech', input.dataset.name, equipmentRates[input.id], finalQty);
                     }
                 });
-                
-                // Add After-Hours Surcharge (if not whole building/workshop/practice)
-                if (!isWholeBuilding && !isWorkshop && !isPracticeRoom) {
-                    const surchargeHours = calculateSurcharge(startTime, endTime, days);
-                    if (surchargeHours > 0) {
-                        const surchargeTotalHours = surchargeHours * dayCount;
-                        addQuoteItem('tech', 'After-Hours Surcharge', AFTER_HOURS_SURCHARGE, surchargeTotalHours, true, false);
-                    }
-                }
-
                 renderQuoteTable();
             });
-            
-            function addQuoteItem(group, description, unitPrice, quantity, isTech, isWholeBuilding) {
-                const total = unitPrice * quantity;
-                const quoteItem = {
-                    id: Date.now() + Math.random(), // Unique ID
-                    group,
-                    description,
-                    unitPrice,
-                    quantity,
-                    total,
-                    isTech,
-                    isWholeBuilding
-                };
-                quoteItems.push(quoteItem);
+
+            function addQuoteItem(group, description, unitPrice, quantity) {
+                quoteItems.push({ id: Date.now() + Math.random(), group, description, unitPrice, quantity, total: unitPrice * quantity });
             }
 
-            // Function to parse time and calculate duration in hours
-            function calculateDuration(start, end) {
-                const [startH, startM] = start.split(':').map(Number);
-                const [endH, endM] = end.split(':').map(Number);
-                const startDate = new Date(0, 0, 0, startH, startM);
-                let endDate = new Date(0, 0, 0, endH, endM);
-                if (endDate < startDate) {
-                    endDate.setDate(endDate.getDate() + 1);
-                }
-                const diffMs = endDate - startDate;
-                return diffMs / (1000 * 60 * 60); // Convert milliseconds to hours
-            }
-            
-            // Function to calculate after-hours surcharge
-            function calculateSurcharge(start, end, days) {
-                const [startH, startM] = start.split(':').map(Number);
-                const [endH, endM] = end.split(':').map(Number);
-                let totalSurchargeHours = 0;
-                days.forEach(day => {
-                    const isWeekend = (day === 'Sat' || day === 'Sun');
-                    const regularStart = 8;
-                    const regularEnd = isWeekend ? 19 : 23;
-                    const bookingStart = startH + startM / 60;
-                    let bookingEnd = endH + endM / 60;
-                    if (bookingEnd < bookingStart) {
-                        bookingEnd += 24; 
-                    }
-                    if (bookingStart < regularStart) {
-                        totalSurchargeHours += (regularStart - bookingStart);
-                    }
-                    if (bookingEnd > regularEnd) {
-                        totalSurchargeHours += (bookingEnd - regularEnd);
-                    }
-                });
-                // Return average surcharge hours per day
-                return totalSurchargeHours > 0 ? totalSurchargeHours / days.length : 0;
-            }
-            
-            function showMessage(message, type = 'warning') {
-                quoteMessageBar.textContent = message;
-                quoteMessageBar.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d1ecf1';
-                quoteMessageBar.style.color = type === 'error' ? '#721c24' : '#0c5460';
-                quoteMessageBar.style.border = type === 'error' ? '1px solid #f5c6cb' : '1px solid #bee5eb';
-                quoteMessageBar.style.display = 'block';
-            }
-            
-            function hideMessage() {
-                quoteMessageBar.style.display = 'none';
-            }
-
-            // Function to render the entire quote table
             function renderQuoteTable() {
                 quoteBody.innerHTML = '';
-                let venueTotal = 0;
-                let techTotal = 0;
-                let staffTotal = 0;
-                let percussionTotal = 0;
+                let vTotal = 0, tTotal = 0;
                 
-                const groups = {
-                    venue: { items: [], total: 0, header: 'Venue Hire' },
-                    tech: { items: [], total: 0, header: 'Technical Hire' },
-                    staff: { items: [], total: 0, header: 'Staffing Costs' },
-                    percussion: { items: [], total: 0, header: 'Percussion Hire' }
-                };
-
-                // Group items
                 quoteItems.forEach(item => {
-                    if (groups[item.group]) {
-                        groups[item.group].items.push(item);
-                        groups[item.group].total += item.total;
-                    }
+                    if(item.group === 'venue') vTotal += item.total;
+                    if(item.group === 'tech') tTotal += item.total;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${item.description}</td><td style="text-align:right">${item.unitPrice.toFixed(2)}</td><td style="text-align:right">${item.quantity.toFixed(2)}</td><td style="text-align:right"><strong>${item.total.toFixed(2)}</strong></td><td class="remove-col"><button class="remove-btn" data-id="${item.id}">X</button></td>`;
+                    quoteBody.appendChild(row);
                 });
 
-                // Render each group
-                Object.values(groups).forEach(group => {
-                    if (group.items.length > 0) {
-                        // Add group header
-                        const headerRow = document.createElement('tr');
-                        headerRow.className = 'group-header-row';
-                        headerRow.innerHTML = `<td colspan="5">${group.header}</td>`;
-                        quoteBody.appendChild(headerRow);
-                        
-                        // Add group items
-                        group.items.forEach(item => {
-                            const row = document.createElement('tr');
-                            
-                            // Admin Mode: Editable Total, Auto-Updating Unit Price
-                            let totalCell, unitPriceCell;
-                            if (isAdmin) {
-                                unitPriceCell = `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
-                                totalCell = `<td style="text-align: right;"><input type="number" class="admin-editable-total" data-id="${item.id}" value="${item.total.toFixed(2)}" min="0" step="0.01"></td>`;
-                            } else {
-                                unitPriceCell = `<td style="text-align: right;">${item.unitPrice.toFixed(2)}</td>`;
-                                totalCell = `<td style="text-align: right;"><strong>${item.total.toFixed(2)}</strong></td>`;
-                            }
-                            
-                            row.innerHTML = `
-                                <td>${item.description}</td>
-                                ${unitPriceCell}
-                                <td style="text-align: right;">${item.quantity.toFixed(2)}</td>
-                                ${totalCell}
-                                <td class="remove-col"><button class="remove-btn" data-id="${item.id}">X</button></td>
-                            `;
-                            quoteBody.appendChild(row);
-                        });
-                    }
-                });
-                
-                // Update Subtotals
-                venueSubtotalEl.textContent = `£${groups.venue.total.toFixed(2)}`;
-                techSubtotalEl.textContent = `£${groups.tech.total.toFixed(2)}`;
-                staffingSubtotalEl.textContent = `£${groups.staff.total.toFixed(2)}`;
-                percussionSubtotalEl.textContent = `£${groups.percussion.total.toFixed(2)}`;
-                
-                // Show/Hide subtotal rows if they have value
-                staffingSubtotalRow.style.display = (groups.staff.total > 0 && isAdmin) ? 'flex' : 'none';
-                percussionSubtotalRow.style.display = (groups.percussion.total > 0 && isAdmin) ? 'flex' : 'none';
-                
-                const currentSubtotal = groups.venue.total + groups.tech.total + groups.staff.total + groups.percussion.total;
-                const vat = currentSubtotal * VAT_RATE;
-                const grandTotal = currentSubtotal + vat;
+                document.getElementById('venue-subtotal').textContent = `£${vTotal.toFixed(2)}`;
+                document.getElementById('tech-subtotal').textContent = `£${tTotal.toFixed(2)}`;
+                const sub = vTotal + tTotal;
+                document.getElementById('combined-subtotal').textContent = `£${sub.toFixed(2)}`;
+                document.getElementById('combined-vat').textContent = `£${(sub * VAT_RATE).toFixed(2)}`;
+                document.getElementById('combined-grand-total').textContent = `£${(sub * 1.2).toFixed(2)}`;
 
-                combinedSubtotalEl.textContent = `£${currentSubtotal.toFixed(2)}`;
-                combinedVatEl.textContent = `£${vat.toFixed(2)}`;
-                combinedGrandTotalEl.textContent = `£${grandTotal.toFixed(2)}`;
-                
-                addRemoveListeners();
-                if (isAdmin) {
-                    addAdminInputListeners();
-                }
+                document.querySelectorAll('.remove-btn').forEach(btn => btn.addEventListener('click', e => {
+                    quoteItems = quoteItems.filter(i => i.id !== parseFloat(e.target.dataset.id));
+                    renderQuoteTable();
+                }));
             }
 
-            // Function to add listeners to all "remove" buttons
-            function addRemoveListeners() {
-                document.querySelectorAll('.remove-btn').forEach(button => {
-                    button.removeEventListener('click', handleRemoveClick);
-                    button.addEventListener('click', handleRemoveClick);
+            // Helpers
+            function calculateDuration(s, e) {
+                const [sh, sm] = s.split(':').map(Number); const [eh, em] = e.split(':').map(Number);
+                let end = new Date(0,0,0,eh,em); if(end < new Date(0,0,0,sh,sm)) end.setDate(end.getDate()+1);
+                return (end - new Date(0,0,0,sh,sm)) / 36e5;
+            }
+            function calculateSurcharge(s, e, days) {
+                const [sh, sm] = s.split(':').map(Number); const [eh, em] = e.split(':').map(Number);
+                let total = 0;
+                days.forEach(d => {
+                    const regEnd = (d==='Sat'||d==='Sun') ? 19 : 23;
+                    const start = sh+sm/60; let end = eh+em/60; if(end<start) end+=24;
+                    if(start < 8) total += (8-start);
+                    if(end > regEnd) total += (end-regEnd);
                 });
+                return total > 0 ? total/days.length : 0;
             }
-            
-            function handleRemoveClick(e) {
-                const idToRemove = parseFloat(e.target.getAttribute('data-id'));
-                quoteItems = quoteItems.filter(item => item.id !== idToRemove);
-                renderQuoteTable();
-            }
-            
-            // NEW: Function to add listeners for admin inputs
-            function addAdminInputListeners() {
-                document.querySelectorAll('.admin-editable-total').forEach(input => {
-                    input.removeEventListener('change', handleAdminTotalChange);
-                    input.addEventListener('change', handleAdminTotalChange);
-                });
-            }
-            
-            function handleAdminTotalChange(e) {
-                const idToUpdate = parseFloat(e.target.dataset.id);
-                const newTotal = parseFloat(e.target.value) || 0;
-                
-                const item = quoteItems.find(item => item.id === idToUpdate);
-                if (item) {
-                    item.total = newTotal;
-                    // Auto-update unit price
-                    if (item.quantity !== 0) {
-                        item.unitPrice = newTotal / item.quantity;
-                    }
-                }
-                renderQuoteTable(); // Re-render to update unit price and totals
-            }
-            
-            // --- PDF & Email Logic ---
-            const downloadPdfBtn = document.getElementById('download-pdf-btn');
-            const emailBtn = document.getElementById('email-btn');
-            
-            downloadPdfBtn.addEventListener('click', () => {
-                const quoteContainer = document.getElementById('quote-summary-container');
-                const notes = notesTextarea.value.trim();
-                
-                // Add a temporary notes element for the PDF
-                let notesEl = null;
-                if (notes) {
-                    notesEl = document.createElement('div');
-                    notesEl.style.padding = '20px';
-                    notesEl.style.border = '1px solid var(--border-color)';
-                    notesEl.style.borderRadius = 'var(--border-radius)';
-                    notesEl.style.marginBottom = '20px';
-                    notesEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-                    notesEl.innerText = `Quote Notes:\n\n${notes}`;
-                    quoteContainer.prepend(notesEl);
-                }
-                
-                // Add 'printing' class to hide elements
-                quoteContainer.classList.add('printing');
-                
-                html2canvas(quoteContainer).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
+
+            // PDF & Email
+            document.getElementById('download-pdf-btn').addEventListener('click', () => {
+                const el = document.getElementById('quote-summary-container');
+                el.classList.add('printing');
+                html2canvas(el).then(canvas => {
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-                    const pdfHeight = (canvasHeight * pdfWidth) / canvasWidth;
-                    
-                    pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
-                    pdf.save(`rbc-quote-${combinedGrandTotalEl.textContent}.pdf`);
-                    
-                    // Clean up
-                    quoteContainer.classList.remove('printing');
-                    if (notesEl) {
-                        quoteContainer.removeChild(notesEl);
-                    }
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, (canvas.height*190)/canvas.width);
+                    pdf.save('quote.pdf');
+                    el.classList.remove('printing');
                 });
             });
-            
-            emailBtn.addEventListener('click', () => {
-                const email = 'conservatoireevents@bcu.ac.uk';
-                const subject = 'New Venue Hire Quote Request';
-                const notes = notesTextarea.value.trim();
-                
-                let body = 'Hello Conservatoire Events Team,\n\nPlease see the generated quote details below:\n\n';
-                
-                if (notes) {
-                    body += `--- NOTES ---\n${notes}\n---------------\n\n`;
-                }
-                
-                // Group items for email body
-                const groups = {
-                    venue: { items: [], total: 0, header: '--- Venue Hire ---' },
-                    tech: { items: [], total: 0, header: '--- Technical Hire ---' },
-                    staff: { items: [], total: 0, header: '--- Staffing Costs ---' },
-                    percussion: { items: [], total: 0, header: '--- Percussion Hire ---' }
-                };
-                quoteItems.forEach(item => {
-                    if (groups[item.group]) groups[item.group].items.push(item);
-                });
 
-                Object.values(groups).forEach(group => {
-                    if (group.items.length > 0) {
-                        body += `${group.header}\n`;
-                        group.items.forEach(item => {
-                            body += `Item: ${item.description}\n`;
-                            body += `Price: £${item.unitPrice.toFixed(2)}\n`;
-                            body += `Qty/Hrs: ${item.quantity.toFixed(2)}\n`;
-                            body += `Total: £${item.total.toFixed(2)}\n\n`;
-                        });
-                    }
-                });
-                
-                // Add totals
-                body += `\n--- TOTALS ---\n`;
-                body += `Venue Subtotal: ${venueSubtotalEl.textContent}\n`;
-                body += `Tech Subtotal: ${techSubtotalEl.textContent}\n`;
-                if (groups.staff.items.length > 0) body += `Staffing Subtotal: ${staffingSubtotalEl.textContent}\n`;
-                if (groups.percussion.items.length > 0) body += `Percussion Subtotal: ${percussionSubtotalEl.textContent}\n`;
-                body += `\nCOMBINED SUBTOTAL: ${combinedSubtotalEl.textContent}\n`;
-                body += `VAT (20%): ${combinedVatEl.textContent}\n`;
-                body += `GRAND TOTAL: ${combinedGrandTotalEl.textContent}\n`;
-                body += `\nDisclaimer: This is a generated quote and is subject to review.\n`;
-                
-                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailtoLink;
-            });
-
-
-            // --- 4. Staffing Cost Logic (Admin Only) ---
-            const addStaffBtn = document.getElementById('add-staff-to-quote-btn');
-            const staffingBody = document.getElementById('staffing-timesheet-body');
-            
-            // Auto-calculate on input
-            staffingBody.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', calculateStaffingSubtotals);
-            });
-
-            function calculateStaffingSubtotals() {
-                staffingBody.querySelectorAll('.staff-row').forEach(row => {
-                    const rate = parseFloat(row.dataset.rate);
-                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
-                });
-                staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
-                    const rate = parseFloat(row.querySelector('.custom-rate').value) || 0;
-                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * hours).toFixed(2)}`;
-                });
-            }
-            
-            addStaffBtn.addEventListener('click', () => {
-                // Add standard staff
-                staffingBody.querySelectorAll('.staff-row').forEach(row => {
-                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    if (hours > 0 && quantity > 0) {
-                        const description = row.cells[0].textContent;
-                        const unitPrice = parseFloat(row.dataset.rate);
-                        addQuoteItem('staff', description, unitPrice, hours * quantity, true, false);
-                    }
-                });
-                // Add custom staff
-                staffingBody.querySelectorAll('.staff-row-custom').forEach(row => {
-                    const description = row.querySelector('.custom-role').value.trim();
-                    const unitPrice = parseFloat(row.querySelector('.custom-rate').value) || 0;
-                    const quantity = parseFloat(row.querySelector('.staff-quantity').value) || 0;
-                    const hours = parseFloat(row.querySelector('.staff-hours').value) || 0;
-                    if (description && hours > 0 && quantity > 0 && unitPrice > 0) {
-                        addQuoteItem('staff', description, unitPrice, hours * quantity, true, false);
-                    }
-                });
-                renderQuoteTable();
-                showMessage('Staffing costs added to main quote.');
-            });
-
-            // --- 5. Percussion Hire Logic (Admin Only) ---
-            const addPercussionBtn = document.getElementById('add-percussion-to-quote-btn');
-            const percussionBody = document.getElementById('percussion-timesheet-body');
-            
-            // Inflation-adjusted rates
-            const percussionRates = {
-                'Bass Drum': 41.94, 'Bell Tree': 22.37, 'Bongos': 22.37, 'Celeste': 83.85,
-                'Clash Cymbals': 27.95, 'Concert Toms (per tom)': 12.58, 'Congas (per conga)': 19.57,
-                'Crotales (per octave)': 25.16, 'Drum Kit': 83.85, 'Glockenspiel': 30.75,
-                'Hi Hats': 25.16, 'Marimba (4.3)': 67.08, 'Marimba (5 octave)': 139.76,
-                'Mark Tree': 20.97, 'Snare Drum': 25.16, 'Suspended Cymbal': 16.77,
-                'Temple Blocks (set of 5)': 25.16, 'Timbales (pair)': 44.71, 'Timpani (per timp)': 55.90,
-                'Trap Tray': 9.79, 'Tubular Bells': 53.11, 'Vibraphone': 48.92, 'Xylophone': 39.13,
-                'Tam tam': 30.75
-            };
-
-            // Populate percussion table
-            Object.entries(percussionRates).forEach(([name, rate]) => {
-                const row = document.createElement('tr');
-                row.className = 'percussion-row';
-                row.dataset.rate = rate;
-                row.innerHTML = `
-                    <td>${name}</td>
-                    <td class="rate-cell">${rate.toFixed(2)}</td>
-                    <td><input type="number" class="perc-quantity" value="0" min="0" step="1"></td>
-                    <td><input type="number" class="perc-days" value="0" min="0" step="1"></td>
-                    <td class="row-cost">£0.00</td>
-                `;
-                percussionBody.appendChild(row);
-            });
-            
-            // Auto-calculate on input
-            percussionBody.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', calculatePercussionSubtotals);
-            });
-
-            function calculatePercussionSubtotals() {
-                percussionBody.querySelectorAll('.percussion-row').forEach(row => {
-                    const rate = parseFloat(row.dataset.rate);
-                    const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
-                    const days = parseFloat(row.querySelector('.perc-days').value) || 0;
-                    row.querySelector('.row-cost').textContent = `£${(rate * quantity * days).toFixed(2)}`;
-                });
-            }
-            
-            addPercussionBtn.addEventListener('click', () => {
-                percussionBody.querySelectorAll('.percussion-row').forEach(row => {
-                    const quantity = parseFloat(row.querySelector('.perc-quantity').value) || 0;
-                    const days = parseFloat(row.querySelector('.perc-days').value) || 0;
-                    if (days > 0 && quantity > 0) {
-                        const description = row.cells[0].textContent;
-                        const unitPrice = parseFloat(row.dataset.rate);
-                        addQuoteItem('percussion', description, unitPrice, quantity * days, true, false);
-                    }
-                });
-                renderQuoteTable();
-                showMessage('Percussion hire added to main quote.');
-            });
-
-
-            // --- 6. Modal & Gallery Logic ---
+            // Modal & Gallery Logic
             const venueDetails = {
-                'Bradshaw Hall': {
-                    title: 'Bradshaw Hall',
-                    capacity: 'Capacity: 440+',
-                    description: 'A premier concert hall acoustically modelled to optimize the experience for performers and audiences. The hall has a raised platform stage with three retractable risers and is large enough for a full symphony orchestra.',
-                    image: `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/bradshaw-hall',
-                    gallery: [
-                        `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg`,
-                        `${baseURL}bradshaw/rb_RBC-Music---Jazz_30933.jpg`,
-                        `${baseURL}bradshaw/rb_RBC-Music_30995.jpg`,
-                        `${baseURL}bradshaw/rb_RBC-Music_30998.jpg`,
-                        `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11160.jpg`,
-                        `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11166.jpg`,
-                        `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11169.jpg`,
-                        `${baseURL}bradshaw/rb_Royal-Birmingham-Conservatoire_11095.jpg`
-                    ]
-                },
-                'Recital Hall': {
-                    title: 'Recital Hall',
-                    capacity: 'Capacity: 146-200',
-                    description: 'An intimate, flexible space with a floor-level stage, variable acoustics, and retractable seating. Ideal for music concerts, dance, drama, and talks.',
-                    image: `${baseURL}recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/recital-hall',
-                    gallery: [
-                        `${baseURL}recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg`,
-                        `${baseURL}recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11142.jpg`,
-                        `${baseURL}recital/rb_Royal-Birmingham-Conservatoire_11107.jpg`,
-                        `${baseURL}recital/rb_Royal-Birmingham-Conservatoire_11108.jpg`
-                    ]
-                },
-                'Eastside Jazz Club': {
-                    title: 'Eastside Jazz Club',
-                    capacity: 'Capacity: 60-100',
-                    description: "Birmingham's only dedicated Jazz venue, designed for a quintessential, cosy club atmosphere. Features low-level mood lighting and cabaret seating.",
-                    image: `${baseURL}jazz/rb_RBC-Music---Jazz_30928.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club',
-                    gallery: [
-                        `${baseURL}jazz/rb_RBC-Music---Jazz_30928.jpg`,
-                        `${baseURL}jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11138.jpg`,
-                        `${baseURL}jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11139.jpg`,
-                        `${baseURL}jazz/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11140.jpg`
-                    ]
-                },
-                'The Lab': {
-                    title: 'The Lab',
-                    capacity: 'Capacity: 100',
-                    description: 'A cutting-edge, completely flexible black-box studio for art performances, theatre, and experimental music. Features a technical walkway and a 10.2 surround sound system.',
-                    image: `${baseURL}lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-lab',
-                    gallery: [
-                        `${baseURL}lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg`,
-                        `${baseURL}lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11123.jpg`
-                    ]
-                },
-                'The Organ Studio': {
-                    title: 'The Organ Studio',
-                    capacity: 'Capacity: 80',
-                    description: 'A light and airy venue with a Eule Pipe organ, suited to chamber music and organ recitals. The venue has a distinctive shape and tranquil atmosphere.',
-                    image: `${baseURL}organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-organ-studio',
-                    gallery: [
-                        `${baseURL}organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg`,
-                        `${baseURL}organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11173.jpg`,
-                        `${baseURL}organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11174.jpg`
-                    ]
-                },
-                'Workshop Space': { // This is the modal for the single "Workshops" tile
-                    title: 'Workshops / Studios',
-                    capacity: 'Capacity: 30-60',
-                    description: 'Eight flexible performance studios designed to the highest standards for rehearsals, workshops, and intimate performances. Each studio has a timber hardwood floor, grand piano, and B&W surround sound.',
-                    image: `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg`,
-                    link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/performance-studios',
-                    gallery: [
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11154.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11155.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11156.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11157.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire_11106.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11150.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11151.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11152.jpg`,
-                        `${baseURL}workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11153.jpg`
-                    ]
-                },
-                'Practice Room (Grand Piano)': {
-                    title: 'Practice Room (Grand)',
-                    capacity: 'N/A',
-                    description: 'Standard practice room equipped with a grand piano. Priced per room, per day.',
-                    image: `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23555.jpg`, // Placeholder
-                    link: '',
-                    gallery: []
-                },
-                'Practice Room (Upright Piano)': {
-                    title: 'Practice Room (Upright)',
-                    capacity: 'N/A',
-                    description: 'Standard practice room equipped with an upright piano. Priced per room, per day.',
-                    image: `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23556.jpg`, // Placeholder
-                    link: '',
-                    gallery: []
-                }
+                'Bradshaw Hall': { title: 'Bradshaw Hall', capacity: '440+', desc: 'Premier concert hall.', img: 'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/bradshaw-hall' },
+                'Recital Hall': { title: 'Recital Hall', capacity: '146-200', desc: 'Intimate flexible space.', img: 'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/recital-hall' },
+                'Eastside Jazz Club': { title: 'Eastside Jazz Club', capacity: '60-100', desc: 'Dedicated Jazz venue.', img: 'jazz/rb_RBC-Music---Jazz_30928.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/eastside-jazz-club' },
+                'The Lab': { title: 'The Lab', capacity: '100', desc: 'Black-box studio.', img: 'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-lab' },
+                'The Organ Studio': { title: 'The Organ Studio', capacity: '80', desc: 'Pipe organ venue.', img: 'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/the-organ-studio' },
+                'Workshop Space': { title: 'Workshops', capacity: '30-60', desc: 'Flexible studios.', img: 'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg', link: 'https://www.bcu.ac.uk/conservatoire/hire/venues/performance-studios' }
             };
-            
-            // --- Global Gallery Image List ---
-            const globalGalleryImages = [
-                ...venueDetails['Bradshaw Hall'].gallery,
-                ...venueDetails['Recital Hall'].gallery,
-                ...venueDetails['Eastside Jazz Club'].gallery,
-                ...venueDetails['The Lab'].gallery,
-                ...venueDetails['The Organ Studio'].gallery,
-                ...venueDetails['Workshop Space'].gallery,
-                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23555.jpg`,
-                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23556.jpg`,
-                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire-interior_23557.jpg`,
-                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire_11104.jpg`,
-                `${baseURL}venue/rb_Royal-Birmingham-Conservatoire_11105.jpg`,
-                `${baseURL}venue/rb_The-Conservatoire's-logo-Outside_32065.jpg`
-            ];
-            
-            // --- Lightbox Modal ---
+
+            const modal = document.getElementById('venue-modal');
             const lightbox = document.getElementById('lightbox-overlay');
             const lightboxImg = document.getElementById('lightbox-image');
-            const lightboxClose = document.getElementById('lightbox-close');
-            const lightboxPrev = document.getElementById('lightbox-prev');
-            const lightboxNext = document.getElementById('lightbox-next');
-            
-            let currentLightboxGallery = [];
-            let currentLightboxIndex = 0;
-            
-            function openLightbox(imgUrl, galleryArray) {
-                currentLightboxGallery = galleryArray;
-                currentLightboxIndex = currentLightboxGallery.indexOf(imgUrl);
-                
-                lightboxImg.src = imgUrl;
-                lightbox.classList.add('show');
-                updateLightboxArrows();
-            }
-            
-            function closeLightbox() {
-                lightbox.classList.remove('show');
-                setTimeout(() => { lightboxImg.src = ''; }, 300);
-            }
-            
-            function updateLightboxArrows() {
-                lightboxPrev.style.display = (currentLightboxIndex > 0) ? 'block' : 'none';
-                lightboxNext.style.display = (currentLightboxIndex < currentLightboxGallery.length - 1) ? 'block' : 'none';
-            }
-            
-            function showPrevImage() {
-                if (currentLightboxIndex > 0) {
-                    currentLightboxIndex--;
-                    lightboxImg.src = currentLightboxGallery[currentLightboxIndex];
-                    updateLightboxArrows();
-                }
-            }
-            
-            function showNextImage() {
-                 if (currentLightboxIndex < currentLightboxGallery.length - 1) {
-                    currentLightboxIndex++;
-                    lightboxImg.src = currentLightboxGallery[currentLightboxIndex];
-                    updateLightboxArrows();
-                }
-            }
-            
-            lightbox.addEventListener('click', (e) => {
-                if (e.target === lightbox) closeLightbox();
-            });
-            lightboxClose.addEventListener('click', closeLightbox);
-            lightboxPrev.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showPrevImage();
-            });
-            lightboxNext.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showNextImage();
-            });
 
-            // --- Venue Modal (Pop-up) ---
-            const venueModal = document.getElementById('venue-modal');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
-            const modalTitle = document.getElementById('modal-title');
-            const modalCapacity = document.getElementById('modal-capacity');
-            const modalDescription = document.getElementById('modal-description');
-            const modalMainImage = document.getElementById('modal-main-image');
-            const modalLink = document.getElementById('modal-link');
-            const modalThumbnailContainer = document.getElementById('modal-thumbnail-container');
-            
-            let currentModalGallery = [];
-            
-            modalMainImage.addEventListener('click', () => {
-                openLightbox(modalMainImage.src, currentModalGallery);
-            });
-            
-            document.querySelectorAll('.venue-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const venueName = card.dataset.venue;
-                    const detailsKey = venueName.includes('Workshop') ? 'Workshop Space' : venueName;
-                    const details = venueDetails[detailsKey];
-                    
-                    if (details) {
-                        modalTitle.textContent = venueName.includes('Workshop') ? venueName : details.title;
-                        modalCapacity.textContent = details.capacity;
-                        modalDescription.textContent = details.description;
-                        
-                        modalLink.href = details.link;
-                        modalLink.style.display = details.link ? 'inline-block' : 'none';
-                        
-                        modalMainImage.src = details.image;
-                        modalMainImage.alt = details.title;
-                        
-                        modalThumbnailContainer.innerHTML = '';
-                        currentModalGallery = [details.image];
-                        
-                        if (details.gallery && details.gallery.length > 0) {
-                            details.gallery.forEach(imgUrl => {
-                                if (imgUrl !== details.image) {
-                                    currentModalGallery.push(imgUrl);
-                                }
-                            });
-                        }
-                        
-                        // Create thumbnails
-                        currentModalGallery.forEach((imgUrl, index) => {
-                            const thumbDiv = document.createElement('div');
-                            thumbDiv.className = 'thumbnail';
-                            if (index === 0) thumbDiv.classList.add('active');
-                            
-                            const thumbImg = document.createElement('img');
-                            thumbImg.src = imgUrl;
-                            thumbImg.alt = `${details.title} thumbnail ${index + 1}`;
-                            thumbDiv.appendChild(thumbImg);
-                            
-                            thumbDiv.addEventListener('click', () => {
-                                modalMainImage.src = imgUrl;
-                                modalThumbnailContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-                                thumbDiv.classList.add('active');
-                            });
-                            
-                            modalThumbnailContainer.appendChild(thumbDiv);
-                        });
-                        
-                        venueModal.style.display = 'flex';
-                    }
-                });
-            });
-
-            function closeModal() {
-                venueModal.style.display = 'none';
-            }
-
-            modalCloseBtn.addEventListener('click', closeModal);
-            venueModal.addEventListener('click', (e) => {
-                if (e.target === venueModal) closeModal();
-            });
-            
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeModal();
-                    closeLightbox();
-                    closePasswordModal();
+            document.querySelectorAll('.venue-card').forEach(card => card.addEventListener('click', () => {
+                const d = venueDetails[card.dataset.venue];
+                if(d) {
+                    document.getElementById('modal-title').textContent = d.title;
+                    document.getElementById('modal-main-image').src = baseURL + d.img;
+                    document.getElementById('modal-capacity').textContent = 'Capacity: ' + d.capacity;
+                    document.getElementById('modal-description').textContent = d.desc;
+                    document.getElementById('modal-link').href = d.link;
+                    modal.style.display = 'flex';
                 }
-                
-                if (lightbox.classList.contains('show')) {
-                    if (e.key === 'ArrowLeft') showPrevImage();
-                    else if (e.key === 'ArrowRight') showNextImage();
-                }
-            });
-            
-            // --- Populate Global Gallery ---
-            const globalGalleryScroll = document.getElementById('global-gallery-scroll');
-            const uniqueImageUrls = [...new Set(globalGalleryImages)];
-            
-            uniqueImageUrls.forEach(imgUrl => {
-                const thumbDiv = document.createElement('div');
-                thumbDiv.className = 'global-thumbnail';
-                
-                const thumbImg = document.createElement('img');
-                thumbImg.src = imgUrl;
-                thumbImg.alt = 'Venue Gallery Image';
-                thumbDiv.appendChild(thumbImg);
-                
-                thumbDiv.addEventListener('click', () => {
-                    openLightbox(imgUrl, uniqueImageUrls);
-                });
-                
-                globalGalleryScroll.appendChild(thumbDiv);
-            });
+            }));
 
+            document.getElementById('modal-close-btn').addEventListener('click', () => modal.style.display = 'none');
+            window.onclick = e => { if(e.target == modal) modal.style.display = 'none'; if(e.target == lightbox) lightbox.style.display = 'none'; };
+            document.getElementById('lightbox-close').addEventListener('click', () => lightbox.style.display = 'none');
+            document.getElementById('modal-main-image').addEventListener('click', e => {
+                lightboxImg.src = e.target.src;
+                lightbox.style.display = 'flex';
+            });
+            
+            // Populate Global Gallery
+            const galleryImages = [
+                'bradshaw/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11162.jpg',
+                'recital/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11141.jpg',
+                'jazz/rb_RBC-Music---Jazz_30928.jpg',
+                'lab/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11122.jpg',
+                'organ/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11172.jpg',
+                'workshop/rb_Royal-Birmingham-Conservatoire-building-opening-shots_11149.jpg'
+            ];
+            galleryImages.forEach(img => {
+                const div = document.createElement('div'); div.className = 'global-thumbnail';
+                const i = document.createElement('img'); i.src = baseURL + img;
+                div.appendChild(i);
+                div.onclick = () => { lightboxImg.src = i.src; lightbox.style.display = 'flex'; };
+                document.getElementById('global-gallery-scroll').appendChild(div);
+            });
         });
     </script>
-
 </body>
 </html>
